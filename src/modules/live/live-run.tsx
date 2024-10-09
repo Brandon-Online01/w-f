@@ -13,9 +13,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { User, Trash2, ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown, EllipsisVerticalIcon, TrendingUpDownIcon } from "lucide-react"
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import testImage from '../../shared/assets/logo/waresense.png'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
+import { imagePathGenerator } from '@/utils/image-paths'
 
 type Machine = {
     uid: number;
@@ -253,11 +253,10 @@ export default function LiveRun() {
     const [filteredMachines, setFilteredMachines] = useState<Machine[]>([])
     // Update the initial state
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: null })
-    const [loading, setLoading] = useState(true)
     const [dialogOpen, setDialogOpen] = useState(false)
     const [dialogContent, setDialogContent] = useState<React.ReactNode | null>(null)
 
-    const { data: liveRunData, error, isLoading } = useQuery({
+    const { data: liveRunData, isLoading } = useQuery({
         queryKey: ['getMachineData'],
         queryFn: getMachineData,
         refetchInterval: 5000,
@@ -268,7 +267,6 @@ export default function LiveRun() {
     setTimeout(() => {
         if (liveRunData?.data) {
             setMachineData(liveRunData?.data)
-            setLoading(false)
         }
     }, 1500)
 
@@ -460,7 +458,7 @@ export default function LiveRun() {
                                                         <TableCell className="text-center">{machine.machine.name}</TableCell>
                                                         <TableCell className="text-center">
                                                             <div className="flex flex-col items-center">
-                                                                {/* <Image src={machine.component.photoURL} alt={machine.component.name} width={30} height={30} className="rounded-md" /> */}
+                                                                <Image src={imagePathGenerator(machine.component?.photoURL)} alt={machine.component.name} width={30} height={30} className="rounded-md" />
                                                                 <span className="text-sm mt-1">{machine.component.name}</span>
                                                             </div>
                                                         </TableCell>

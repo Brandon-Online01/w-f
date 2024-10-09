@@ -221,13 +221,18 @@ export function MaterialUsageChart() {
                                     tickLine={true}
                                 />
                                 <YAxis
-                                    label={{ value: 'weight', angle: -90, position: 'insideLeft' }}
+                                    label={{ value: 'WEIGHT', angle: -90, position: 'insideLeft' }}
                                     axisLine={true}
                                     tickLine={true}
                                     tick={{
                                         fontSize: 10,
+                                        fontStyle: 'uppercase'
                                     }}
                                     tickFormatter={(value) => `${value}kg`}
+                                    style={{
+                                        fontSize: 10,
+                                        textAnchor: 'end',
+                                    }}
                                 />
                                 <Tooltip
                                     content={({ active, payload }) => {
