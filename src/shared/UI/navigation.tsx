@@ -22,6 +22,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { useSessionStore } from "@/session/session.provider";
+import { ThemeModeToggler } from "./theme-mode-toggler";
 
 export const Navigation = () => {
     return (
@@ -116,6 +117,9 @@ export const DesktopNavigation = () => {
                     <Link href="/settings">
                         <Settings strokeWidth={1} size={18} className={`${pathname === '/settings' ? 'stroke-primary' : 'stroke-card-foreground'}`} />
                     </Link>
+                </li>
+                <li className="flex items-center justify-center cursor-pointer">
+                    <ThemeModeToggler />
                 </li>
                 <li className="flex items-center justify-center cursor-pointer" onClick={signOut}>
                     <Image src={signOutIcon} alt="logo" width={25} height={25} className="rounded-full" />

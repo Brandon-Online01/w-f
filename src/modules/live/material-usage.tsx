@@ -124,23 +124,24 @@ export function MaterialUsageChart() {
 
     const extractedData = useMemo(() => {
         if (!liveRunData) return [];
-        return liveRunData?.data?.map((machine: Machine) => {
-            const distance = formatDistance(new Date(machine.eventTimeStamp), new Date(), { addSuffix: true });
-            let day;
-            if (distance.includes('less than a day') || distance.includes('hours') || distance.includes('minutes')) {
-                day = 30;
-            } else if (distance.includes('days') && parseInt(distance) <= 7) {
-                day = 29;
-            } else {
-                day = 28;
-            }
-            return {
-                machine: `M${machine.machine.machineNumber}`,
-                masterBatch: machine.masterBatchMaterial,
-                virginMaterial: machine.virginMaterial,
-                day: day
-            };
-        });
+        return liveRunData?.data?.filter((machine: Machine) => (machine.virginMaterial !== 0 && machine.masterBatchMaterial !== 0))
+            .map((machine: Machine) => {
+                const distance = formatDistance(new Date(machine.eventTimeStamp), new Date(), { addSuffix: true });
+                let day;
+                if (distance.includes('less than a day') || distance.includes('hours') || distance.includes('minutes')) {
+                    day = 30;
+                } else if (distance.includes('days') && parseInt(distance) <= 7) {
+                    day = 29;
+                } else {
+                    day = 28;
+                }
+                return {
+                    machine: `M${machine.machine.machineNumber}`,
+                    masterBatch: machine.masterBatchMaterial,
+                    virginMaterial: machine.virginMaterial,
+                    day: day
+                };
+            });
     }, [liveRunData]);
 
     const allData = extractedData;
@@ -168,7 +169,7 @@ export function MaterialUsageChart() {
     }, [filteredData]);
 
     const totalPages = Math.ceil(aggregatedData?.length / itemsPerPage)
-    const paginatedData = aggregatedData.slice(
+    const paginatedData = aggregatedData?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -236,8 +237,8 @@ export function MaterialUsageChart() {
                                         if (active && payload && payload.length) {
                                             const data = payload[0].payload as DataEntry;
                                             return (
-                                                <div className="bg-background p-2 border rounded shadow">
-                                                    <p className="font-bold text-2xl text-gray-700">{payload[0].payload.machine}</p>
+                                                <div className="bg-card p-2 border rounded shadow">
+                                                    <p className="font-bold text-2xl text-card-foreground">{payload[0].payload.machine}</p>
                                                     <p className="text-sm" style={{ color: chartConfig.masterBatch.color }}>Master Batch: {payload[0].value} kg</p>
                                                     <p className="text-sm" style={{ color: chartConfig.virginMaterial.color }}>Virgin Material: {data.virginMaterial} kg</p>
                                                     <p className="font-bold text-lg mt-4 text-card-foreground">Total: {(data.masterBatch + data.virginMaterial)?.toFixed(2)} kg</p>
@@ -288,12 +289,12 @@ export function MaterialUsageChart() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {paginatedData.map((row: DataEntry) => (
-                                        <tr key={row.machine} className="border-t">
-                                            <td className="text-center p-2">{row.machine}</td>
-                                            <td className="text-center p-2">{row.masterBatch.toLocaleString()}</td>
-                                            <td className="text-center p-2">{row.virginMaterial.toLocaleString()}</td>
-                                            <td className="text-center p-2">{(row.masterBatch + row.virginMaterial).toLocaleString()}</td>
+                                    {paginatedData?.map((row: DataEntry) => (
+                                        <tr key={row?.machine} className="border-t">
+                                            <td className="text-center p-2">{row?.machine}</td>
+                                            <td className="text-center p-2">{row?.masterBatch.toLocaleString()}</td>
+                                            <td className="text-center p-2">{row?.virginMaterial.toLocaleString()}</td>
+                                            <td className="text-center p-2">{(row?.masterBatch + row?.virginMaterial).toLocaleString()}</td>
                                         </tr>
                                     ))}
                                 </tbody>

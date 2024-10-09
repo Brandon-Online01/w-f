@@ -15,6 +15,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 type Machine = {
     uid: number;
@@ -93,7 +94,6 @@ interface ProductionInfoDialogProps {
     machine: Machine;
 }
 
-// Update the type definition for SortConfig
 type SortConfig = { key: string | null; direction: 'asc' | 'desc' | null };
 
 const ItemsPerPageSelect: React.FunctionComponent<ItemsPerPageSelectProps> = ({ value, onChange }) => (
@@ -185,38 +185,67 @@ const ProductionInfoDialog: React.FunctionComponent<ProductionInfoDialogProps> =
             <DialogHeader>
                 <DialogTitle>Production Information: {machine.machine.name}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-                <div>
-                    <h4 className="font-semibold">Component Details</h4>
-                    <p>Name: {machine.component.name}</p>
-                    <p>Code: {machine.component.code}</p>
-                    <p>Color: {machine.component.color}</p>
+            <ScrollArea className="h-[80vh] pr-4">
+                <div className="space-y-6">
+                    <section className="rounded-lg border p-4">
+                        <h2 className="text-lg font-semibold mb-2">Component Details</h2>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>Name: Component A</div>
+                            <div>Code: COMP-A-001</div>
+                            <div>Color: Red</div>
+                        </div>
+                    </section>
+
+                    <section className="rounded-lg border p-4">
+                        <h2 className="text-lg font-semibold mb-2">Production Stats</h2>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>Current Production: 0</div>
+                            <div>Target Production: 0</div>
+                            <div>Efficiency: 0.00%</div>
+                        </div>
+                    </section>
+
+                    <section className="rounded-lg border p-4">
+                        <h2 className="text-lg font-semibold mb-2">Cycle Information</h2>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>Cycle Time: 0s</div>
+                            <div>Target Time: 20s</div>
+                            <div>Cycle Counts: 0</div>
+                        </div>
+                    </section>
+
+                    <section className="rounded-lg border p-4">
+                        <h2 className="text-lg font-semibold mb-2">Material Usage</h2>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>Master Batch Material: 0</div>
+                            <div>Virgin Material: 0</div>
+                            <div>Total Materials Used: 0</div>
+                        </div>
+                    </section>
+
+                    <section className="rounded-lg border p-4">
+                        <h2 className="text-lg font-semibold mb-2">Packaging</h2>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>Packaging Type: Box</div>
+                            <div>Quantity Required: 0</div>
+                            <div>Pallets Needed: 0</div>
+                        </div>
+                    </section>
+
+                    <section className="rounded-lg border p-4">
+                        <h2 className="text-lg font-semibold mb-2">Component Image</h2>
+                        <div className="flex justify-center">
+                            <Image
+                                src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
+                                alt={machine?.component?.name}
+                                className="rounded-md"
+                                width={200}
+                                height={200}
+                            />
+                        </div>
+                    </section>
                 </div>
-                <div>
-                    <h4 className="font-semibold">Production Stats</h4>
-                    <p>Current Production: {machine.currentProduction}</p>
-                    <p>Target Production: {machine.targetProduction}</p>
-                    <p>Efficiency: {(machine.efficiency * 100).toFixed(2)}%</p>
-                </div>
-                <div>
-                    <h4 className="font-semibold">Cycle Information</h4>
-                    <p>Cycle Time: {machine.cycleTime}s</p>
-                    <p>Target Time: {machine.component.targetTime}s</p>
-                    <p>Cycle Counts: {machine.cycleCounts}</p>
-                </div>
-                <div>
-                    <h4 className="font-semibold">Material Usage</h4>
-                    <p>Master Batch Material: {machine.masterBatchMaterial}</p>
-                    <p>Virgin Material: {machine.virginMaterial}</p>
-                    <p>Total Materials Used: {machine.totalMaterialsUsed}</p>
-                </div>
-                <div>
-                    <h4 className="font-semibold">Packaging</h4>
-                    <p>Packaging Type: {machine.packagingType}</p>
-                    <p>Quantity Required: {machine.packagingTypeQtyRequired}</p>
-                    <p>Pallets Needed: {machine.palletsNeeded}</p>
-                </div>
-            </div>
+            </ScrollArea>
         </>
     )
 }
@@ -446,22 +475,21 @@ export default function LiveRun() {
                                     isLoading ? <TableLoader /> :
                                         <>
                                             {
-                                                displayedMachines?.map((machine, index) => (
+                                                displayedMachines?.map((machine) => (
                                                     <motion.tr
                                                         key={machine.uid}
                                                         initial={{ opacity: 0 }}
                                                         animate={{ opacity: 1 }}
                                                         exit={{ opacity: 0 }}
-                                                        transition={{ duration: 0.2 }}
-                                                        className={index % 2 === 0 ? 'bg-muted/50' : ''}>
+                                                        transition={{ duration: 0.2 }}>
                                                         <TableCell className="text-center">{machine.machine.name}</TableCell>
                                                         <TableCell className="text-center">
                                                             <div className="flex flex-col items-center">
                                                                 <Image
                                                                     src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine.component.photoURL}`}
                                                                     alt={machine.component.name}
-                                                                    width={30}
-                                                                    height={30}
+                                                                    width={80}
+                                                                    height={80}
                                                                     className="rounded" />
                                                                 <span className="text-sm mt-1">{machine.component.name}</span>
                                                             </div>

@@ -2,8 +2,8 @@
 
 export default function Page() {
     return (
-        <div className="flex flex-col items-center justify-center h-screen">
-            <p>Staff Page</p>
+        <div className="flex flex-col items-start h-screen">
+            <p>staff page</p>
         </div>
     );
 }

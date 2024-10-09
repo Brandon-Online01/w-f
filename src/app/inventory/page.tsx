@@ -1,9 +1,11 @@
 'use client'
 
+import { InventoryHighlights } from "@/modules/inventory/highlight-cards";
+
 export default function Page() {
     return (
-        <div className="flex flex-col items-center justify-center h-screen">
-            <p>Inventory Page</p>
+        <div className="flex flex-col items-start h-screen">
+            <InventoryHighlights />
         </div>
     );
 }
