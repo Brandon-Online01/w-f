@@ -26,8 +26,6 @@ export const HighlightCards = () => {
     const cardData = [
         { Icon: PlugZap, description: "Machine Utilization", bottomText: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos." },
         { Icon: Hourglass, description: "Material Usage", bottomText: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos." },
-        { Icon: Hourglass, description: "Machine Utilization", bottomText: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos." },
-        { Icon: Hourglass, description: "Machine Utilization", bottomText: "lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos." },
     ]
 
     return (
