@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { User, Trash2, MoreVertical, ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown } from "lucide-react"
+import { User, Trash2, ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown, EllipsisVerticalIcon, TrendingUpDownIcon } from "lucide-react"
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import testImage from '../../shared/assets/logo/waresense.png'
@@ -67,7 +67,7 @@ type Machine = {
         nextServiceDate: string | null;
         status: string;
     };
-    notes: any[];
+    notes: string[];
     machine: {
         uid: number;
         name: string;
@@ -80,13 +80,16 @@ type Machine = {
 };
 
 interface NotesDialogProps {
-    machine: { notes: string };
-    onSave: (notes: string) => void;
+    machine: Machine;
 }
 
 interface ItemsPerPageSelectProps {
     value: number;
     onChange: (value: number) => void;
+}
+
+interface ProductionInfoDialogProps {
+    machine: Machine;
 }
 
 // Update the type definition for SortConfig
@@ -158,8 +161,8 @@ const WasteDialog = ({ onSave }: { onSave: (wasteType: string, weight: number) =
     )
 }
 
-const NotesDialog: React.FunctionComponent<NotesDialogProps> = ({ machine, onSave }) => {
-    const [notes, setNotes] = useState(machine.notes)
+const NotesDialog: React.FunctionComponent<NotesDialogProps> = (machine) => {
+    console.log(machine, 'machine')
 
     return (
         <>
@@ -167,12 +170,52 @@ const NotesDialog: React.FunctionComponent<NotesDialogProps> = ({ machine, onSav
                 <DialogTitle>Add Notes</DialogTitle>
             </DialogHeader>
             <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
                 placeholder="Enter notes about the run..."
                 className="min-h-[100px]"
             />
-            <Button onClick={() => onSave(notes)}>Save Notes</Button>
+            <Button>Save Notes</Button >
+        </>
+    )
+}
+
+const ProductionInfoDialog: React.FunctionComponent<ProductionInfoDialogProps> = ({ machine }) => {
+    return (
+        <>
+            <DialogHeader>
+                <DialogTitle>Production Information: {machine.machine.name}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+                <div>
+                    <h4 className="font-semibold">Component Details</h4>
+                    <p>Name: {machine.component.name}</p>
+                    <p>Code: {machine.component.code}</p>
+                    <p>Color: {machine.component.color}</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold">Production Stats</h4>
+                    <p>Current Production: {machine.currentProduction}</p>
+                    <p>Target Production: {machine.targetProduction}</p>
+                    <p>Efficiency: {(machine.efficiency * 100).toFixed(2)}%</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold">Cycle Information</h4>
+                    <p>Cycle Time: {machine.cycleTime}s</p>
+                    <p>Target Time: {machine.component.targetTime}s</p>
+                    <p>Cycle Counts: {machine.cycleCounts}</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold">Material Usage</h4>
+                    <p>Master Batch Material: {machine.masterBatchMaterial}</p>
+                    <p>Virgin Material: {machine.virginMaterial}</p>
+                    <p>Total Materials Used: {machine.totalMaterialsUsed}</p>
+                </div>
+                <div>
+                    <h4 className="font-semibold">Packaging</h4>
+                    <p>Packaging Type: {machine.packagingType}</p>
+                    <p>Quantity Required: {machine.packagingTypeQtyRequired}</p>
+                    <p>Pallets Needed: {machine.palletsNeeded}</p>
+                </div>
+            </div>
         </>
     )
 }
@@ -270,8 +313,7 @@ export default function LiveRun() {
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: null })
     const [loading, setLoading] = useState(true)
     const [dialogOpen, setDialogOpen] = useState(false)
-    const [dialogContent, setDialogContent] = useState<string | null>(null)
-    const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null)
+    const [dialogContent, setDialogContent] = useState<React.ReactNode | null>(null)
 
     useEffect(() => {
         setTimeout(() => {
@@ -316,7 +358,7 @@ export default function LiveRun() {
     const endIndex = startIndex + itemsPerPage
     const displayedMachines = filteredMachines.slice(startIndex, endIndex)
 
-    const handleSaveOperator = (operator: any) => {
+    const handleSaveOperator = (operator: string) => {
         console.log(operator)
     }
 
@@ -324,14 +366,14 @@ export default function LiveRun() {
         console.log(wasteType, weight)
     }
 
-    const handleSaveNotes = (notes: string) => {
-        console.log(notes)
-    }
-
-    const openDialog = (machine: Machine, content: string) => {
-        setSelectedMachine(machine)
+    const openDialog = (machine: Machine, content: React.ReactNode) => {
         setDialogContent(content)
         setDialogOpen(true)
+    }
+
+    const openProductionInfoDialog = (machine: Machine, content: React.ReactNode) => {
+        setDialogContent(content);
+        setDialogOpen(true);
     }
 
     const exportToExcel = () => {
@@ -379,7 +421,7 @@ export default function LiveRun() {
             return sortConfig.direction === 'asc' ? <ArrowUp className="h-4 w-4 inline-block ml-1" /> : <ArrowDown className="h-4 w-4 inline-block ml-1" />
         }
 
-        return null
+        return <ArrowDown className="h-4 w-4 inline-block ml-1" />
     }
 
     console.log(displayedMachines, 'displayedMachines')
@@ -484,10 +526,14 @@ export default function LiveRun() {
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
                                                             <Button variant="ghost" size="icon">
-                                                                <MoreVertical className="h-4 w-4" />
+                                                                <EllipsisVerticalIcon className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent>
+                                                            <DropdownMenuItem onSelect={() => openProductionInfoDialog(machine, <ProductionInfoDialog machine={machine} />)}>
+                                                                <TrendingUpDownIcon className="mr-2 h-4 w-4" />
+                                                                <span>Insights</span>
+                                                            </DropdownMenuItem>
                                                             <DropdownMenuItem onSelect={() => openDialog(machine, <OperatorDialog onSave={handleSaveOperator} />)}>
                                                                 <User className="mr-2 h-4 w-4" />
                                                                 <span>Select Operator</span>
@@ -496,7 +542,7 @@ export default function LiveRun() {
                                                                 <Trash2 className="mr-2 h-4 w-4" />
                                                                 <span>Record Waste</span>
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onSelect={() => openDialog(machine, <NotesDialog machine={machine} onSave={handleSaveNotes} />)}>
+                                                            <DropdownMenuItem onSelect={() => openDialog(machine, <NotesDialog machine={machine} />)}>
                                                                 <FileText className="mr-2 h-4 w-4" />
                                                                 <span>Add Notes</span>
                                                             </DropdownMenuItem>
@@ -520,8 +566,7 @@ export default function LiveRun() {
                         disabled={page === 1}
                         size="icon"
                         variant="ghost"
-                        className="hover:bg-muted"
-                    >
+                        className="hover:bg-muted">
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span className="text-sm">
@@ -532,8 +577,7 @@ export default function LiveRun() {
                         disabled={page === totalPages}
                         size="icon"
                         variant="ghost"
-                        className="hover:bg-muted"
-                    >
+                        className="hover:bg-muted">
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
