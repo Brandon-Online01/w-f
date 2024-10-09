@@ -5,6 +5,8 @@ import { MaterialUsageChart } from "@/modules/live/material-usage"
 import LiveRun from "@/modules/live/live-run";
 import { Separator } from "@/components/ui/separator";
 import { LiveHighlights } from "@/modules/live/highlights";
+import ActivityCard from "@/modules/live/activity-card";
+import MouldRepairCard from "@/modules/live/repairs-card";
 
 export default function Home() {
     return (
@@ -16,6 +18,11 @@ export default function Home() {
             </div>
             <div className="flex flex-col items-start justify-start gap-3 w-full">
                 <LiveRun />
+            </div>
+            <Separator className="w-8/12 border border-card-foreground/10 my-5 mx-auto " />
+            <div className="flex flex-row items-start justify-center gap-3 w-full">
+                <ActivityCard />
+                <MouldRepairCard />
             </div>
             <Separator className="w-8/12 border border-card-foreground/10 my-5 mx-auto " />
             <div className="flex flex-col items-start justify-start gap-3 px-1 w-full">
