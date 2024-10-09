@@ -1,6 +1,6 @@
 'use client'
 
-import { Code, PlugZap, Puzzle, Repeat, Warehouse, Wrench, Zap } from "lucide-react";
+import { PlugZap, Warehouse, Wrench } from "lucide-react";
 import HighlightsCards from "@/components/highlight-cards";
 
 export const InventoryHighlights = () => {
