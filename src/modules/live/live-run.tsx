@@ -15,7 +15,6 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
-import { imagePathGenerator } from '@/utils/image-paths'
 
 type Machine = {
     uid: number;
@@ -264,11 +263,11 @@ export default function LiveRun() {
         refetchOnReconnect: false,
     });
 
-    setTimeout(() => {
+    useEffect(() => {
         if (liveRunData?.data) {
-            setMachineData(liveRunData?.data)
+            setMachineData(liveRunData.data);
         }
-    }, 1500)
+    }, [liveRunData?.data]);
 
     useEffect(() => {
         const filtered = machineData.filter(machine =>
@@ -458,7 +457,12 @@ export default function LiveRun() {
                                                         <TableCell className="text-center">{machine.machine.name}</TableCell>
                                                         <TableCell className="text-center">
                                                             <div className="flex flex-col items-center">
-                                                                <Image src={imagePathGenerator(machine.component?.photoURL)} alt={machine.component.name} width={30} height={30} className="rounded-md" />
+                                                                <Image
+                                                                    src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine.component.photoURL}`}
+                                                                    alt={machine.component.name}
+                                                                    width={30}
+                                                                    height={30}
+                                                                    className="rounded" />
                                                                 <span className="text-sm mt-1">{machine.component.name}</span>
                                                             </div>
                                                         </TableCell>

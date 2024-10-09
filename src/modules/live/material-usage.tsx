@@ -1,9 +1,9 @@
 "use client"
 
 import { formatDistance } from 'date-fns';
-import { useState, useMemo } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts"
+import { useState, useMemo } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 import {
     Card,
@@ -120,9 +120,6 @@ export function MaterialUsageChart() {
     const { data: liveRunData } = useQuery({
         queryKey: ['getMachineData'],
         queryFn: getMachineData,
-        refetchInterval: 5000,
-        refetchOnMount: true,
-        refetchOnReconnect: false,
     });
 
     const extractedData = useMemo(() => {
@@ -170,7 +167,7 @@ export function MaterialUsageChart() {
         }, [] as DataEntry[]);
     }, [filteredData]);
 
-    const totalPages = Math.ceil(aggregatedData.length / itemsPerPage)
+    const totalPages = Math.ceil(aggregatedData?.length / itemsPerPage)
     const paginatedData = aggregatedData.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
@@ -181,7 +178,7 @@ export function MaterialUsageChart() {
             <CardHeader>
                 <div className="flex flex-row items-start justify-start gap-0 flex-col">
                     <CardTitle className="text-2xl font-bold">Material Usage</CardTitle>
-                    <CardDescription className="text-sm -mt-1">Real-time material usage for 40 machines</CardDescription>
+                    <CardDescription className="text-sm -mt-1">Real-time material usage for {aggregatedData?.length} machines</CardDescription>
                 </div>
                 <div className="flex flex-wrap gap-4 mt-4">
                     <Select value={selectedMachine} onValueChange={setSelectedMachine}>
