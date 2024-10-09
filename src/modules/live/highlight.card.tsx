@@ -13,7 +13,7 @@ const HighlightCard = ({ Icon, title, description, bottomText }: HighlightCardPr
     return (
         <div className="border rounded p-4 w-[49%] flex flex-col justify-start gap-2 cursor-pointer border-b-1 ease-in-out duration-300 hover:border-b-red-400 group">
             <div className="flex items-center justify-start gap-2">
-                <div className="p-2 bg-muted-foreground/10 cursor-pointer w-10 h-10 flex items-center justify-center rounded group-hover:border-red-400/50 group-hover:border ease-in-out duration-500">
+                <div className="p-2 bg-muted-foreground/10 cursor-pointer w-10 h-10 flex items-center justify-center rounded ease-in-out duration-500">
                     <Icon strokeWidth={1} size={18} className="stroke-card-foreground" />
                 </div>
                 <p>{title}</p>

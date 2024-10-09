@@ -15,43 +15,84 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import testImage from '../../shared/assets/logo/waresense.png'
 
-// Define the type for a single machine
 type Machine = {
-  id: number;
-  name: string;
-  component: { image: string; name: string };
-  production: { produced: number; target: number };
-  runTimes: { cycle: number; target: number };
-  notes: string;
-  status: string;
+    uid: number;
+    machineNumber: string;
+    status: string;
+    cycleTime: number;
+    cycleCounts: number;
+    shift: string;
+    currentProduction: number;
+    targetProduction: number;
+    masterBatchMaterial: number;
+    virginMaterial: number;
+    totalMaterialsUsed: number;
+    totalDownTime: number;
+    efficiency: number;
+    packagingTypeQtyRequired: number;
+    palletsNeeded: number;
+    packagingType: string;
+    eventTimeStamp: string;
+    component: {
+        uid: number;
+        name: string;
+        description: string;
+        photoURL: string;
+        weight: number;
+        volume: number;
+        code: string;
+        color: string;
+        cycleTime: number;
+        targetTime: number;
+        coolingTime: number;
+        chargingTime: number;
+        cavity: number;
+        configuration: string;
+        configQTY: number;
+        palletQty: number;
+        testMachine: string;
+        masterBatch: number;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+    };
+    mould: {
+        uid: number;
+        name: string;
+        serialNumber: string;
+        creationDate: string;
+        lastRepairDate: string;
+        mileage: number;
+        servicingMileage: number;
+        nextServiceDate: string | null;
+        status: string;
+    };
+    notes: any[];
+    machine: {
+        uid: number;
+        name: string;
+        machineNumber: string;
+        macAddress: string;
+        description: string;
+        creationDate: string;
+        status: string;
+    };
 };
 
-// Mock data
-const machines = Array.from({ length: 40 }, (_, i) => ({
-    id: i + 1,
-    name: `Machine ${i + 1}`,
-    component: {
-        image: testImage,
-        name: `Component ${i + 1}`
-    },
-    production: {
-        produced: Math.floor(Math.random() * 100),
-        target: 100
-    },
-    runTimes: {
-        cycle: Math.floor(Math.random() * 80) + 20,
-        target: 60
-    },
-    notes: '',
-    status: ['Running', 'Stopped', 'Maintenance'][Math.floor(Math.random() * 3)]
-}))
+interface NotesDialogProps {
+    machine: { notes: string };
+    onSave: (notes: string) => void;
+}
 
 interface ItemsPerPageSelectProps {
     value: number;
     onChange: (value: number) => void;
 }
 
-const ItemsPerPageSelect: React.FC<ItemsPerPageSelectProps> = ({ value, onChange }) => (
+// Update the type definition for SortConfig
+type SortConfig = { key: string | null; direction: 'asc' | 'desc' | null };
+
+const ItemsPerPageSelect: React.FunctionComponent<ItemsPerPageSelectProps> = ({ value, onChange }) => (
     <Select value={value.toString()} onValueChange={(v) => onChange(Number(v))}>
         <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Items per page" />
@@ -87,7 +128,7 @@ const OperatorDialog = ({ onSave }: { onSave: (operator: string) => void }) => {
     )
 }
 
-const WasteDialog = ({ onSave }: { onSave: (wasteType: string, weight: string) => void }) => {
+const WasteDialog = ({ onSave }: { onSave: (wasteType: string, weight: number) => void }) => {
     const [wasteType, setWasteType] = useState('')
     const [weight, setWeight] = useState('')
 
@@ -112,17 +153,12 @@ const WasteDialog = ({ onSave }: { onSave: (wasteType: string, weight: string) =
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
             />
-            <Button onClick={() => onSave(wasteType, weight)}>Save</Button>
+            <Button onClick={() => onSave(wasteType, Number(weight))}>Save</Button>
         </>
     )
 }
 
-interface NotesDialogProps {
-    machine: { notes: string };
-    onSave: (notes: string) => void;
-}
-
-const NotesDialog: React.FC<NotesDialogProps> = ({ machine, onSave }) => {
+const NotesDialog: React.FunctionComponent<NotesDialogProps> = ({ machine, onSave }) => {
     const [notes, setNotes] = useState(machine.notes)
 
     return (
@@ -158,49 +194,114 @@ const StatusIndicator = ({ status }: { status: string }) => {
     )
 }
 
+// Update the mock data generation
+const machines: Machine[] = Array.from({ length: 20 }, (_, i) => ({
+    uid: i + 1,
+    machineNumber: `M${i + 1}`,
+    status: ['Running', 'Stopped', 'Maintenance'][Math.floor(Math.random() * 3)],
+    cycleTime: Math.floor(Math.random() * 100),
+    cycleCounts: Math.floor(Math.random() * 1000),
+    shift: ['Day', 'Night'][Math.floor(Math.random() * 2)],
+    currentProduction: Math.floor(Math.random() * 100),
+    targetProduction: 100,
+    masterBatchMaterial: Math.floor(Math.random() * 50),
+    virginMaterial: Math.floor(Math.random() * 50),
+    totalMaterialsUsed: Math.floor(Math.random() * 100),
+    totalDownTime: Math.floor(Math.random() * 60),
+    efficiency: Math.random(),
+    packagingTypeQtyRequired: Math.floor(Math.random() * 100),
+    palletsNeeded: Math.floor(Math.random() * 10),
+    packagingType: ['Box', 'Bag', 'Pallet'][Math.floor(Math.random() * 3)],
+    eventTimeStamp: new Date().toISOString(),
+    component: {
+        uid: i + 1,
+        name: `Component ${i + 1}`,
+        description: `Description of Component ${i + 1}`,
+        photoURL: testImage.src,
+        weight: Math.random() * 100,
+        volume: Math.random() * 1000,
+        code: `COMP-${i + 1}`,
+        color: ['Red', 'Blue', 'Green'][Math.floor(Math.random() * 3)],
+        cycleTime: Math.floor(Math.random() * 60),
+        targetTime: 30,
+        coolingTime: Math.floor(Math.random() * 20),
+        chargingTime: Math.floor(Math.random() * 15),
+        cavity: Math.floor(Math.random() * 4) + 1,
+        configuration: ['Box', 'Bag'][Math.floor(Math.random() * 2)],
+        configQTY: Math.floor(Math.random() * 100),
+        palletQty: Math.floor(Math.random() * 20),
+        testMachine: `Test Machine ${i + 1}`,
+        masterBatch: Math.floor(Math.random() * 5),
+        status: 'Active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    },
+    mould: {
+        uid: i + 1,
+        name: `Mould ${i + 1}`,
+        serialNumber: `MOULD-00${i + 1}`,
+        creationDate: new Date().toISOString(),
+        lastRepairDate: new Date().toISOString(),
+        mileage: Math.floor(Math.random() * 10000),
+        servicingMileage: 15000,
+        nextServiceDate: null,
+        status: 'Active',
+    },
+    notes: [],
+    machine: {
+        uid: i + 1,
+        name: `Machine ${i + 1}`,
+        machineNumber: `${i + 1}`,
+        macAddress: `${Math.random().toString(36).substring(2, 15)}`,
+        description: `Description of Machine ${i + 1}`,
+        creationDate: new Date().toISOString(),
+        status: 'Active',
+    },
+}));
+
 export default function LiveRun() {
     const [page, setPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(5)
     const [machineData, setMachineData] = useState<Machine[]>([])
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('All')
-    const [filteredMachines, setFilteredMachines] = useState([])
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: null })
+    const [filteredMachines, setFilteredMachines] = useState<Machine[]>([])
+    // Update the initial state
+    const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: null })
     const [loading, setLoading] = useState(true)
     const [dialogOpen, setDialogOpen] = useState(false)
-    const [dialogContent, setDialogContent] = useState(null)
-    const [selectedMachine, setSelectedMachine] = useState(null)
+    const [dialogContent, setDialogContent] = useState<string | null>(null)
+    const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null)
 
     useEffect(() => {
-        // Simulate API call
         setTimeout(() => {
-            setMachineData(machines)
-            setLoading(false)
+            setMachineData(machines);
+            setLoading(false);
         }, 1500)
     }, [])
 
     useEffect(() => {
         const filtered = machineData.filter(machine =>
-            (machine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                machine.id.toString().includes(searchTerm) ||
-                machine.component.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
-            (statusFilter === 'All' || machine.status === statusFilter)
+            (machine?.machine?.name?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+                machine?.uid.toString().includes(searchTerm) ||
+                machine?.component?.name?.toLowerCase().includes(searchTerm?.toLowerCase())) &&
+            (statusFilter === 'All' || machine?.status === statusFilter)
         )
 
-        if (sortConfig.key !== null) {
+        if (sortConfig?.key !== null) {
             filtered.sort((a, b) => {
-                if (sortConfig.key === 'id') {
-                    return sortConfig.direction === 'ascending' ? a.id - b.id : b.id - a.id
+                if (sortConfig?.key === 'uid') {
+                    return sortConfig.direction === 'asc' ? a.uid - b.uid : b.uid - a.uid
                 }
-                if (sortConfig.key === 'production') {
-                    const aValue = a.production.produced / a.production.target
-                    const bValue = b.production.produced / b.production.target
-                    return sortConfig.direction === 'ascending' ? aValue - bValue : bValue - aValue
+
+                if (sortConfig?.key === 'production') {
+                    const aValue = a.currentProduction / a.targetProduction
+                    const bValue = b.currentProduction / b.targetProduction
+                    return sortConfig?.direction === 'asc' ? aValue - bValue : bValue - aValue
                 }
-                if (sortConfig.key === 'runTimes') {
-                    const aValue = a.runTimes.cycle / a.runTimes.target
-                    const bValue = b.runTimes.cycle / b.runTimes.target
-                    return sortConfig.direction === 'ascending' ? aValue - bValue : bValue - aValue
+
+                if (sortConfig?.key === 'cycleTime') {
+                    return sortConfig?.direction === 'asc' ? a.cycleTime - b.cycleTime : b.cycleTime - a.cycleTime
                 }
                 return 0
             })
@@ -215,54 +316,39 @@ export default function LiveRun() {
     const endIndex = startIndex + itemsPerPage
     const displayedMachines = filteredMachines.slice(startIndex, endIndex)
 
-    const handleSaveOperator = (operator) => {
-        setMachineData(prevData =>
-            prevData.map(machine =>
-                machine.id === selectedMachine.id ? { ...machine, operator } : machine
-            )
-        )
-        setDialogOpen(false)
+    const handleSaveOperator = (operator: any) => {
+        console.log(operator)
     }
 
-    const handleSaveWaste = (wasteType, weight) => {
-        setMachineData(prevData =>
-            prevData.map(machine =>
-                machine.id === selectedMachine.id ? { ...machine, waste: { type: wasteType, weight } } : machine
-            )
-        )
-        setDialogOpen(false)
+    const handleSaveWaste = (wasteType: string, weight: number) => {
+        console.log(wasteType, weight)
     }
 
-    const handleSaveNotes = (notes) => {
-        setMachineData(prevData =>
-            prevData.map(machine =>
-                machine.id === selectedMachine.id ? { ...machine, notes } : machine
-            )
-        )
-        setDialogOpen(false)
+    const handleSaveNotes = (notes: string) => {
+        console.log(notes)
     }
 
-    const openDialog = (machine, content) => {
+    const openDialog = (machine: Machine, content: string) => {
         setSelectedMachine(machine)
         setDialogContent(content)
         setDialogOpen(true)
     }
 
     const exportToExcel = () => {
-        const header = ['ID', 'Machine Name', 'Component', 'Production', 'Run Times', 'Status', 'Notes']
+        const header = ['#', 'Machine Name', 'Component', 'Production', 'Cycle Time', 'Status', 'Efficiency']
         const data = filteredMachines.map(machine => [
-            machine.id,
-            machine.name,
-            machine.component.name,
-            `${machine.production.produced}/${machine.production.target}`,
-            `${machine.runTimes.cycle}s/${machine.runTimes.target}s`,
-            machine.status,
-            machine.notes
+            machine?.uid,
+            machine?.machine?.name,
+            machine?.component.name,
+            `${machine?.currentProduction}/${machine?.targetProduction}`,
+            `${machine?.cycleTime}s`,
+            machine?.status,
+            `${(machine?.efficiency * 100).toFixed(2)}%`
         ])
 
         const csvContent = [
-            header.join(','),
-            ...data.map(row => row.join(','))
+            header?.join(','),
+            ...data?.map(row => row?.join(','))
         ].join('\n')
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
@@ -278,20 +364,25 @@ export default function LiveRun() {
         }
     }
 
-    const requestSort = (key) => {
-        let direction = 'ascending'
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending'
+    const requestSort = (key: string) => {
+        let direction = 'asc'
+
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc'
         }
-        setSortConfig({ key, direction })
+
+        setSortConfig({ key, direction } as SortConfig);
     }
 
-    const getSortIcon = (key) => {
+    const getSortIcon = (key: string) => {
         if (sortConfig.key === key) {
-            return sortConfig.direction === 'ascending' ? <ArrowUp className="h-4 w-4 inline-block ml-1" /> : <ArrowDown className="h-4 w-4 inline-block ml-1" />
+            return sortConfig.direction === 'asc' ? <ArrowUp className="h-4 w-4 inline-block ml-1" /> : <ArrowDown className="h-4 w-4 inline-block ml-1" />
         }
+
         return null
     }
+
+    console.log(displayedMachines, 'displayedMachines')
 
     return (
         <div className=" w-full h-full">
@@ -329,18 +420,18 @@ export default function LiveRun() {
                     <Table>
                         <TableHeader className="sticky top-0 bg-background z-10">
                             <TableRow>
-                                <TableHead className="text-center cursor-pointer" onClick={() => requestSort('id')}>
+                                <TableHead className="text-center cursor-pointer" onClick={() => requestSort('uid')}>
                                     Machine
-                                    {getSortIcon('id')}
+                                    {getSortIcon('uid')}
                                 </TableHead>
                                 <TableHead className="text-center">Component</TableHead>
                                 <TableHead className="text-center cursor-pointer" onClick={() => requestSort('production')}>
                                     Production
                                     {getSortIcon('production')}
                                 </TableHead>
-                                <TableHead className="text-center cursor-pointer" onClick={() => requestSort('runTimes')}>
-                                    Run Times
-                                    {getSortIcon('runTimes')}
+                                <TableHead className="text-center cursor-pointer" onClick={() => requestSort('cycleTime')}>
+                                    Cycle Time
+                                    {getSortIcon('cycleTime')}
                                 </TableHead>
                                 <TableHead className="text-center">Status</TableHead>
                                 <TableHead className="text-center">Actions</TableHead>
@@ -357,35 +448,33 @@ export default function LiveRun() {
                                         </TableRow>
                                     ))
                                 ) : (
-                                    displayedMachines.map((machine, index) => (
+                                    displayedMachines?.map((machine, index) => (
                                         <motion.tr
-                                            key={machine.id}
+                                            key={machine.uid}
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             exit={{ opacity: 0 }}
                                             transition={{ duration: 0.2 }}
-                                            className={index % 2 === 0 ? 'bg-muted/50' : ''}
-                                        >
-                                            <TableCell className="text-center">{machine.name}</TableCell>
+                                            className={index % 2 === 0 ? 'bg-muted/50' : ''}>
+                                            <TableCell className="text-center">{machine.machine.name}</TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex flex-col items-center">
-                                                    <Image src={machine.component.image} alt={machine.component.name} width={30} height={30} className="rounded-md" />
+                                                    <Image src={machine.component.photoURL} alt={machine.component.name} width={30} height={30} className="rounded-md" />
                                                     <span className="text-sm mt-1">{machine.component.name}</span>
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <div className="flex flex-col items-center">
-                                                    <span>{machine.production.produced} / {machine.production.target}</span>
-                                                    <Progress value={(machine.production.produced / machine.production.target) * 100} className="w-full max-w-[200px]" />
+                                                    <span>{machine.currentProduction} / {machine.targetProduction}</span>
+                                                    <Progress value={(machine.currentProduction / machine.targetProduction) * 100} className="w-full max-w-[200px]" />
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <span className={machine.runTimes.cycle <= machine.runTimes.target ? 'text-green-600' : 'text-destructive'}>
-
-                                                    {machine.runTimes.cycle}s
+                                                <span className={machine.cycleTime <= machine.component.targetTime ? 'text-green-600' : 'text-destructive'}>
+                                                    {machine.cycleTime}s
                                                 </span>
                                                 {' / '}
-                                                <span>{machine.runTimes.target}s</span>
+                                                <span>{machine.component.targetTime}s</span>
                                             </TableCell>
                                             <TableCell className="text-center">
                                                 <StatusIndicator status={machine.status} />
