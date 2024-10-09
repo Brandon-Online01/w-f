@@ -14,6 +14,8 @@ import { User, Trash2, ChevronLeft, ChevronRight, FileText, Search, Download, Ar
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import testImage from '../../shared/assets/logo/waresense.png'
+import axios from 'axios'
+import { useQuery } from '@tanstack/react-query'
 
 type Machine = {
     uid: number;
@@ -237,70 +239,10 @@ const StatusIndicator = ({ status }: { status: string }) => {
     )
 }
 
-// Update the mock data generation
-const machines: Machine[] = Array.from({ length: 20 }, (_, i) => ({
-    uid: i + 1,
-    machineNumber: `M${i + 1}`,
-    status: ['Running', 'Stopped', 'Maintenance'][Math.floor(Math.random() * 3)],
-    cycleTime: Math.floor(Math.random() * 100),
-    cycleCounts: Math.floor(Math.random() * 1000),
-    shift: ['Day', 'Night'][Math.floor(Math.random() * 2)],
-    currentProduction: Math.floor(Math.random() * 100),
-    targetProduction: 100,
-    masterBatchMaterial: Math.floor(Math.random() * 50),
-    virginMaterial: Math.floor(Math.random() * 50),
-    totalMaterialsUsed: Math.floor(Math.random() * 100),
-    totalDownTime: Math.floor(Math.random() * 60),
-    efficiency: Math.random(),
-    packagingTypeQtyRequired: Math.floor(Math.random() * 100),
-    palletsNeeded: Math.floor(Math.random() * 10),
-    packagingType: ['Box', 'Bag', 'Pallet'][Math.floor(Math.random() * 3)],
-    eventTimeStamp: new Date().toISOString(),
-    component: {
-        uid: i + 1,
-        name: `Component ${i + 1}`,
-        description: `Description of Component ${i + 1}`,
-        photoURL: testImage.src,
-        weight: Math.random() * 100,
-        volume: Math.random() * 1000,
-        code: `COMP-${i + 1}`,
-        color: ['Red', 'Blue', 'Green'][Math.floor(Math.random() * 3)],
-        cycleTime: Math.floor(Math.random() * 60),
-        targetTime: 30,
-        coolingTime: Math.floor(Math.random() * 20),
-        chargingTime: Math.floor(Math.random() * 15),
-        cavity: Math.floor(Math.random() * 4) + 1,
-        configuration: ['Box', 'Bag'][Math.floor(Math.random() * 2)],
-        configQTY: Math.floor(Math.random() * 100),
-        palletQty: Math.floor(Math.random() * 20),
-        testMachine: `Test Machine ${i + 1}`,
-        masterBatch: Math.floor(Math.random() * 5),
-        status: 'Active',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-    },
-    mould: {
-        uid: i + 1,
-        name: `Mould ${i + 1}`,
-        serialNumber: `MOULD-00${i + 1}`,
-        creationDate: new Date().toISOString(),
-        lastRepairDate: new Date().toISOString(),
-        mileage: Math.floor(Math.random() * 10000),
-        servicingMileage: 15000,
-        nextServiceDate: null,
-        status: 'Active',
-    },
-    notes: [],
-    machine: {
-        uid: i + 1,
-        name: `Machine ${i + 1}`,
-        machineNumber: `${i + 1}`,
-        macAddress: `${Math.random().toString(36).substring(2, 15)}`,
-        description: `Description of Machine ${i + 1}`,
-        creationDate: new Date().toISOString(),
-        status: 'Active',
-    },
-}));
+const getMachineData = async () => {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/live-run`)
+    return response?.data
+}
 
 export default function LiveRun() {
     const [page, setPage] = useState(1)
@@ -315,12 +257,20 @@ export default function LiveRun() {
     const [dialogOpen, setDialogOpen] = useState(false)
     const [dialogContent, setDialogContent] = useState<React.ReactNode | null>(null)
 
-    useEffect(() => {
-        setTimeout(() => {
-            setMachineData(machines);
-            setLoading(false);
-        }, 1500)
-    }, [])
+    const { data: liveRunData, error, isLoading } = useQuery({
+        queryKey: ['getMachineData'],
+        queryFn: getMachineData,
+        refetchInterval: 5000,
+        refetchOnMount: true,
+        refetchOnReconnect: false,
+    });
+
+    setTimeout(() => {
+        if (liveRunData?.data) {
+            setMachineData(liveRunData?.data)
+            setLoading(false)
+        }
+    }, 1500)
 
     useEffect(() => {
         const filtered = machineData.filter(machine =>
@@ -424,7 +374,21 @@ export default function LiveRun() {
         return <ArrowDown className="h-4 w-4 inline-block ml-1" />
     }
 
-    console.log(displayedMachines, 'displayedMachines')
+    const TableLoader = () => {
+        return (
+            <>
+                {
+                    Array.from({ length: itemsPerPage }).map((_, index) => (
+                        <TableRow key={index}>
+                            <TableCell colSpan={6}>
+                                <Skeleton className="h-12 w-full" />
+                            </TableCell>
+                        </TableRow>
+                    ))
+                }
+            </>
+        )
+    }
 
     return (
         <div className=" w-full h-full">
@@ -481,78 +445,75 @@ export default function LiveRun() {
                         </TableHeader>
                         <TableBody>
                             <AnimatePresence>
-                                {loading ? (
-                                    Array.from({ length: itemsPerPage }).map((_, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell colSpan={6}>
-                                                <Skeleton className="h-12 w-full" />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    displayedMachines?.map((machine, index) => (
-                                        <motion.tr
-                                            key={machine.uid}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.2 }}
-                                            className={index % 2 === 0 ? 'bg-muted/50' : ''}>
-                                            <TableCell className="text-center">{machine.machine.name}</TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-col items-center">
-                                                    <Image src={machine.component.photoURL} alt={machine.component.name} width={30} height={30} className="rounded-md" />
-                                                    <span className="text-sm mt-1">{machine.component.name}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <div className="flex flex-col items-center">
-                                                    <span>{machine.currentProduction} / {machine.targetProduction}</span>
-                                                    <Progress value={(machine.currentProduction / machine.targetProduction) * 100} className="w-full max-w-[200px]" />
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className={machine.cycleTime <= machine.component.targetTime ? 'text-green-600' : 'text-destructive'}>
-                                                    {machine.cycleTime}s
-                                                </span>
-                                                {' / '}
-                                                <span>{machine.component.targetTime}s</span>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <StatusIndicator status={machine.status} />
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex justify-center">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon">
-                                                                <EllipsisVerticalIcon className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent>
-                                                            <DropdownMenuItem onSelect={() => openProductionInfoDialog(machine, <ProductionInfoDialog machine={machine} />)}>
-                                                                <TrendingUpDownIcon className="mr-2 h-4 w-4" />
-                                                                <span>Insights</span>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onSelect={() => openDialog(machine, <OperatorDialog onSave={handleSaveOperator} />)}>
-                                                                <User className="mr-2 h-4 w-4" />
-                                                                <span>Select Operator</span>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onSelect={() => openDialog(machine, <WasteDialog onSave={handleSaveWaste} />)}>
-                                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                                <span>Record Waste</span>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onSelect={() => openDialog(machine, <NotesDialog machine={machine} />)}>
-                                                                <FileText className="mr-2 h-4 w-4" />
-                                                                <span>Add Notes</span>
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </div>
-                                            </TableCell>
-                                        </motion.tr>
-                                    ))
-                                )}
+                                {
+                                    isLoading ? <TableLoader /> :
+                                        <>
+                                            {
+                                                displayedMachines?.map((machine, index) => (
+                                                    <motion.tr
+                                                        key={machine.uid}
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        exit={{ opacity: 0 }}
+                                                        transition={{ duration: 0.2 }}
+                                                        className={index % 2 === 0 ? 'bg-muted/50' : ''}>
+                                                        <TableCell className="text-center">{machine.machine.name}</TableCell>
+                                                        <TableCell className="text-center">
+                                                            <div className="flex flex-col items-center">
+                                                                {/* <Image src={machine.component.photoURL} alt={machine.component.name} width={30} height={30} className="rounded-md" /> */}
+                                                                <span className="text-sm mt-1">{machine.component.name}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="text-center">
+                                                            <div className="flex flex-col items-center">
+                                                                <span>{machine.currentProduction} / {machine.targetProduction}</span>
+                                                                <Progress value={(machine.currentProduction / machine.targetProduction) * 100} className="w-full max-w-[200px]" />
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="text-center">
+                                                            <span className={machine.cycleTime <= machine.component.targetTime ? 'text-green-600' : 'text-destructive'}>
+                                                                {machine.cycleTime}s
+                                                            </span>
+                                                            {' / '}
+                                                            <span>{machine.component.targetTime}s</span>
+                                                        </TableCell>
+                                                        <TableCell className="text-center">
+                                                            <StatusIndicator status={machine.status} />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="flex justify-center">
+                                                                <DropdownMenu>
+                                                                    <DropdownMenuTrigger asChild>
+                                                                        <Button variant="ghost" size="icon">
+                                                                            <EllipsisVerticalIcon className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </DropdownMenuTrigger>
+                                                                    <DropdownMenuContent>
+                                                                        <DropdownMenuItem onSelect={() => openProductionInfoDialog(machine, <ProductionInfoDialog machine={machine} />)}>
+                                                                            <TrendingUpDownIcon className="mr-2 h-4 w-4" />
+                                                                            <span>Insights</span>
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem onSelect={() => openDialog(machine, <OperatorDialog onSave={handleSaveOperator} />)}>
+                                                                            <User className="mr-2 h-4 w-4" />
+                                                                            <span>Select Operator</span>
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem onSelect={() => openDialog(machine, <WasteDialog onSave={handleSaveWaste} />)}>
+                                                                            <Trash2 className="mr-2 h-4 w-4" />
+                                                                            <span>Record Waste</span>
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem onSelect={() => openDialog(machine, <NotesDialog machine={machine} />)}>
+                                                                            <FileText className="mr-2 h-4 w-4" />
+                                                                            <span>Add Notes</span>
+                                                                        </DropdownMenuItem>
+                                                                    </DropdownMenuContent>
+                                                                </DropdownMenu>
+                                                            </div>
+                                                        </TableCell>
+                                                    </motion.tr>
+                                                ))
+                                            }
+                                        </>
+                                }
                             </AnimatePresence>
                         </TableBody>
                     </Table>

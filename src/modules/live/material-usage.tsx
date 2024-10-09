@@ -1,5 +1,6 @@
 "use client"
 
+import { formatDistance } from 'date-fns';
 import { useState, useMemo } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts"
@@ -20,6 +21,8 @@ import {
 } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
+import axios from "axios"
+import { useQuery } from "@tanstack/react-query"
 
 interface DataEntry {
     machine: string;
@@ -28,23 +31,73 @@ interface DataEntry {
     day?: number;
 }
 
-const generateData = (machines: number, days: number) => {
-    const data = []
-    for (let day = 1; day <= days; day++) {
-        for (let i = 1; i <= machines; i++) {
-            const totalMaterial = Math.floor(Math.random() * 50)
-            const masterBatch = Math.round(totalMaterial * (0.02 + Math.random() * 0.05)) // Between 2% and 7% of total material
-            const virginMaterial = totalMaterial - masterBatch
-            const entry = {
-                day,
-                machine: `M${i}`,
-                masterBatch,
-                virginMaterial,
-            }
-            data.push(entry)
-        }
-    }
-    return data
+type Machine = {
+    uid: number;
+    machineNumber: string;
+    status: string;
+    cycleTime: number;
+    cycleCounts: number;
+    shift: string;
+    currentProduction: number;
+    targetProduction: number;
+    masterBatchMaterial: number;
+    virginMaterial: number;
+    totalMaterialsUsed: number;
+    totalDownTime: number;
+    efficiency: number;
+    packagingTypeQtyRequired: number;
+    palletsNeeded: number;
+    packagingType: string;
+    eventTimeStamp: string;
+    component: {
+        uid: number;
+        name: string;
+        description: string;
+        photoURL: string;
+        weight: number;
+        volume: number;
+        code: string;
+        color: string;
+        cycleTime: number;
+        targetTime: number;
+        coolingTime: number;
+        chargingTime: number;
+        cavity: number;
+        configuration: string;
+        configQTY: number;
+        palletQty: number;
+        testMachine: string;
+        masterBatch: number;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+    };
+    mould: {
+        uid: number;
+        name: string;
+        serialNumber: string;
+        creationDate: string;
+        lastRepairDate: string;
+        mileage: number;
+        servicingMileage: number;
+        nextServiceDate: string | null;
+        status: string;
+    };
+    notes: string[];
+    machine: {
+        uid: number;
+        name: string;
+        machineNumber: string;
+        macAddress: string;
+        description: string;
+        creationDate: string;
+        status: string;
+    };
+};
+
+const getMachineData = async () => {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/live-run`)
+    return response?.data
 }
 
 const chartConfig = {
@@ -59,60 +112,63 @@ const chartConfig = {
 }
 
 export function MaterialUsageChart() {
-    const [timeFrame, setTimeFrame] = useState("last24Hours")
     const [selectedMachine, setSelectedMachine] = useState("all")
     const [view, setView] = useState("chart")
     const [currentPage, setCurrentPage] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(5)
 
-    const allData = useMemo(() => generateData(40, 30), [])
+    const { data: liveRunData } = useQuery({
+        queryKey: ['getMachineData'],
+        queryFn: getMachineData,
+        refetchInterval: 5000,
+        refetchOnMount: true,
+        refetchOnReconnect: false,
+    });
+
+    const extractedData = useMemo(() => {
+        if (!liveRunData) return [];
+        return liveRunData?.data?.map((machine: Machine) => {
+            const distance = formatDistance(new Date(machine.eventTimeStamp), new Date(), { addSuffix: true });
+            let day;
+            if (distance.includes('less than a day') || distance.includes('hours') || distance.includes('minutes')) {
+                day = 30;
+            } else if (distance.includes('days') && parseInt(distance) <= 7) {
+                day = 29;
+            } else {
+                day = 28;
+            }
+            return {
+                machine: `M${machine.machine.machineNumber}`,
+                masterBatch: machine.masterBatchMaterial,
+                virginMaterial: machine.virginMaterial,
+                day: day
+            };
+        });
+    }, [liveRunData]);
+
+    const allData = extractedData;
 
     const filteredData = useMemo(() => {
-        let filtered = allData
-        if (selectedMachine !== "all") {
-            filtered = filtered.filter(d => d.machine === selectedMachine)
+        if (selectedMachine === "all") {
+            return allData;
+        } else {
+            const result = allData.filter((d: DataEntry) => d.machine === selectedMachine);
+            return result;
         }
-        switch (timeFrame) {
-            case "last24Hours":
-                filtered = filtered.filter(d => d.day === 30)
-                break
-            case "lastWeek":
-                filtered = filtered.filter(d => d.day > 23)
-                break
-            case "lastMonth":
-                break
-        }
-        return filtered
-    }, [allData, selectedMachine, timeFrame])
+    }, [allData, selectedMachine]);
 
     const aggregatedData = useMemo(() => {
-        return filteredData.reduce<DataEntry[]>((acc, curr) => {
-            const existingEntry = acc.find(e => e.machine === curr.machine)
+        return filteredData?.reduce((acc: DataEntry[], curr: DataEntry) => {
+            const existingEntry = acc.find(e => e?.machine === curr?.machine);
             if (existingEntry) {
                 existingEntry.masterBatch += curr.masterBatch;
                 existingEntry.virginMaterial += curr.virginMaterial;
             } else {
-                acc.push({ ...curr })
+                acc.push({ ...curr });
             }
-            return acc
-        }, [])
-    }, [filteredData])
-
-    // const totalProduction = useMemo(() => {
-    //     return aggregatedData.reduce((total, curr) => total + curr.masterBatch + (curr as any).virginMaterial, 0)
-    // }, [aggregatedData])
-
-    // const masterBatchPercentage = useMemo(() => {
-    //     const totalMasterBatch = aggregatedData.reduce((total, curr) => total + curr.masterBatch, 0)
-    //     return (totalMasterBatch / totalProduction) * 100
-    // }, [aggregatedData, totalProduction])
-
-    // const trend = useMemo(() => {
-    //     const prevPeriodTotal = allData
-    //         .filter(d => d.day === (timeFrame === "last24Hours" ? 29 : timeFrame === "lastWeek" ? 23 : 1))
-    //         .reduce((total, curr) => total + curr.masterBatch + curr.virginMaterial, 0)
-    //     return ((totalProduction - prevPeriodTotal) / prevPeriodTotal) * 100
-    // }, [allData, timeFrame, totalProduction])
+            return acc;
+        }, [] as DataEntry[]);
+    }, [filteredData]);
 
     const totalPages = Math.ceil(aggregatedData.length / itemsPerPage)
     const paginatedData = aggregatedData.slice(
@@ -128,16 +184,6 @@ export function MaterialUsageChart() {
                     <CardDescription className="text-sm -mt-1">Real-time material usage for 40 machines</CardDescription>
                 </div>
                 <div className="flex flex-wrap gap-4 mt-4">
-                    <Select value={timeFrame} onValueChange={setTimeFrame}>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select time frame" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="last24Hours">Last 24 Hours</SelectItem>
-                            <SelectItem value="lastWeek">Last Week</SelectItem>
-                            <SelectItem value="lastMonth">Last Month</SelectItem>
-                        </SelectContent>
-                    </Select>
                     <Select value={selectedMachine} onValueChange={setSelectedMachine}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select machine" />
@@ -192,7 +238,7 @@ export function MaterialUsageChart() {
                                                     <p className="font-bold text-2xl text-gray-700">{payload[0].payload.machine}</p>
                                                     <p className="text-sm" style={{ color: chartConfig.masterBatch.color }}>Master Batch: {payload[0].value} kg</p>
                                                     <p className="text-sm" style={{ color: chartConfig.virginMaterial.color }}>Virgin Material: {data.virginMaterial} kg</p>
-                                                    <p className="font-bold text-lg mt-4 text-card-foreground">Total: {data.masterBatch + data.virginMaterial} kg</p>
+                                                    <p className="font-bold text-lg mt-4 text-card-foreground">Total: {(data.masterBatch + data.virginMaterial)?.toFixed(2)} kg</p>
                                                 </div>
                                             )
                                         }
