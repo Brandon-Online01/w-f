@@ -1,10 +1,11 @@
 "use client"
 
+import dynamic from 'next/dynamic'
 import * as React from "react"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 
-export function ThemeModeToggler() {
+const ThemeModeTogglerContent = () => {
     const { theme, setTheme } = useTheme()
 
     const cycleTheme = () => {
@@ -20,3 +21,7 @@ export function ThemeModeToggler() {
         </span>
     )
 }
+
+export const ThemeModeToggler = dynamic(() => Promise.resolve(ThemeModeTogglerContent), {
+    ssr: false
+})

@@ -17,7 +17,7 @@ export default function Home() {
             <div className="flex flex-col items-start justify-start gap-3 w-full">
                 <LiveRun />
             </div>
-            <Separator className="w-8/12 border border-card-foreground mx-auto my-5" />
+            <Separator className="w-8/12 border border-card-foreground/10 my-5 mx-auto " />
             <div className="flex flex-col items-start justify-start gap-3 px-1 w-full">
                 <div className="w-full h-[200px]">
                     <MaterialUsageChart />

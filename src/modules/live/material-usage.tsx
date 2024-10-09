@@ -103,11 +103,11 @@ const getMachineData = async () => {
 const chartConfig = {
     masterBatch: {
         label: "Master Batch",
-        color: "#eb4934",
+        color: "hsl(var(--chart-3))",
     },
     virginMaterial: {
         label: "Virgin Material",
-        color: "#58d67c",
+        color: "hsl(var(--chart-4))",
     },
 }
 
