@@ -19,13 +19,13 @@ export default function Home() {
             <div className="flex flex-col items-start justify-start gap-3 w-full">
                 <LiveRun />
             </div>
-            <Separator className="w-8/12 border border-card-foreground/10 my-5 mx-auto " />
+            {/* <Separator className="w-8/12 border border-card-foreground/10 my-5 mx-auto " />
             <div className="flex flex-col items-start justify-start gap-3 px-1 w-full">
                 <div className="flex flex-row items-start justify-center gap-3 w-full">
                     <ActivityCard />
                     <MouldRepairCard />
                 </div>
-            </div>
+            </div> */}
             <Separator className="w-8/12 border border-card-foreground/10 my-5 mx-auto " />
             <div className="flex flex-col items-start justify-start gap-3 px-1 w-full">
                 <div className="w-full h-[200px]">
