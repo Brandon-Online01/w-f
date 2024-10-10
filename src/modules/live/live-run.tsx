@@ -73,7 +73,7 @@ type Machine = {
         nextServiceDate: string | null;
         status: string;
     };
-    notes: string[];
+    notes: Note[];
     machine: {
         uid: number;
         name: string;
@@ -110,6 +110,13 @@ const useSignInStore = create<liveRunloadingState>((set) => ({
 
 interface SaveNotesProps {
     machineUid: number;
+    creationDate: string;
+    note: string;
+    type: string;
+}
+
+type Note = {
+    uid: number;
     creationDate: string;
     note: string;
     type: string;
@@ -234,7 +241,7 @@ const NotesDialog: React.FunctionComponent<NotesDialogProps> = (machine) => {
                             <SelectValue placeholder="Select note type" />
                         </SelectTrigger>
                         <SelectContent>
-                            {noteTypes.map((type) => (
+                            {noteTypes?.map((type) => (
                                 <SelectItem key={type} value={type}>
                                     {type}
                                 </SelectItem>
@@ -382,7 +389,12 @@ const ProductionInfoDialog: React.FunctionComponent<ProductionInfoDialogProps> =
                     </div>
                     <div className='flex flex-col justify-start gap-2 w-full border rounded p-2'>
                         <p className='uppercase text-[10px]'>Notes:</p>
-                        <p>{machine.notes}</p>
+                        {machine?.notes?.map((note: Note) => (
+                            <div key={note?.uid}>
+                                <p className='text-[10px] font-medium'>{new Date(note?.creationDate).toLocaleDateString()}</p>
+                                <p className='text-[14px] font-medium'>{note?.note}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </ScrollArea>
