@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown, EllipsisVerticalIcon, TrendingUpDownIcon, LucideClock5, GaugeIcon, Boxes } from "lucide-react"
+import { ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown, EllipsisVerticalIcon, TrendingUpDownIcon, LucideClock5, GaugeIcon, Boxes, Loader2 } from "lucide-react"
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
@@ -18,8 +18,8 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useForm, Controller } from "react-hook-form";
 import { format } from 'date-fns'
-import { toast } from 'sonner'
 import { create } from 'zustand'
+import toast from 'react-hot-toast';
 
 type Machine = {
     uid: number;
@@ -109,7 +109,7 @@ const useSignInStore = create<liveRunloadingState>((set) => ({
 }))
 
 interface SaveNotesProps {
-    machineUid: string;
+    machineUid: number;
     creationDate: string;
     note: string;
     type: string;
@@ -148,7 +148,7 @@ const ItemsPerPageSelect: React.FunctionComponent<ItemsPerPageSelectProps> = ({ 
 )
 
 const saveNotes = async (notesData: SaveNotesProps) => {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/machines/notes`, notesData)
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/machines/notes/${notesData.machineUid}`, notesData)
     return response?.data
 }
 
@@ -177,7 +177,10 @@ const NotesDialog: React.FunctionComponent<NotesDialogProps> = (machine) => {
             );
         },
         onSuccess: (data) => {
-            if (data.status === 'Success') {
+            console.log(data?.status === "Success", data?.message)
+
+            if (data?.status === "Success") {
+                setIsLoading(false)
                 toast(`${data?.message}`,
                     {
                         icon: '🎉',
@@ -200,12 +203,12 @@ const NotesDialog: React.FunctionComponent<NotesDialogProps> = (machine) => {
                     }
                 );
             }
-        },
+        }
     })
 
     const onSubmit = (formNotesData: { noteType: string; noteContent: string }) => {
         const notesData = {
-            machineUid: machine?.machine?.machine?.machineNumber,
+            machineUid: Number(machine?.machine?.machine?.machineNumber),
             creationDate: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
             note: formNotesData?.noteContent,
             type: formNotesData?.noteType
@@ -215,6 +218,7 @@ const NotesDialog: React.FunctionComponent<NotesDialogProps> = (machine) => {
 
         mutation.mutate(notesData)
     };
+
     return (
         <>
             <DialogHeader>
@@ -225,7 +229,7 @@ const NotesDialog: React.FunctionComponent<NotesDialogProps> = (machine) => {
                 control={control}
                 rules={{ required: "Note type is required" }}
                 render={({ field }) => (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select note type" />
                         </SelectTrigger>
@@ -250,12 +254,13 @@ const NotesDialog: React.FunctionComponent<NotesDialogProps> = (machine) => {
                         {...field}
                         placeholder="Enter notes about the run..."
                         className="min-h-[100px]"
+                        disabled={isLoading}
                     />
                 )}
             />
             {errors.noteContent && <span className="text-red-500 text-sm">{errors.noteContent.message}</span>}
 
-            <Button type="submit" onClick={handleSubmit(onSubmit)}>Save Notes</Button>
+            <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={isLoading}>{isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : 'Save Notes'}</Button>
         </>
     )
 }
