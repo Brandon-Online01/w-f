@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { User, Trash2, ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown, EllipsisVerticalIcon, TrendingUpDownIcon } from "lucide-react"
+import { User, Trash2, ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown, EllipsisVerticalIcon, TrendingUpDownIcon, LucideClock5, GaugeIcon, Boxes } from "lucide-react"
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
@@ -183,67 +183,121 @@ const ProductionInfoDialog: React.FunctionComponent<ProductionInfoDialogProps> =
     return (
         <>
             <DialogHeader>
-                <DialogTitle>Production Information: {machine.machine.name}</DialogTitle>
+                <DialogTitle>{machine.machine.name}</DialogTitle>
             </DialogHeader>
-            <ScrollArea className="h-[80vh] pr-4">
-                <div className="space-y-6">
-                    <section className="rounded-lg border p-4">
-                        <h2 className="text-lg font-semibold mb-2">Component Details</h2>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>Name: Component A</div>
-                            <div>Code: COMP-A-001</div>
-                            <div>Color: Red</div>
+            <ScrollArea className="flex-grow pr-4 mt-4">
+                <div className="space-y-6 flex flex-col justify-start gap-6">
+                    <div className='flex flex-col justify-start gap-4'>
+                        <div className='flex justify-between items-center'>
+                            <div className='flex flex-col justify-center items-center'>
+                                <p className='flex flex-row justify-center items-center gap-1'>
+                                    <span className='uppercase text-sm'>Efficiency</span>
+                                    <TrendingUpDownIcon className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                                </p>
+                                <p className='text-sm font-medium'>{machine?.efficiency}%</p>
+                            </div>
+                            <div className='flex flex-col justify-center items-center'>
+                                <p className='flex flex-row justify-center items-center gap-1'>
+                                    <span className='uppercase text-lg'>Run Times</span>
+                                    <LucideClock5 className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                                </p>
+                                <p className='text-sm font-medium'>{machine.cycleTime} / {machine.component.targetTime}s</p>
+                            </div>
+                            <div className='flex flex-col justify-center items-center'>
+                                <p className='flex flex-row justify-center items-center gap-1'>
+                                    <span className='uppercase text-lg'>Units Produced</span>
+                                    <GaugeIcon className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                                </p>
+                                <p className='text-sm font-medium'>{machine.currentProduction} / {machine.targetProduction}</p>
+                            </div>
+                            <div className='flex flex-col justify-center items-center'>
+                                <p className='flex flex-row justify-center items-center gap-1'>
+                                    <span className='uppercase text-lg'>Efficiency</span>
+                                    <Boxes className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                                </p>
+                                <p className='text-sm font-medium'>{machine.currentProduction}</p>
+                            </div>
                         </div>
-                    </section>
+                    </div>
+                    <div className='flex flex-row justify-start gap-4 flex-nowrap'>
+                        <div className='flex flex-col justify-start gap-2 w-1/2 border rounded p-2'>
+                            <div className='flex flex-col justify-start gap-3'>
+                                <div className='flex items-center justify-center border rounded p-1 gap-0 w-full'>
+                                    <Image
+                                        src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine.component.photoURL}`}
+                                        alt={machine.component.name}
+                                        width={100}
+                                        height={100}
+                                        className="rounded" />
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Name:</p>
+                                    <p>{machine.component.name}</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Weight:</p>
+                                    <p>{machine.component.weight}g</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Volume:</p>
+                                    <p>{machine.component.volume}ml</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Color:</p>
+                                    <p>{machine.component.color}</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Cycle Time:</p>
+                                    <p>{machine.component.cycleTime}s</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Target Time:</p>
+                                    <p>{machine.component.targetTime}s</p>
+                                </div>
 
-                    <section className="rounded-lg border p-4">
-                        <h2 className="text-lg font-semibold mb-2">Production Stats</h2>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>Current Production: 0</div>
-                            <div>Target Production: 0</div>
-                            <div>Efficiency: 0.00%</div>
+                            </div>
                         </div>
-                    </section>
-
-                    <section className="rounded-lg border p-4">
-                        <h2 className="text-lg font-semibold mb-2">Cycle Information</h2>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>Cycle Time: 0s</div>
-                            <div>Target Time: 20s</div>
-                            <div>Cycle Counts: 0</div>
+                        <div className='flex flex-col justify-start gap-2 w-1/2 border rounded p-2'>
+                            <div className='flex flex-col justify-start gap-3'>
+                                <div className='flex items-center justify-center border rounded p-1 gap-0 w-full'>
+                                    <Image
+                                        src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine.component.photoURL}`}
+                                        alt={machine.component.name}
+                                        width={100}
+                                        height={100}
+                                        className="rounded" />
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Name:</p>
+                                    <p>{machine.mould.name}</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Serial Number:</p>
+                                    <p>{machine.mould?.serialNumber}</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Service Date:</p>
+                                    <p>{machine.mould?.nextServiceDate}</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Status:</p>
+                                    <p>{machine.mould?.status}</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Mileage:</p>
+                                    <p>{machine.mould?.mileage}</p>
+                                </div>
+                                <div className='flex justify-start gap-1 w-full items-center'>
+                                    <p className='uppercase text-[10px]'>Service Date:</p>
+                                    <p>{machine.mould?.nextServiceDate}</p>
+                                </div>
+                            </div>
                         </div>
-                    </section>
-
-                    <section className="rounded-lg border p-4">
-                        <h2 className="text-lg font-semibold mb-2">Material Usage</h2>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>Master Batch Material: 0</div>
-                            <div>Virgin Material: 0</div>
-                            <div>Total Materials Used: 0</div>
-                        </div>
-                    </section>
-
-                    <section className="rounded-lg border p-4">
-                        <h2 className="text-lg font-semibold mb-2">Packaging</h2>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>Packaging Type: Box</div>
-                            <div>Quantity Required: 0</div>
-                            <div>Pallets Needed: 0</div>
-                        </div>
-                    </section>
-
-                    <section className="rounded-lg border p-4">
-                        <h2 className="text-lg font-semibold mb-2">Component Image</h2>
-                        <div className="flex justify-center">
-                            <Image
-                                src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
-                                alt={machine?.component?.name}
-                                className="rounded-md"
-                                width={200}
-                                height={200}
-                            />
-                        </div>
-                    </section>
+                    </div>
+                    <div className='flex flex-col justify-start gap-2 w-full border rounded p-2'>
+                        <p className='uppercase text-[10px]'>Notes:</p>
+                        <p>{machine.notes}</p>
+                    </div>
                 </div>
             </ScrollArea>
         </>

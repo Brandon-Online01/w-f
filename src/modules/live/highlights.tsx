@@ -22,19 +22,19 @@ export const LiveHighlights = () => {
 
     if (isLoading) return <HighlightCardsSkeleton count={4} />
 
-    if (isError) return <div>Error</div>
+    if (isError) return <HighlightCardsSkeleton count={4} />
 
     if (isEmpty(liveRunData?.data)) {
-        return <div>No data</div>
+        return <HighlightCardsSkeleton count={4} />
     }
 
     const { runningMachines, stoppedMachines, totalMasterBatch, totalVirginMaterials, totalDowntime, overallEfficiency } = liveRunData?.data
 
     const highlights = [
-        { title: "Material Usage", value: `${totalMasterBatch} / ${totalVirginMaterials}`, Icon: Layers, subTitle: "master batch / virgin material in kg" },
-        { title: "Machine Utilization", value: `${runningMachines} / ${stoppedMachines}`, Icon: Gauge, subTitle: `active machines / total machines` },
-        { title: "Total Downtime", value: `${totalDowntime} hrs`, Icon: Clock, subTitle: "total downtime in hours" },
-        { title: "Overall Efficiency", value: `${overallEfficiency}%`, Icon: Activity, subTitle: "overall machines efficiency" },
+        { title: "Material Usage", value: `${totalMasterBatch} / ${totalVirginMaterials}`, Icon: Layers, subTitle: "MasterBatch / Virgin Material in kg" },
+        { title: "Machine Utilization", value: `${runningMachines} / ${stoppedMachines}`, Icon: Gauge, subTitle: `Running / Stopped` },
+        { title: "Total Downtime", value: `${totalDowntime} hrs`, Icon: Clock, subTitle: "Total Downtime" },
+        { title: "Overall Efficiency", value: `${overallEfficiency}%`, Icon: Activity, subTitle: "Overall Efficiency" },
     ];
 
     return (
