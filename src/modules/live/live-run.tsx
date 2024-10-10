@@ -10,12 +10,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { User, Trash2, ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown, EllipsisVerticalIcon, TrendingUpDownIcon, LucideClock5, GaugeIcon, Boxes } from "lucide-react"
+import { ChevronLeft, ChevronRight, FileText, Search, Download, ArrowUp, ArrowDown, EllipsisVerticalIcon, TrendingUpDownIcon, LucideClock5, GaugeIcon, Boxes } from "lucide-react"
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useForm, Controller } from "react-hook-form";
+import { format } from 'date-fns'
+import { toast } from 'sonner'
+import { create } from 'zustand'
 
 type Machine = {
     uid: number;
@@ -94,6 +98,40 @@ interface ProductionInfoDialogProps {
     machine: Machine;
 }
 
+interface liveRunloadingState {
+    isLoading: boolean
+    setIsLoading: (isLoading: boolean) => void
+}
+
+const useSignInStore = create<liveRunloadingState>((set) => ({
+    isLoading: false,
+    setIsLoading: (isLoading: boolean) => set({ isLoading }),
+}))
+
+interface SaveNotesProps {
+    machineUid: string;
+    creationDate: string;
+    note: string;
+    type: string;
+}
+
+const noteTypes = [
+    "Incident Report",
+    "General Note",
+    "Mechanical Breakdown",
+    "Electrical Issue",
+    "Quality Control",
+    "Maintenance Request",
+    "Safety Concern",
+    "Production Delay",
+    "Material Shortage",
+    "Equipment Malfunction",
+    "Process Improvement Suggestion",
+    "Training Need",
+    "Shift Handover",
+    "Environmental Concern"
+];
+
 type SortConfig = { key: string | null; direction: 'asc' | 'desc' | null };
 
 const ItemsPerPageSelect: React.FunctionComponent<ItemsPerPageSelectProps> = ({ value, onChange }) => (
@@ -109,72 +147,115 @@ const ItemsPerPageSelect: React.FunctionComponent<ItemsPerPageSelectProps> = ({ 
     </Select>
 )
 
-const OperatorDialog = ({ onSave }: { onSave: (operator: string) => void }) => {
-    const [selectedOperator, setSelectedOperator] = useState('')
-
-    return (
-        <>
-            <DialogHeader>
-                <DialogTitle>Select Operator</DialogTitle>
-            </DialogHeader>
-            <Select value={selectedOperator} onValueChange={setSelectedOperator}>
-                <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select an operator" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="operator1">Operator 1</SelectItem>
-                    <SelectItem value="operator2">Operator 2</SelectItem>
-                    <SelectItem value="operator3">Operator 3</SelectItem>
-                </SelectContent>
-            </Select>
-            <Button onClick={() => onSave(selectedOperator)}>Save</Button>
-        </>
-    )
-}
-
-const WasteDialog = ({ onSave }: { onSave: (wasteType: string, weight: number) => void }) => {
-    const [wasteType, setWasteType] = useState('')
-    const [weight, setWeight] = useState('')
-
-    return (
-        <>
-            <DialogHeader>
-                <DialogTitle>Record Waste</DialogTitle>
-            </DialogHeader>
-            <Select value={wasteType} onValueChange={setWasteType}>
-                <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select waste type" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="type1">Waste Type 1</SelectItem>
-                    <SelectItem value="type2">Waste Type 2</SelectItem>
-                    <SelectItem value="type3">Waste Type 3</SelectItem>
-                </SelectContent>
-            </Select>
-            <Input
-                type="number"
-                placeholder="Weight in kg"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-            />
-            <Button onClick={() => onSave(wasteType, Number(weight))}>Save</Button>
-        </>
-    )
+const saveNotes = async (notesData: SaveNotesProps) => {
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/machines/notes`, notesData)
+    return response?.data
 }
 
 const NotesDialog: React.FunctionComponent<NotesDialogProps> = (machine) => {
-    console.log(machine, 'machine')
+    const { isLoading, setIsLoading } = useSignInStore()
+    const { control, handleSubmit, formState: { errors } } = useForm({
+        defaultValues: {
+            noteType: "",
+            noteContent: ""
+        }
+    });
 
+    const mutation = useMutation({
+        mutationFn: saveNotes,
+        onError: (error) => {
+            setIsLoading(false)
+            toast(`${error?.message}`,
+                {
+                    icon: '⛔',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        },
+        onSuccess: (data) => {
+            if (data.status === 'Success') {
+                toast(`${data?.message}`,
+                    {
+                        icon: '🎉',
+                        style: {
+                            borderRadius: '5px',
+                            background: '#333',
+                            color: '#fff',
+                        },
+                    }
+                );
+            } else {
+                toast(`${data?.message}`,
+                    {
+                        icon: '⛔',
+                        style: {
+                            borderRadius: '5px',
+                            background: '#333',
+                            color: '#fff',
+                        },
+                    }
+                );
+            }
+        },
+    })
+
+    const onSubmit = (formNotesData: { noteType: string; noteContent: string }) => {
+        const notesData = {
+            machineUid: machine?.machine?.machine?.machineNumber,
+            creationDate: format(new Date(), "yyyy-MM-dd'T'HH:mm:ss"),
+            note: formNotesData?.noteContent,
+            type: formNotesData?.noteType
+        }
+
+        setIsLoading(true)
+
+        mutation.mutate(notesData)
+    };
     return (
         <>
             <DialogHeader>
                 <DialogTitle>Add Notes</DialogTitle>
             </DialogHeader>
-            <Textarea
-                placeholder="Enter notes about the run..."
-                className="min-h-[100px]"
+            <Controller
+                name="noteType"
+                control={control}
+                rules={{ required: "Note type is required" }}
+                render={({ field }) => (
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select note type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {noteTypes.map((type) => (
+                                <SelectItem key={type} value={type}>
+                                    {type}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
             />
-            <Button>Save Notes</Button >
+            {errors.noteType && <span className="text-red-500 text-sm">{errors.noteType.message}</span>}
+
+            <Controller
+                name="noteContent"
+                control={control}
+                rules={{ required: "Note content is required" }}
+                render={({ field }) => (
+                    <Textarea
+                        {...field}
+                        placeholder="Enter notes about the run..."
+                        className="min-h-[100px]"
+                    />
+                )}
+            />
+            {errors.noteContent && <span className="text-red-500 text-sm">{errors.noteContent.message}</span>}
+
+            <Button type="submit" onClick={handleSubmit(onSubmit)}>Save Notes</Button>
         </>
     )
 }
@@ -388,14 +469,6 @@ export default function LiveRun() {
     const endIndex = startIndex + itemsPerPage
     const displayedMachines = filteredMachines.slice(startIndex, endIndex)
 
-    const handleSaveOperator = (operator: string) => {
-        console.log(operator)
-    }
-
-    const handleSaveWaste = (wasteType: string, weight: number) => {
-        console.log(wasteType, weight)
-    }
-
     const openDialog = (machine: Machine, content: React.ReactNode) => {
         setDialogContent(content)
         setDialogOpen(true)
@@ -577,14 +650,6 @@ export default function LiveRun() {
                                                                             <TrendingUpDownIcon className="mr-2 h-4 w-4" />
                                                                             <span>Insights</span>
                                                                         </DropdownMenuItem>
-                                                                        <DropdownMenuItem onSelect={() => openDialog(machine, <OperatorDialog onSave={handleSaveOperator} />)}>
-                                                                            <User className="mr-2 h-4 w-4" />
-                                                                            <span>Select Operator</span>
-                                                                        </DropdownMenuItem>
-                                                                        <DropdownMenuItem onSelect={() => openDialog(machine, <WasteDialog onSave={handleSaveWaste} />)}>
-                                                                            <Trash2 className="mr-2 h-4 w-4" />
-                                                                            <span>Record Waste</span>
-                                                                        </DropdownMenuItem>
                                                                         <DropdownMenuItem onSelect={() => openDialog(machine, <NotesDialog machine={machine} />)}>
                                                                             <FileText className="mr-2 h-4 w-4" />
                                                                             <span>Add Notes</span>
@@ -628,7 +693,7 @@ export default function LiveRun() {
                 </div>
             </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent>
+                <DialogContent className='w-1/2'>
                     {dialogContent}
                 </DialogContent>
             </Dialog>
