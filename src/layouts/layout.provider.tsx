@@ -47,7 +47,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
 
     useEffect(() => {
         validateSession();
-    }, [status, token, isSignInPage]);
+    }, [status, token, isSignInPage, validateSession]);
 
     const MainApp = () => {
         return (
@@ -68,19 +68,19 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
         )
     }
 
-    const PageLoader = () => {
-        return (
-            <div className="w-full h-full flex items-center justify-center">
-                <div className="loading">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        )
-    }
+    // const PageLoader = () => {
+    //     return (
+    //         <div className="w-full h-full flex items-center justify-center">
+    //             <div className="loading">
+    //                 <span></span>
+    //                 <span></span>
+    //                 <span></span>
+    //                 <span></span>
+    //                 <span></span>
+    //             </div>
+    //         </div>
+    //     )
+    // }
 
     return <MainApp />;
 };

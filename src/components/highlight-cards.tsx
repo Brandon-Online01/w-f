@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Hourglass, Loader2, LucideIcon, Weight } from "lucide-react"
+import { Loader2, LucideIcon } from "lucide-react"
 import { Skeleton } from "./ui/skeleton";
 
 interface HighlightItem {
