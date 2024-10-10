@@ -212,7 +212,8 @@ export function MaterialUsageChart() {
                                         // angle: -45,
                                         textAnchor: 'end',
                                         fontSize: 10,
-                                        dy: 2
+                                        dy: 2,
+                                        color: 'hsl(var(--card-foreground))'
                                     }}
                                     height={60}
                                     axisLine={true}
@@ -230,6 +231,7 @@ export function MaterialUsageChart() {
                                     style={{
                                         fontSize: 10,
                                         textAnchor: 'end',
+                                        color: 'hsl(var(--card-foreground))'
                                     }}
                                 />
                                 <Tooltip

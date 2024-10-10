@@ -2,8 +2,8 @@
 
 export default function Page() {
     return (
-        <div className="flex flex-col items-start h-screen">
-            <p>staff page</p>
+        <div className="flex items-center justify-center h-screen">
+            <p className="text-xs uppercase font-medium text-card-foreground">Staff Page - Coming Soon</p>
         </div>
     );
 }
