@@ -5,8 +5,8 @@ import { MaterialUsageChart } from "@/modules/live/material-usage"
 import LiveRun from "@/modules/live/live-run";
 import { Separator } from "@/components/ui/separator";
 import { LiveHighlights } from "@/modules/live/highlights";
-import ActivityCard from "@/modules/live/activity-card";
-import MouldRepairCard from "@/modules/live/repairs-card";
+// import ActivityCard from "@/modules/live/activity-card";
+// import MouldRepairCard from "@/modules/live/repairs-card";
 
 export default function Home() {
     return (
