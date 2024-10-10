@@ -47,7 +47,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
 
     useEffect(() => {
         validateSession();
-    }, [status, token, isSignInPage, validateSession]);
+    }, [status, token, isSignInPage]);
 
     const MainApp = () => {
         return (

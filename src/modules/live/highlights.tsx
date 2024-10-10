@@ -28,15 +28,13 @@ export const LiveHighlights = () => {
         return <div>No data</div>
     }
 
-    console.log(liveRunData?.data)
-
-    const { activeMachines, stoppedMachines, totalMachines, totalMasterBatchMaterial, totalVirginMaterial } = liveRunData?.data
+    const { runningMachines, stoppedMachines, totalMasterBatch, totalVirginMaterials, totalDowntime, overallEfficiency } = liveRunData?.data
 
     const highlights = [
-        { title: "Material Usage", value: `${totalMasterBatchMaterial} / ${totalVirginMaterial}`, Icon: Layers, subTitle: "master batch / virgin material in kg" },
-        { title: "Machine Utilization", value: `${activeMachines} / ${stoppedMachines}`, Icon: Gauge, subTitle: `active machines / total machines` },
-        { title: "Total Downtime", value: `${stoppedMachines} hrs`, Icon: Clock, subTitle: "total downtime in hours" },
-        { title: "Overall Efficiency", value: `${(activeMachines / totalMachines) * 100}%`, Icon: Activity, subTitle: "overall machines efficiency" },
+        { title: "Material Usage", value: `${totalMasterBatch} / ${totalVirginMaterials}`, Icon: Layers, subTitle: "master batch / virgin material in kg" },
+        { title: "Machine Utilization", value: `${runningMachines} / ${stoppedMachines}`, Icon: Gauge, subTitle: `active machines / total machines` },
+        { title: "Total Downtime", value: `${totalDowntime} hrs`, Icon: Clock, subTitle: "total downtime in hours" },
+        { title: "Overall Efficiency", value: `${overallEfficiency}%`, Icon: Activity, subTitle: "overall machines efficiency" },
     ];
 
     return (
