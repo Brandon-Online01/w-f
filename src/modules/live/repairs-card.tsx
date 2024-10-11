@@ -38,6 +38,34 @@ const mouldRepairData: MouldRepairEntry[] = [
         severity: "Low",
         action: "Inspected and treated small mould spots",
         completedTime: "05:15 PM"
+    },
+    {
+        time: "09:00 AM",
+        roomNumber: "R101",
+        severity: "Low",
+        action: "Applied anti-mould treatment",
+        completedTime: "09:30 AM"
+    },
+    {
+        time: "11:30 AM",
+        roomNumber: "R202",
+        severity: "Medium",
+        action: "Removed affected drywall, scheduled replacement",
+        completedTime: "12:15 PM"
+    },
+    {
+        time: "02:15 PM",
+        roomNumber: "R103",
+        severity: "High",
+        action: "Full remediation started, dehumidifiers installed",
+        completedTime: "04:30 PM"
+    },
+    {
+        time: "04:45 PM",
+        roomNumber: "R305",
+        severity: "Low",
+        action: "Inspected and treated small mould spots",
+        completedTime: "05:15 PM"
     }
 ]
 

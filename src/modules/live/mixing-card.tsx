@@ -68,6 +68,13 @@ const timelineData: TimelineEntry[] = [
         noteSavedTime: "04:40 PM"
     },
     {
+        time: "09:00 AM",
+        machineNumber: "M001",
+        status: "Running",
+        note: "Regular maintenance completed",
+        noteSavedTime: "08:55 AM"
+    },
+    {
         time: "11:30 AM",
         machineNumber: "M002",
         status: "Idle",
@@ -90,11 +97,11 @@ const timelineData: TimelineEntry[] = [
     }
 ]
 
-export default function ActivityCard() {
+export default function MixingCard() {
     return (
         <Card className="w-full max-w-2xl mx-auto h-[450px] overflow-hidden">
             <CardHeader>
-                <CardTitle className="text-2xl font-bold">Production</CardTitle>
+                <CardTitle className="text-2xl font-bold">Materials Mixing</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="space-y-6 h-[400px] overflow-y-scroll pb-20">

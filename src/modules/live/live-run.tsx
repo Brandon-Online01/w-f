@@ -32,7 +32,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Skeleton } from "@/components/ui/skeleton"
 import {
     ChevronLeft,
     ChevronRight,
@@ -581,58 +580,132 @@ export default function LiveRun() {
         return <ArrowDown className="h-4 w-4 inline-block ml-1" />
     }
 
-    const TableLoader = () => {
+    const TableContent = () => {
+        if (isLoading) {
+            return (
+                <TableRow>
+                    <TableCell colSpan={6} className="h-[550px]">
+                        <div className="flex justify-center items-center h-full">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                    </TableCell>
+                </TableRow>
+            );
+        }
+
         return (
-            <>
+            <AnimatePresence>
                 {
-                    Array.from({ length: itemsPerPage }).map((_, index) => (
-                        <TableRow key={index}>
-                            <TableCell colSpan={6}>
-                                <Skeleton className="h-12 w-full" />
+                    displayedMachines?.map((machine) => (
+                        <motion.tr
+                            key={machine.uid}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}>
+                            <TableCell className="text-center">{machine.machine.name}</TableCell>
+                            <TableCell className="text-center">
+                                <div className="flex flex-col items-center">
+                                    <Image
+                                        src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine.component.photoURL}`}
+                                        alt={machine.component.name}
+                                        width={80}
+                                        height={80}
+                                        className="rounded" />
+                                    <span className="text-sm mt-1">{machine.component.name}</span>
+                                </div>
                             </TableCell>
-                        </TableRow>
+                            <TableCell className="text-center">
+                                <div className="flex flex-col items-center">
+                                    <span>{machine.currentProduction} / {machine.targetProduction}</span>
+                                    <Progress value={(machine.currentProduction / machine.targetProduction) * 100} className="w-full max-w-[200px]" />
+                                </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                                <span className={machine.cycleTime <= machine.component.targetTime ? 'text-green-600' : 'text-destructive'}>
+                                    {machine.cycleTime}s
+                                </span>
+                                {' / '}
+                                <span>{machine.component.targetTime}s</span>
+                            </TableCell>
+                            <TableCell className="text-center">
+                                <StatusIndicator status={machine.status} />
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex justify-center">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon">
+                                                <EllipsisVerticalIcon className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem onSelect={() => openProductionInfoDialog(machine, <ProductionInfoDialog machine={machine} />)}>
+                                                <TrendingUpDownIcon className="mr-2 h-4 w-4" />
+                                                <span>Insights</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => openDialog(machine, <NotesDialog machine={machine} />)}>
+                                                <FileText className="mr-2 h-4 w-4" />
+                                                <span>Add Notes</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </TableCell>
+                        </motion.tr>
                     ))
                 }
-            </>
+            </AnimatePresence>
         )
     }
 
     return (
         <div className=" w-full h-full">
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="flex justify-between items-center mb-4">
-                <div className="flex items-center space-x-2">
-                    <div className="relative">
-                        <Search className="h-4 w-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <Input
-                            type="text"
-                            placeholder="Search machines..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-8 w-64"
-                        />
+                className="flex justify-between items-center">
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}>
+                    <div className="flex items-center space-x-2">
+                        <div className="relative">
+                            <Search className="h-4 w-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <Input
+                                type="text"
+                                placeholder="Search machines..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-8 w-64"
+                            />
+                        </div>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Filter by status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="All">All Statuses</SelectItem>
+                                <SelectItem value="Running">Running</SelectItem>
+                                <SelectItem value="Stopped">Stopped</SelectItem>
+                                <SelectItem value="Maintenance">Maintenance</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Filter by status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="All">All Statuses</SelectItem>
-                            <SelectItem value="Running">Running</SelectItem>
-                            <SelectItem value="Stopped">Stopped</SelectItem>
-                            <SelectItem value="Maintenance">Maintenance</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <Button onClick={exportToExcel} className="flex items-center space-x-2">
-                    <Download className="h-4 w-4" />
-                    <span>Export to Excel</span>
-                </Button>
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="flex items-center space-x-2">
+                    <Button onClick={exportToExcel} className="flex items-center space-x-2">
+                        <Download className="h-4 w-4" />
+                        <span>Export to Excel</span>
+                    </Button>
+                </motion.div>
             </motion.div>
-            <div className="rounded-md border overflow-hidden">
+            <div className="rounded mt-2 border overflow-hidden">
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader className="sticky top-0 bg-background z-10">
@@ -655,80 +728,27 @@ export default function LiveRun() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <AnimatePresence>
-                                {
-                                    isLoading ? <TableLoader /> :
-                                        <>
-                                            {
-                                                displayedMachines?.map((machine) => (
-                                                    <motion.tr
-                                                        key={machine.uid}
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        exit={{ opacity: 0 }}
-                                                        transition={{ duration: 0.2 }}>
-                                                        <TableCell className="text-center">{machine.machine.name}</TableCell>
-                                                        <TableCell className="text-center">
-                                                            <div className="flex flex-col items-center">
-                                                                <Image
-                                                                    src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine.component.photoURL}`}
-                                                                    alt={machine.component.name}
-                                                                    width={80}
-                                                                    height={80}
-                                                                    className="rounded" />
-                                                                <span className="text-sm mt-1">{machine.component.name}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            <div className="flex flex-col items-center">
-                                                                <span>{machine.currentProduction} / {machine.targetProduction}</span>
-                                                                <Progress value={(machine.currentProduction / machine.targetProduction) * 100} className="w-full max-w-[200px]" />
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            <span className={machine.cycleTime <= machine.component.targetTime ? 'text-green-600' : 'text-destructive'}>
-                                                                {machine.cycleTime}s
-                                                            </span>
-                                                            {' / '}
-                                                            <span>{machine.component.targetTime}s</span>
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            <StatusIndicator status={machine.status} />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex justify-center">
-                                                                <DropdownMenu>
-                                                                    <DropdownMenuTrigger asChild>
-                                                                        <Button variant="ghost" size="icon">
-                                                                            <EllipsisVerticalIcon className="h-4 w-4" />
-                                                                        </Button>
-                                                                    </DropdownMenuTrigger>
-                                                                    <DropdownMenuContent>
-                                                                        <DropdownMenuItem onSelect={() => openProductionInfoDialog(machine, <ProductionInfoDialog machine={machine} />)}>
-                                                                            <TrendingUpDownIcon className="mr-2 h-4 w-4" />
-                                                                            <span>Insights</span>
-                                                                        </DropdownMenuItem>
-                                                                        <DropdownMenuItem onSelect={() => openDialog(machine, <NotesDialog machine={machine} />)}>
-                                                                            <FileText className="mr-2 h-4 w-4" />
-                                                                            <span>Add Notes</span>
-                                                                        </DropdownMenuItem>
-                                                                    </DropdownMenuContent>
-                                                                </DropdownMenu>
-                                                            </div>
-                                                        </TableCell>
-                                                    </motion.tr>
-                                                ))
-                                            }
-                                        </>
-                                }
-                            </AnimatePresence>
+                            <TableContent />
                         </TableBody>
                     </Table>
                 </div>
-            </div>
-            <div className="flex justify-between items-center mt-6">
-                <ItemsPerPageSelect value={itemsPerPage} onChange={setItemsPerPage} />
-                <div className="flex items-center space-x-2">
+            </div >
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex justify-between items-center mt-2">
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}>
+                    <ItemsPerPageSelect value={itemsPerPage} onChange={setItemsPerPage} />
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="flex items-center space-x-2">
                     <Button
                         onClick={() => setPage(p => Math.max(1, p - 1))}
                         disabled={page === 1}
@@ -748,13 +768,13 @@ export default function LiveRun() {
                         className="hover:bg-muted">
                         <ChevronRight className="h-4 w-4" />
                     </Button>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent className='w-1/2'>
                     {dialogContent}
                 </DialogContent>
             </Dialog>
-        </div>
+        </div >
     )
 }

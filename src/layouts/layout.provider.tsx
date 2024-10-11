@@ -25,8 +25,6 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
     const router = useRouter();
     const { status, token } = useSessionStore();
 
-    console.log(status, token, 'here')
-
     const validateSession = async () => {
         if ((status === 'unauthenticated' || !token) && !isSignInPage) {
             router.push('/sign-in');
