@@ -599,7 +599,11 @@ export default function LiveRun() {
 
     return (
         <div className=" w-full h-full">
-            <div className="flex justify-between items-center mb-4">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex justify-between items-center mb-4">
                 <div className="flex items-center space-x-2">
                     <div className="relative">
                         <Search className="h-4 w-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -627,7 +631,7 @@ export default function LiveRun() {
                     <Download className="h-4 w-4" />
                     <span>Export to Excel</span>
                 </Button>
-            </div>
+            </motion.div>
             <div className="rounded-md border overflow-hidden">
                 <div className="overflow-x-auto">
                     <Table>
@@ -730,11 +734,11 @@ export default function LiveRun() {
                         disabled={page === 1}
                         size="icon"
                         variant="ghost"
-                        className="hover:bg-muted">
+                        className="hover:bg-muted border-0">
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span className="text-sm">
-                        Page {page} of {totalPages}
+                        {page} of {totalPages}
                     </span>
                     <Button
                         onClick={() => setPage(p => Math.min(totalPages, p + 1))}

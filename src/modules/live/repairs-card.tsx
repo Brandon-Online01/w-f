@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, Droplet } from "lucide-react"
+import { motion } from "framer-motion"
 
 type MouldRepairEntry = {
     time: string
@@ -42,14 +43,19 @@ const mouldRepairData: MouldRepairEntry[] = [
 
 export default function MouldRepairCard() {
     return (
-        <Card className="w-full max-w-2xl mx-auto h-full">
+        <Card className="w-full max-w-2xl mx-auto h-[450px] overflow-hidden">
             <CardHeader>
                 <CardTitle className="text-2xl font-bold">Tool Room</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="space-y-6">
+                <div className="space-y-6 h-[400px] overflow-y-scroll pb-20">
                     {mouldRepairData.map((entry, index) => (
-                        <div key={index} className="flex items-start space-x-4">
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                            className="flex items-start space-x-4">
                             <div className="flex-shrink-0 w-16 text-sm font-medium text-card-foreground">
                                 {entry.time}
                             </div>
@@ -70,7 +76,7 @@ export default function MouldRepairCard() {
                                     <span className="text-card-foreground ml-1">Completed at {entry.completedTime}</span>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </CardContent>

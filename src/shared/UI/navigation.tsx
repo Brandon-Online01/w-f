@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { useSessionStore } from "@/session/session.provider";
 import { ThemeModeToggler } from "./theme-mode-toggler";
+import { motion } from "framer-motion";
 
 export const Navigation = () => {
     return (
@@ -91,39 +92,59 @@ export const DesktopNavigation = () => {
     return (
         <div className="xl:flex w-full flex-col justify-between py-4 h-full hidden">
             <ul className="flex w-full flex-col gap-5">
-                <li className="flex items-center justify-center cursor-pointer">
-                    <Link href="/">
-                        <TrendingUpDown strokeWidth={1} size={18} className={`${pathname === '/' ? 'stroke-primary' : 'stroke-card-foreground'}`} />
-                    </Link>
-                </li>
-                <li className="flex items-center justify-center cursor-pointer">
-                    <Link href="/staff">
-                        <UsersIcon strokeWidth={1} size={18} className={`${pathname === '/staff' ? 'stroke-primary' : 'stroke-card-foreground'}`} />
-                    </Link>
-                </li>
-                <li className="flex items-center justify-center cursor-pointer">
-                    <Link href="/reports">
-                        <LibraryBig strokeWidth={1} size={18} className={`${pathname === '/reports' ? 'stroke-primary' : 'stroke-card-foreground'}`} />
-                    </Link>
-                </li>
-                <li className="flex items-center justify-center cursor-pointer">
-                    <Link href="/inventory">
-                        <Blocks strokeWidth={1} size={18} className={`${pathname === '/inventory' ? 'stroke-primary' : 'stroke-card-foreground'}`} />
-                    </Link>
-                </li>
+                {[
+                    { href: "/", Icon: TrendingUpDown },
+                    { href: "/staff", Icon: UsersIcon },
+                    { href: "/reports", Icon: LibraryBig },
+                    { href: "/inventory", Icon: Blocks },
+                ].map((item, index) => (
+                    <motion.li
+                        key={item.href}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        className="flex items-center justify-center cursor-pointer"
+                    >
+                        <Link href={item.href}>
+                            <item.Icon
+                                strokeWidth={1}
+                                size={18}
+                                className={`${pathname === item.href ? 'stroke-primary' : 'stroke-card-foreground'}`}
+                            />
+                        </Link>
+                    </motion.li>
+                ))}
             </ul>
             <ul className="flex w-full flex-col gap-5">
-                <li className="flex items-center justify-center cursor-pointer">
-                    <Link href="/settings">
-                        <Settings strokeWidth={1} size={18} className={`${pathname === '/settings' ? 'stroke-primary' : 'stroke-card-foreground'}`} />
-                    </Link>
-                </li>
-                <li className="flex items-center justify-center cursor-pointer">
-                    <ThemeModeToggler />
-                </li>
-                <li className="flex items-center justify-center cursor-pointer" onClick={signOut}>
-                    <Image src={signOutIcon} alt="logo" width={25} height={25} className="rounded-full" />
-                </li>
+                {[
+                    { href: "/settings", Icon: Settings },
+                    { component: ThemeModeToggler },
+                    { onClick: signOut, Icon: () => <Image src={signOutIcon} alt="logo" width={25} height={25} className="rounded-full" /> },
+                ].map((item, index) => (
+                    <motion.li
+                        key={index}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: (index + 4) * 0.1 }}
+                        className="flex items-center justify-center cursor-pointer"
+                    >
+                        {item.href ? (
+                            <Link href={item.href}>
+                                <item.Icon
+                                    strokeWidth={1}
+                                    size={18}
+                                    className={`${pathname === item.href ? 'stroke-primary' : 'stroke-card-foreground'}`}
+                                />
+                            </Link>
+                        ) : item.component ? (
+                            <item.component />
+                        ) : (
+                            <div onClick={item.onClick}>
+                                <item.Icon />
+                            </div>
+                        )}
+                    </motion.li>
+                ))}
             </ul>
         </div>
     )
