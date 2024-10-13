@@ -5,10 +5,10 @@ import { Radio } from "lucide-react";
 import { MaterialUsageChart } from "@/modules/live/material-usage"
 import LiveRun from "@/modules/live/live-run";
 import { Separator } from "@/components/ui/separator";
-import MouldRepairCard from "@/modules/live/repairs-card";
-import { LiveHighlights } from "@/modules/live/highlights";
-import ActivityCard from "@/modules/live/activity-card";
-import MixingCard from "@/modules/live/mixing-card";
+import { LiveHighlights } from "@/modules/live/highlights/highlights";
+import ActivityCard from "@/modules/live/cards/activity-card";
+import MouldRepairCard from "@/modules/live/cards/repairs-card";
+import MixingCard from "@/modules/live/cards/mixing-card";
 
 export default function Home() {
     return (
