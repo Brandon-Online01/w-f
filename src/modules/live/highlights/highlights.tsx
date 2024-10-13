@@ -1,15 +1,10 @@
 'use client'
 
 import HighlightsCards, { HighlightCardsSkeleton } from "@/components/highlight-cards"
+import { getHighlightsData } from "@/shared/helpers/live-run";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { isEmpty } from "lodash";
 import { Activity, Clock, Gauge, Layers } from "lucide-react";
-
-const getHighlightsData = async () => {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/highlights`)
-    return response?.data
-}
 
 export const LiveHighlights = () => {
     const { data: liveRunData, isLoading, isError } = useQuery({

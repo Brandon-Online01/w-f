@@ -20,30 +20,39 @@ export const InsightsDialog: React.FunctionComponent<InsightsDialogProps> = ({ m
                             <div className='flex flex-col justify-center items-center'>
                                 <p className='flex flex-row justify-center items-center gap-1'>
                                     <span className='uppercase text-sm'>Efficiency</span>
-                                    <TrendingUpDownIcon className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                                    <TrendingUpDownIcon className="stroke-card-foreground" strokeWidth={1.5} size={18} />
                                 </p>
-                                <p className='text-sm font-medium'>{machine?.efficiency}%</p>
+                                <p className='text-lg font-medium'>
+                                    {machine?.efficiency}%
+                                    <span className="text-[12px]">%</span>
+                                </p>
                             </div>
                             <div className='flex flex-col justify-center items-center'>
                                 <p className='flex flex-row justify-center items-center gap-1'>
-                                    <span className='uppercase text-lg'>Run Times</span>
-                                    <LucideClock5 className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                                    <span className='uppercase text-sm'>Run Times</span>
+                                    <LucideClock5 className="stroke-card-foreground" strokeWidth={1.5} size={18} />
                                 </p>
-                                <p className='text-sm font-medium'>{machine.cycleTime} / {machine.component.targetTime}s</p>
+                                <p className='text-lg font-medium'>
+                                    {machine.cycleTime} / {machine.component.targetTime}
+                                    <span className="text-[12px]">s</span>
+                                </p>
                             </div>
                             <div className='flex flex-col justify-center items-center'>
                                 <p className='flex flex-row justify-center items-center gap-1'>
-                                    <span className='uppercase text-lg'>Units Produced</span>
-                                    <GaugeIcon className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                                    <span className='uppercase text-sm text-wrap'>Units Produced</span>
+                                    <GaugeIcon className="stroke-card-foreground" strokeWidth={1.5} size={18} />
                                 </p>
-                                <p className='text-sm font-medium'>{machine.currentProduction} / {machine.targetProduction}</p>
+                                <p className='text-lg font-medium'>{machine.currentProduction} / {machine.targetProduction}</p>
                             </div>
                             <div className='flex flex-col justify-center items-center'>
                                 <p className='flex flex-row justify-center items-center gap-1'>
-                                    <span className='uppercase text-lg'>Efficiency</span>
-                                    <Boxes className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                                    <span className='uppercase text-sm'>Materials Usage</span>
+                                    <Boxes className="stroke-card-foreground" strokeWidth={1.5} size={18} />
                                 </p>
-                                <p className='text-sm font-medium'>{machine.currentProduction}</p>
+                                <p className='text-lg font-medium'>
+                                    {machine?.masterBatchMaterial} / {machine?.virginMaterial}
+                                    <span className="text-[12px]">kg</span>
+                                </p>
                             </div>
                         </div>
                     </div>

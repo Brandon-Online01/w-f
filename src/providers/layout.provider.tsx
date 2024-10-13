@@ -1,12 +1,12 @@
 'use client'
 
-import { Toaster } from 'react-hot-toast';
-import { ReactNode, useEffect, useState } from "react";
-import { Navigation } from "@/shared/UI/navigation";
-import { usePathname, useRouter } from "next/navigation";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useSessionStore } from '@/session/session.provider';
 import { jwtDecode } from "jwt-decode";
+import { Toaster } from 'react-hot-toast';
+import { Navigation } from "@/shared/UI/navigation";
+import { ReactNode, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useSessionStore } from '@/session/session.provider';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
 
@@ -23,6 +23,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
     useEffect(() => {
         const validateSession = async () => {
             setIsLoading(true);
+            const startTime = Date.now();
 
             if (status === 'unauthenticated' || !token) {
                 if (pathname !== '/sign-in') {
@@ -31,10 +32,13 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
             } else {
                 try {
                     const decodedToken = jwtDecode(token);
+
                     if (decodedToken.exp && decodedToken.exp < Date.now() / 1000) {
                         signOut();
                         router.push('/sign-in');
-                    } else if (pathname === '/sign-in') {
+                    }
+
+                    if (pathname === '/sign-in') {
                         router.push('/');
                     }
                 } catch (error) {
@@ -44,9 +48,12 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
                 }
             }
 
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, 100 - elapsedTime);
+
             setTimeout(() => {
                 setIsLoading(false);
-            }, 200);
+            }, remainingTime);
         };
 
         validateSession();
@@ -70,13 +77,13 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <div className={`w-full h-screen flex flex-col lg:flex-row items-center justify-center lg:gap-2 gap-1 relative ${pathname === '/sign-in' ? '' : 'p-1 lg:p-2'}`}>
+            <div className={`w-full h-screen flex flex-col xl:flex-row items-center justify-center xl:gap-2 gap-1 relative ${pathname === '/sign-in' ? '' : 'p-1 xl:p-2'}`}>
                 {pathname !== '/sign-in' && (
-                    <div className="border h-10 w-full lg:w-[3%] rounded p-2 flex justify-center h-[5%] lg:h-full ease-in-out duration-300 bg-card">
+                    <div className="border h-10 w-full xl:w-[3%] rounded p-2 flex justify-center h-[5%] xl:h-full ease-in-out duration-300 bg-card">
                         <Navigation />
                     </div>
                 )}
-                <div className={`${pathname === '/sign-in' ? 'w-full h-full' : 'lg:w-[97%] rounded'} lg:h-full h-[95%] ease-in-out duration-300`}>
+                <div className={`${pathname === '/sign-in' ? 'w-full h-full' : 'xl:w-[97%] rounded'} xl:h-full h-[95%] ease-in-out duration-300`}>
                     {children}
                 </div>
             </div>

@@ -377,7 +377,7 @@ export default function LiveRun() {
                 </motion.div>
             </motion.div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent className='w-1/2'>
+                <DialogContent className='w-3/4'>
                     {dialogContent}
                 </DialogContent>
             </Dialog>

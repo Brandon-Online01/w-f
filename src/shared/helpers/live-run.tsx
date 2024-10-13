@@ -36,3 +36,8 @@ export const exportToExcel = (filteredMachines: Machine[]) => {
         document.body.removeChild(link)
     }
 }
+
+export const getHighlightsData = async () => {
+    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/highlights`)
+    return data
+}
