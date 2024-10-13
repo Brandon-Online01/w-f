@@ -87,9 +87,10 @@ export default function InventoryManagement() {
         }
     }, [componentsData?.data, setProducts]);
 
-    const filteredComponents = products.filter((product: any) => {
-        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesStatus = statusFilter === "all" || product.status.toLowerCase() === statusFilter
+    const filteredComponents = products.filter((product: Component) => {
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === "all" || product.status.toLowerCase() === statusFilter;
+
         return matchesSearch && matchesStatus
     })
 

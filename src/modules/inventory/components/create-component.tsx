@@ -4,7 +4,6 @@ import { DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { useState } from 'react'
 import { Upload } from 'lucide-react'
 import Image from 'next/image'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -31,7 +30,7 @@ const useComponentStore = create<ComponentStore>((set) => ({
 }))
 
 export const CreateComponentForm = () => {
-    const { newComponentImage, setNewComponentImage, componentData, setComponentData } = useComponentStore()
+    const { newComponentImage, setNewComponentImage, setComponentData } = useComponentStore()
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
