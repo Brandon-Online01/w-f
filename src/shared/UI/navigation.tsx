@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import logoIcon from '../assets/logo/waresense.png';
 import signOutIcon from '../assets/icons/signout.png';
 import {
-    Blocks,
+    Component,
     LayoutDashboard,
     LibraryBig,
     Settings,
@@ -67,7 +67,7 @@ export const MobileNavigation = () => {
                                     </li>
                                     <li className="flex items-center justify-center cursor-pointer">
                                         <Link href="/inventory" className="flex items-center justify-center gap-2">
-                                            <Blocks strokeWidth={1} size={18} className="stroke-card-foreground" />
+                                            <Component strokeWidth={1} size={18} className="stroke-card-foreground" />
                                             <p>Inventory</p>
                                         </Link>
                                     </li>
@@ -96,7 +96,7 @@ export const DesktopNavigation = () => {
                     { href: "/", Icon: TrendingUpDown },
                     { href: "/staff", Icon: UsersIcon },
                     { href: "/reports", Icon: LibraryBig },
-                    { href: "/inventory", Icon: Blocks },
+                    { href: "/inventory", Icon: Component },
                 ].map((item, index) => (
                     <motion.li
                         key={item.href}

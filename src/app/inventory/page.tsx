@@ -2,7 +2,7 @@
 
 import { InventoryHighlights } from "@/modules/inventory/highlights/highlights";
 import InventoryManagement from "@/modules/inventory/inventory-manager";
-import { Boxes } from "lucide-react";
+import { Component } from "lucide-react";
 
 export default function Page() {
     return (
@@ -10,7 +10,7 @@ export default function Page() {
             <InventoryHighlights />
             <div className="flex flex-row items-center justify-start gap-2 px-1 w-full">
                 <p className="text-lg font-medium uppercase">Inventory</p>
-                <Boxes className="stroke-card-foreground" strokeWidth={1} size={18} />
+                <Component className="stroke-card-foreground" strokeWidth={1} size={18} />
             </div>
             <div className="flex flex-col items-start justify-start gap-3 w-full">
                 <InventoryManagement />

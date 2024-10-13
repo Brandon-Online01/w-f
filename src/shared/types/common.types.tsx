@@ -70,3 +70,41 @@ export type Note = {
 }
 
 export type SortConfig = { key: string | null; direction: 'asc' | 'desc' | null };
+
+
+export type Component = {
+    uid: number;
+    name: string;
+    description: string;
+    photoURL: string;
+    weight: number;
+    volume: number;
+    code: string;
+    color: string;
+    cycleTime: number;
+    targetTime: number;
+    coolingTime: number;
+    chargingTime: number;
+    cavity: number;
+    configuration: string;
+    configQTY: number;
+    palletQty: number;
+    testMachine: string;
+    masterBatch: number;
+    status: "Active" | "In Active";
+    createdAt: string;
+    updatedAt: string;
+};
+
+
+export type Mould = {
+    uid: number;
+    name: string;
+    serialNumber: string;
+    creationDate: string;
+    lastRepairDate: string;
+    mileage: number;
+    servicingMileage: number;
+    nextServiceDate: string | null;
+    status: "Active" | "In Active";
+};
