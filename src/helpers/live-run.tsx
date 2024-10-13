@@ -1,5 +1,5 @@
+import { Machine } from "@/types/common.types"
 import axios from "axios"
-import { Machine } from "../types/common.types"
 
 export const getMachineData = async () => {
     const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/live-run`)
