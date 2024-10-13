@@ -354,7 +354,14 @@ export default function InventoryManagement() {
                                             onChange={handleEditImageUpload}
                                         />
                                         <label htmlFor="editImage" className="cursor-pointer">
-                                            <Image src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${editingProduct?.photoURL}`} alt={editingProduct.name} width={128} height={128} className="mx-auto rounded-lg" />
+                                            <Image
+                                                src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${editingProduct?.photoURL}`}
+                                                alt={editingProduct.name}
+                                                width={128}
+                                                height={128}
+                                                priority
+                                                quality={100}
+                                                className="mx-auto rounded-lg" />
                                             <p className="mt-2 text-sm text-gray-500">Click to change image</p>
                                         </label>
                                     </div>

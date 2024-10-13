@@ -1,15 +1,15 @@
 'use client'
 
 import HighlightsCards, { HighlightCardsSkeleton } from "@/components/highlight-cards"
-import { getHighlightsData } from "@/helpers/live-run";
+import { getInventoryHighlightsData } from "@/helpers/components";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { Blend, Component, Warehouse, Weight } from "lucide-react";
 
 export const InventoryHighlights = () => {
     const { data: highlightsData, isLoading, isError } = useQuery({
-        queryKey: ['getHighlightsData'],
-        queryFn: getHighlightsData,
+        queryKey: ['getInventoryHighlightsData'],
+        queryFn: getInventoryHighlightsData,
         refetchInterval: 5000,
         refetchOnMount: true,
         refetchOnReconnect: false,
@@ -23,13 +23,13 @@ export const InventoryHighlights = () => {
         return <HighlightCardsSkeleton count={4} />
     }
 
-    const { runningMachines, stoppedMachines, totalMasterBatch, totalVirginMaterials, totalDowntime, overallEfficiency } = highlightsData?.data
+    const { components, moulds, totalMaterialMixed, toolRoomCompletionStatus } = highlightsData?.data
 
     const highlights = [
-        { title: "Components", value: `${totalMasterBatch} / ${totalVirginMaterials}`, Icon: Component, subTitle: "Active Components / Total Components" },
-        { title: "Moulds", value: `${runningMachines} / ${stoppedMachines}`, Icon: Weight, subTitle: `Active Moulds / Total Moulds` },
-        { title: "Mixing Area", value: `${totalDowntime} hrs`, Icon: Blend, subTitle: "Mixed Material" },
-        { title: "Tool Room", value: `${overallEfficiency}%`, Icon: Warehouse, subTitle: "Repairs / Maintenance Overview" },
+        { title: "Components", value: `${components?.active} / ${components?.total}`, Icon: Component, subTitle: "Active Components / Total Components" },
+        { title: "Moulds", value: `${moulds?.active} / ${moulds?.total}`, Icon: Weight, subTitle: `Active Moulds / Total Moulds` },
+        { title: "Mixing Area", value: `${totalMaterialMixed}`, Icon: Blend, subTitle: "Mixed Material" },
+        { title: "Tool Room", value: `${toolRoomCompletionStatus}%`, Icon: Warehouse, subTitle: "Repairs / Maintenance Overview" },
     ];
 
     return (

@@ -217,6 +217,8 @@ export default function LiveRun() {
                                         alt={machine.component.name}
                                         width={80}
                                         height={80}
+                                        priority
+                                        quality={100}
                                         className="rounded" />
                                     <span className="text-sm mt-1">{machine.component.name}</span>
                                 </div>

@@ -65,6 +65,8 @@ export const InsightsDialog: React.FunctionComponent<InsightsDialogProps> = ({ m
                                         alt={machine.component.name}
                                         width={100}
                                         height={100}
+                                        priority
+                                        quality={100}
                                         className="rounded" />
                                 </div>
                                 <div className='flex justify-start gap-1 w-full items-center'>
