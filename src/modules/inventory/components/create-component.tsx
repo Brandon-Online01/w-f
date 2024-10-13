@@ -94,12 +94,17 @@ export const CreateComponentForm = () => {
         }
 
         try {
-            const response = await uploadMedia(newComponentImage as ImageFile, {})
+            const response = await uploadMedia(newComponentImage as ImageFile)
+
+            console.log(response)
 
             if (response?.newFileName) {
+
+                const imageURL = response.newFileName
+
                 const payload = {
                     ...componentFormData,
-                    photoURL: response?.newFileName?.name
+                    photoURL: imageURL?.name
                 }
 
                 const savedData = await saveComponent(payload)

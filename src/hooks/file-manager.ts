@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 export const CloudFileManager = () => {
-    const uploadMedia = async (file: ImageFile): Promise<{ uploaded: boolean, newFileName: string | null }> => {
+    const uploadMedia = async (file: ImageFile): Promise<{ uploaded: boolean, newFileName: { name: string } | null }> => {
         if (typeof file === 'string' && /\.(png|jpe?g|svg|mp4|ico)$/i.test(file)) {
             return { uploaded: true, newFileName: file };
         }
@@ -13,6 +13,7 @@ export const CloudFileManager = () => {
             try {
                 const url = `files/upload`;
                 const formData = new FormData();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formData.append('file', file as any)
 
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/${url}`, formData)
@@ -39,6 +40,7 @@ export const CloudFileManager = () => {
                     return result
                 }
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             catch (error: any) {
                 toast(`${error.message}, please re-try`, {
                     icon: '❌',
@@ -93,6 +95,7 @@ export const CloudFileManager = () => {
                     return result
                 }
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             catch (error: any) {
                 toast(`${error.message}, please re-try`, {
                     icon: '❌',
