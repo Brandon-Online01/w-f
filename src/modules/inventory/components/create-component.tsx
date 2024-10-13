@@ -4,7 +4,7 @@ import { DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { Upload } from 'lucide-react'
+import { Loader2, Upload } from 'lucide-react'
 import Image from 'next/image'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
@@ -12,14 +12,22 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { componentSchema } from '@/schemas/compoment.schema'
 import { Textarea } from '@/components/ui/textarea'
-import { Component } from '@/types/common.types'
+import { Component, ImageFile } from '@/types/common.types'
 import { create } from 'zustand'
+import toast from 'react-hot-toast';
+import { CloudFileManager } from '@/hooks/file-manager'
+import { format } from 'date-fns'
+import axios from 'axios'
 
 interface ComponentStore {
-    newComponentImage: string | null
-    setNewComponentImage: (image: string | null) => void
+    newComponentImage: File | null
+    setNewComponentImage: (image: File | null) => void
     componentData: Partial<Component>
+    previewImage: string | null
+    setPreviewImage: (image: string | null) => void
     setComponentData: (data: Partial<Component>) => void
+    isLoading: boolean
+    setIsLoading: (isLoading: boolean) => void
 }
 
 const useComponentStore = create<ComponentStore>((set) => ({
@@ -27,33 +35,105 @@ const useComponentStore = create<ComponentStore>((set) => ({
     setNewComponentImage: (image) => set({ newComponentImage: image }),
     componentData: {},
     setComponentData: (data) => set((state) => ({ componentData: { ...state.componentData, ...data } })),
+    previewImage: null,
+    setPreviewImage: (image) => set({ previewImage: image }),
+    isLoading: false,
+    setIsLoading: (isLoading) => set({ isLoading })
 }))
 
+const saveComponent = async (payload: Partial<Component>) => {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/components`
+    const response = await axios.post(url, payload)
+    return response
+}
+
+
 export const CreateComponentForm = () => {
-    const { newComponentImage, setNewComponentImage, setComponentData } = useComponentStore()
+    const { uploadMedia } = CloudFileManager()
+    const { newComponentImage, setNewComponentImage, setPreviewImage, previewImage, isLoading, setIsLoading } = useComponentStore()
 
-    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-
-        if (file) {
-            const reader = new FileReader()
-
-            reader.onloadend = () => {
-                setNewComponentImage(reader.result as string)
-            }
-            reader.readAsDataURL(file)
-        }
-
-        console.log(file, 'uploaded file')
-    }
-
-    const { register: registerComponent, handleSubmit: handleSubmitComponent, formState: { errors: errorsComponent } } = useForm({
+    const { register: registerComponent, handleSubmit: handleSubmitComponent, formState: { errors: errorsComponent }, reset } = useForm({
         resolver: zodResolver(componentSchema)
     })
 
-    const onSubmitComponent = (data: Partial<Component>) => {
-        setComponentData(data)
-        console.log(data)
+    const imageUploadManager = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+
+        if (file) {
+            setNewComponentImage(file)
+
+            setPreviewImage(URL.createObjectURL(file))
+        }
+    }
+
+    const onSubmitComponent = async (data: Partial<Component>) => {
+
+        setIsLoading(true)
+
+        const componentFormData = {
+            "name": data.name,
+            "description": data.description,
+            "photoURL": newComponentImage,
+            "weight": Number(data.weight),
+            "volume": Number(data.volume),
+            "code": data.code,
+            "color": data.color,
+            "cycleTime": Number(data.cycleTime),
+            "targetTime": Number(data.targetTime),
+            "coolingTime": Number(data.coolingTime),
+            "chargingTime": Number(data.chargingTime),
+            "cavity": Number(data.cavity),
+            "configuration": data.configuration,
+            "configQTY": Number(data.configQTY),
+            "palletQty": Number(data.palletQty),
+            "testMachine": data.testMachine,
+            "masterBatch": Number(data.masterBatch),
+            "status": data.status,
+            "createdAt": `${format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")}`,
+            "updatedAt": `${format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")}`
+        }
+
+        try {
+            const response = await uploadMedia(newComponentImage as ImageFile, {})
+
+            if (response?.newFileName) {
+                const payload = {
+                    ...componentFormData,
+                    photoURL: response?.newFileName?.name
+                }
+
+                const savedData = await saveComponent(payload)
+
+                toast(`${savedData?.data?.message}`,
+                    {
+                        icon: savedData?.data?.status === 'Success' ? '✅' : '⛔',
+                        style: {
+                            borderRadius: '5px',
+                            background: '#333',
+                            color: '#fff',
+                        },
+                    }
+                );
+
+                reset()
+                setNewComponentImage(null)
+                setPreviewImage(null)
+                setIsLoading(false)
+            }
+        } catch {
+            toast(`Your action was not successful`,
+                {
+                    icon: '⛔',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -65,17 +145,17 @@ export const CreateComponentForm = () => {
                 <ScrollArea className="max-h-[600px] pr-4 overflow-y-scroll">
                     <div className="w-full mb-4">
                         <Label htmlFor="image" className="block mb-2">Image</Label>
-                        <div className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors">
+                        <div className="border-[1px] border-dashed border-gray-300 rounded p-2 text-center cursor-pointer hover:border-gray-400 transition-colors">
                             <input
                                 type="file"
                                 id="image"
                                 accept="image/*"
                                 className="hidden"
-                                onChange={handleImageUpload}
+                                onChange={imageUploadManager}
                             />
                             <label htmlFor="image" className="cursor-pointer">
-                                {newComponentImage ?
-                                    <Image src={newComponentImage} alt="Uploaded component" width={128} height={128} className="mx-auto rounded" />
+                                {previewImage ?
+                                    <Image src={previewImage} alt="Uploaded component" width={128} height={128} className="mx-auto rounded w-full h-[300px] object-cover" />
                                     :
                                     <>
                                         <Upload className="w-12 h-12 mx-auto text-gray-400" />
@@ -90,7 +170,7 @@ export const CreateComponentForm = () => {
                         <div className="flex flex-col justify-start items-start gap-0 w-full">
                             <div className="flex items-start flex-col gap-0 w-full">
                                 <Label htmlFor="name">Name</Label>
-                                <Input id="name" placeholder="enter component name" {...registerComponent("name")} />
+                                <Input id="name" placeholder="EX Cup" {...registerComponent("name")} />
                             </div>
                             {errorsComponent.name && <p className="text-red-500 text-[10px] lowercase">*{typeof errorsComponent.name.message === 'string' ? errorsComponent.name.message : null}</p>}
                         </div>
@@ -104,13 +184,13 @@ export const CreateComponentForm = () => {
                         <div className="flex flex-col justify-start items-start gap-0 w-full">
                             <div className="flex items-start flex-col gap-0 w-full">
                                 <Label htmlFor="status">Status</Label>
-                                <Select onValueChange={(value) => registerComponent("status", { value: value as "active" | "inactive" })}>
+                                <Select onValueChange={(value) => registerComponent("status", { value: value as "102" | "In Active" })}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="active">Active</SelectItem>
-                                        <SelectItem value="inactive">Inactive</SelectItem>
+                                        <SelectItem value="Active">Active</SelectItem>
+                                        <SelectItem value="In Active">In Active</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -215,7 +295,9 @@ export const CreateComponentForm = () => {
                         {errorsComponent.description && <p className="text-red-500 text-[10px] lowercase">*{typeof errorsComponent.description.message === 'string' ? errorsComponent.description.message : null}</p>}
                     </div>
                 </ScrollArea>
-                <Button type="submit" className="mt-4 w-full">Create Component</Button>
+                <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="animate-spin stroke-white" size={16} strokeWidth={1.5} /> : 'Create Component'}
+                </Button>
             </form>
         </>
     )

@@ -21,6 +21,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import toast from 'react-hot-toast';
 import {
     Select,
     SelectContent,
@@ -53,7 +54,7 @@ import { StatusIndicator } from "../live/misc/status-indicator"
 import { CreateComponentForm } from "./components/create-component"
 import { CreateMouldForm } from "./moulds/create-mould"
 import { useInventoryStore } from "@/state-managers/components"
-import { getComponentsData } from "@/helpers/components"
+import { getComponentsData, removeComponent } from "@/helpers/components"
 
 export default function InventoryManagement() {
     const {
@@ -100,8 +101,19 @@ export default function InventoryManagement() {
 
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
 
-    const deleteComponents = (uid: number) => {
-        console.log(uid, 'uid')
+    const deleteComponents = async (uid: number) => {
+        const response = await removeComponent(uid)
+
+        toast(`${response?.message}`,
+            {
+                icon: response?.status === 'Success' ? '✅' : '⛔',
+                style: {
+                    borderRadius: '5px',
+                    background: '#333',
+                    color: '#fff',
+                },
+            }
+        );
     }
 
     const editComponent = (component: Component | Mould, type: string) => {
@@ -217,7 +229,7 @@ export default function InventoryManagement() {
                         transition={{ duration: 0.2, delay: 0.1 * index }}>
                         <TableCell className="text-center">
                             <div className="flex flex-col items-center space-y-2">
-                                <Image src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${component.photoURL}`} alt={component.name} width={40} height={40} className="rounded-full" />
+                                <Image src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${component.photoURL}`} alt={component.name} width={80} height={80} className="" />
                                 <span>{component.name}</span>
                             </div>
                         </TableCell>

@@ -48,25 +48,25 @@ export const MobileNavigation = () => {
                             <div className="flex items-center justify-center flex-col gap-4 mt-10 w-full">
                                 <ul className="flex w-full flex-col gap-5">
                                     <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/" className="flex items-center justify-center gap-2">
+                                        <Link href="/" className="flex items-center justify-center gap-2" aria-label="Dashboard">
                                             <TrendingUpDown strokeWidth={1} size={18} className="stroke-card-foreground" />
                                             <p>Dashboard</p>
                                         </Link>
                                     </li>
                                     <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/staff" className="flex items-center justify-center gap-2">
+                                        <Link href="/staff" className="flex items-center justify-center gap-2" aria-label="Staff">
                                             <UsersIcon strokeWidth={1} size={18} className="stroke-card-foreground" />
                                             <p>Staff</p>
                                         </Link>
                                     </li>
                                     <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/reports" className="flex items-center justify-center gap-2">
+                                        <Link href="/reports" className="flex items-center justify-center gap-2" aria-label="Reports">
                                             <LibraryBig strokeWidth={1} size={18} className="stroke-card-foreground" />
                                             <p>Reports</p>
                                         </Link>
                                     </li>
                                     <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/inventory" className="flex items-center justify-center gap-2">
+                                        <Link href="/inventory" className="flex items-center justify-center gap-2" aria-label="Inventory">
                                             <Component strokeWidth={1} size={18} className="stroke-card-foreground" />
                                             <p>Inventory</p>
                                         </Link>
@@ -93,10 +93,10 @@ export const DesktopNavigation = () => {
         <div className="xl:flex w-full flex-col justify-between py-4 h-full hidden">
             <ul className="flex w-full flex-col gap-5">
                 {[
-                    { href: "/", Icon: TrendingUpDown },
-                    { href: "/staff", Icon: UsersIcon },
-                    { href: "/reports", Icon: LibraryBig },
-                    { href: "/inventory", Icon: Component },
+                    { href: "/", Icon: TrendingUpDown, ariaLabel: "Dashboard" },
+                    { href: "/staff", Icon: UsersIcon, ariaLabel: "Staff" },
+                    { href: "/reports", Icon: LibraryBig, ariaLabel: "Reports" },
+                    { href: "/inventory", Icon: Component, ariaLabel: "Inventory" },
                 ].map((item, index) => (
                     <motion.li
                         key={item.href}
@@ -105,7 +105,7 @@ export const DesktopNavigation = () => {
                         transition={{ duration: 0.5, delay: index * 0.1 }}
                         className="flex items-center justify-center cursor-pointer"
                     >
-                        <Link href={item.href}>
+                        <Link href={item.href} aria-label={item.ariaLabel}>
                             <item.Icon
                                 strokeWidth={1}
                                 size={18}
@@ -117,7 +117,7 @@ export const DesktopNavigation = () => {
             </ul>
             <ul className="flex w-full flex-col gap-5">
                 {[
-                    { href: "/settings", Icon: Settings },
+                    { href: "/settings", Icon: Settings, ariaLabel: "Settings" },
                     { component: ThemeModeToggler },
                     { onClick: signOut, Icon: () => <Image src={signOutIcon} alt="logo" width={25} height={25} className="rounded-full" /> },
                 ].map((item, index) => (
@@ -128,7 +128,7 @@ export const DesktopNavigation = () => {
                         transition={{ duration: 0.5, delay: (index + 4) * 0.1 }}
                         className="flex items-center justify-center cursor-pointer">
                         {item.href ? (
-                            <Link href={item.href}>
+                            <Link href={item.href} aria-label={item.ariaLabel}>
                                 <item.Icon
                                     strokeWidth={1}
                                     size={18}

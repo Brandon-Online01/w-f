@@ -108,3 +108,11 @@ export type Mould = {
     nextServiceDate: string | null;
     status: "Active" | "In Active";
 };
+
+export interface ImageFile {
+    size: number;
+    name: string;
+    type: string;
+    lastModified: number;
+    webkitRelativePath: string;
+}

@@ -209,7 +209,10 @@ export default function LiveRun() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.2, delay: 0.1 * index }}>
-                            <TableCell className="text-center">{machine.machine.name}</TableCell>
+                            <TableCell className="text-center">
+                                <p>{machine.machine?.machineNumber}</p>
+                                <p>{machine.machine.name}</p>
+                            </TableCell>
                             <TableCell className="text-center">
                                 <div className="flex flex-col items-center">
                                     <Image
