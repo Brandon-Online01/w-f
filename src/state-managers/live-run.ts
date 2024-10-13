@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Machine, SortConfig } from '@/shared/types/common.types'
+import { Machine, SortConfig } from '@/types/common.types'
 
 interface RunState {
     page: number

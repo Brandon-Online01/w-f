@@ -1,7 +1,7 @@
 'use client'
 
 import HighlightsCards, { HighlightCardsSkeleton } from "@/components/highlight-cards"
-import { getHighlightsData } from "@/shared/helpers/live-run";
+import { getHighlightsData } from "@/helpers/live-run";
 import { useQuery } from "@tanstack/react-query";
 import { isEmpty } from "lodash";
 import { Activity, Clock, Gauge, Layers } from "lucide-react";

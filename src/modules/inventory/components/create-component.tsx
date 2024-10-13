@@ -11,9 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { componentSchema } from '@/shared/schemas/compoment.schema'
+import { componentSchema } from '@/schemas/compoment.schema'
 import { Textarea } from '@/components/ui/textarea'
-import { Component } from '@/shared/types/common.types'
+import { Component } from '@/types/common.types'
 import { create } from 'zustand'
 
 interface ComponentStore {

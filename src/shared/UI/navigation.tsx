@@ -4,8 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import logoIcon from '../assets/logo/waresense.png';
-import signOutIcon from '../assets/icons/signout.png';
+import logoIcon from '../../assets/logo/waresense.png';
+import signOutIcon from '../../assets/icons/signout.png';
 import {
     Component,
     LayoutDashboard,
@@ -126,8 +126,7 @@ export const DesktopNavigation = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: (index + 4) * 0.1 }}
-                        className="flex items-center justify-center cursor-pointer"
-                    >
+                        className="flex items-center justify-center cursor-pointer">
                         {item.href ? (
                             <Link href={item.href}>
                                 <item.Icon

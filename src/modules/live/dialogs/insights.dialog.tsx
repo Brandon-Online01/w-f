@@ -2,8 +2,8 @@
 
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { InsightsDialogProps } from "@/shared/interfaces/common.interface"
-import { Note } from "@/shared/types/common.types"
+import { InsightsDialogProps } from "@/interfaces/common.interface"
+import { Note } from "@/types/common.types"
 import { Boxes, GaugeIcon, LucideClock5, TrendingUpDownIcon } from "lucide-react"
 import Image from "next/image"
 

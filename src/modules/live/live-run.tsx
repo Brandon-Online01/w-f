@@ -44,13 +44,13 @@ import {
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
-import { ItemsPerPageSelectProps } from '@/shared/interfaces/common.interface'
-import { Machine, SortConfig } from '@/shared/types/common.types'
-import { getMachineData } from '@/shared/helpers/live-run'
+import { ItemsPerPageSelectProps } from '@/interfaces/common.interface'
+import { Machine, SortConfig } from '@/types/common.types'
+import { getMachineData } from '@/helpers/live-run'
 import { StatusIndicator } from './misc/status-indicator'
 import { InsightsDialog } from './dialogs/insights.dialog'
 import { NotesDialog } from './dialogs/notes.dialog'
-import { useLiveRunStore } from '@/shared/state-managers/live-run'
+import { useLiveRunStore } from '@/state-managers/live-run'
 
 const ItemsPerPageSelect: React.FunctionComponent<ItemsPerPageSelectProps> = ({ value, onChange }) => (
     <Select value={value.toString()} onValueChange={(v) => onChange(Number(v))}>

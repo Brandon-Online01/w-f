@@ -9,7 +9,7 @@ import axios from "axios"
 import toast from 'react-hot-toast';
 import { useMutation } from '@tanstack/react-query'
 import { useForm, SubmitHandler } from "react-hook-form"
-import signInCover from "../../shared/assets/covers/signincover.jpg"
+import signInCover from "../../assets/covers/signincover.jpg"
 import { Loader2 } from 'lucide-react'
 import { useSessionStore } from '@/session/session.provider'
 

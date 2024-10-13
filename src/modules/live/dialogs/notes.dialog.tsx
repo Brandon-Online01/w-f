@@ -1,8 +1,8 @@
-import { NotesDialogProps } from '@/shared/interfaces/common.interface'
+import { NotesDialogProps } from '@/interfaces/common.interface'
 import { useForm, Controller } from 'react-hook-form'
 import { format } from 'date-fns'
 import { useMutation } from '@tanstack/react-query'
-import { saveNotes } from '@/shared/helpers/notes'
+import { saveNotes } from '@/helpers/notes'
 import toast from 'react-hot-toast';
 import { create } from 'zustand'
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -10,7 +10,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
-import { noteTypes } from '@/shared/settings/app.settings'
+import { noteTypes } from '@/settings/app.settings'
 
 interface NotesLoadingState {
     isLoading: boolean

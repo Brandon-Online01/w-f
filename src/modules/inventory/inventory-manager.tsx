@@ -1,8 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -37,25 +35,43 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ChevronLeft, ChevronRight, Search, Plus, MoreVertical, Pen, Trash2, Upload, Loader2, Component as ComponentIcon, Weight } from "lucide-react"
+import {
+    ChevronLeft,
+    ChevronRight,
+    Search,
+    Plus,
+    MoreVertical,
+    Trash2,
+    Loader2,
+    Component as ComponentIcon,
+    Weight,
+} from "lucide-react"
 import Image from "next/image"
 import { useQuery } from "@tanstack/react-query"
-import { getComponentsData } from "@/shared/helpers/components"
-import { componentSchema } from "@/shared/schemas/compoment.schema"
-import { mouldSchema } from "@/shared/schemas/mould.schema"
-import { Component, Mould } from "@/shared/types/common.types"
+import { Component, Mould } from "@/types/common.types"
 import { StatusIndicator } from "../live/misc/status-indicator"
 import { CreateComponentForm } from "./components/create-component"
 import { CreateMouldForm } from "./moulds/create-mould"
+import { useInventoryStore } from "@/state-managers/components"
+import { getComponentsData } from "@/helpers/components"
 
 export default function InventoryManagement() {
-    const [products, setProducts] = useState([])
-    const [searchTerm, setSearchTerm] = useState("")
-    const [statusFilter, setStatusFilter] = useState("all")
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(5)
-    const [editingProduct, setEditingProduct] = useState(null)
-    const [editingMould, setEditingMould] = useState(null)
+    const {
+        products,
+        searchTerm,
+        statusFilter,
+        currentPage,
+        itemsPerPage,
+        editingProduct,
+        editingMould,
+        setProducts,
+        setSearchTerm,
+        setStatusFilter,
+        setCurrentPage,
+        setItemsPerPage,
+        setEditingProduct,
+        setEditingMould
+    } = useInventoryStore()
 
     const { data: componentsData, isLoading } = useQuery({
         queryKey: ['getComponentsData'],
@@ -69,7 +85,7 @@ export default function InventoryManagement() {
         if (componentsData?.data) {
             setProducts(componentsData?.data);
         }
-    }, [componentsData?.data]);
+    }, [componentsData?.data, setProducts]);
 
     const filteredComponents = products.filter((product: any) => {
         const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -87,11 +103,11 @@ export default function InventoryManagement() {
         console.log(uid, 'uid')
     }
 
-    const editComponent = (product: Component, type: string) => {
+    const editComponent = (component: Component | Mould, type: string) => {
         if (type === 'component') {
-            setEditingProduct(product);
+            setEditingProduct(component as Component);
         } else if (type === 'mould') {
-            setEditingMould(product);
+            setEditingMould(component as Mould);
         }
     }
 
@@ -106,6 +122,74 @@ export default function InventoryManagement() {
     const handleEditImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         console.log(file, 'uploaded file')
+    }
+
+    const PageHeader = () => {
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex justify-between items-center">
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}>
+                    <div className="flex items-center space-x-2">
+                        <div className="relative">
+                            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
+                            <Input
+                                placeholder="Search products..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-8 w-64"
+                            />
+                        </div>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Filter by status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Statuses</SelectItem>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive">Inactive</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </motion.div>
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="flex items-center space-x-2">
+                    <div className="space-x-2">
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button>
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Create Component
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[900px]">
+                                <CreateComponentForm />
+                            </DialogContent>
+                        </Dialog>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button>
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Create Mould
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[900px]">
+                                <CreateMouldForm />
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                </motion.div>
+            </motion.div>
+
+        )
     }
 
     const TableContent = () => {
@@ -230,68 +314,7 @@ export default function InventoryManagement() {
 
     return (
         <div className="w-full flex flex-col justify-start gap-2">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="flex justify-between items-center">
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}>
-                    <div className="flex items-center space-x-2">
-                        <div className="relative">
-                            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
-                            <Input
-                                placeholder="Search products..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-8 w-64"
-                            />
-                        </div>
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Filter by status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">All Statuses</SelectItem>
-                                <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="inactive">Inactive</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="flex items-center space-x-2">
-                    <div className="space-x-2">
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button>
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Create Component
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[900px]">
-                                <CreateComponentForm />
-                            </DialogContent>
-                        </Dialog>
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button>
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Create Mould
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[900px]">
-                                <CreateMouldForm />
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </motion.div>
-            </motion.div>
+            <PageHeader />
 
             <Table className="rounded border">
                 <TableHeader>
@@ -356,7 +379,7 @@ export default function InventoryManagement() {
                                         <Label htmlFor="editStatus">Status</Label>
                                         <Select
                                             value={editingProduct.status}
-                                            onValueChange={(value) => setEditingProduct({ ...editingProduct, status: value })}>
+                                            onValueChange={(value: "Active" | "In Active") => setEditingProduct({ ...editingProduct, status: value })}>
                                             <SelectTrigger>
                                                 <SelectValue />
                                             </SelectTrigger>
@@ -371,7 +394,7 @@ export default function InventoryManagement() {
                                         <Input
                                             id="editWeight"
                                             value={editingProduct.weight}
-                                            onChange={(e) => setEditingProduct({ ...editingProduct, weight: e.target.value })}
+                                            onChange={(e) => setEditingProduct({ ...editingProduct, weight: Number(e.target.value) })}
                                         />
                                     </div>
                                     <div className="flex items-start flex-col gap-0 w-full">
@@ -379,7 +402,7 @@ export default function InventoryManagement() {
                                         <Input
                                             id="editVolume"
                                             value={editingProduct.volume}
-                                            onChange={(e) => setEditingProduct({ ...editingProduct, volume: e.target.value })}
+                                            onChange={(e) => setEditingProduct({ ...editingProduct, volume: Number(e.target.value) })}
                                         />
                                     </div>
                                     <div className="flex items-start flex-col gap-0 w-full">
@@ -387,7 +410,7 @@ export default function InventoryManagement() {
                                         <Input
                                             id="editCycleTime"
                                             value={editingProduct.cycleTime}
-                                            onChange={(e) => setEditingProduct({ ...editingProduct, cycleTime: e.target.value })}
+                                            onChange={(e) => setEditingProduct({ ...editingProduct, cycleTime: Number(e.target.value) })}
                                         />
                                     </div>
                                 </div>
@@ -403,7 +426,7 @@ export default function InventoryManagement() {
                             </div>
                         </ScrollArea>
                     )}
-                    <Button onClick={() => updateComponent(editingProduct)} className="mt-4 w-full">Save Changes</Button>
+                    <Button onClick={() => updateComponent(editingProduct!)} className="mt-4 w-full">Save Changes</Button>
                 </DialogContent>
             </Dialog>
 
@@ -432,15 +455,6 @@ export default function InventoryManagement() {
                                     />
                                 </div>
                                 <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editCreationDate">Creation Date</Label>
-                                    <Input
-                                        id="editCreationDate"
-                                        type="date"
-                                        value={editingMould.creationDate}
-                                        onChange={(e) => setEditingMould({ ...editingMould, creationDate: e.target.value })}
-                                    />
-                                </div>
-                                <div className="flex items-start flex-col gap-0 w-full">
                                     <Label htmlFor="editLastRepairDate">Last Repair Date</Label>
                                     <Input
                                         id="editLastRepairDate"
@@ -450,37 +464,19 @@ export default function InventoryManagement() {
                                     />
                                 </div>
                                 <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editMileage">Mileage</Label>
-                                    <Input
-                                        id="editMileage"
-                                        type="number"
-                                        value={editingMould.mileage}
-                                        onChange={(e) => setEditingMould({ ...editingMould, mileage: e.target.value })}
-                                    />
-                                </div>
-                                <div className="flex items-start flex-col gap-0 w-full">
                                     <Label htmlFor="editServicingMileage">Servicing Mileage</Label>
                                     <Input
                                         id="editServicingMileage"
                                         type="number"
                                         value={editingMould.servicingMileage}
-                                        onChange={(e) => setEditingMould({ ...editingMould, servicingMileage: e.target.value })}
-                                    />
-                                </div>
-                                <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editNextServiceDate">Next Service Date</Label>
-                                    <Input
-                                        id="editNextServiceDate"
-                                        type="date"
-                                        value={editingMould.nextServiceDate}
-                                        onChange={(e) => setEditingMould({ ...editingMould, nextServiceDate: e.target.value })}
+                                        onChange={(e) => setEditingMould({ ...editingMould, servicingMileage: Number(e.target.value) })}
                                     />
                                 </div>
                                 <div className="flex items-start flex-col gap-0 w-full">
                                     <Label htmlFor="editMouldStatus">Status</Label>
                                     <Select
                                         value={editingMould.status}
-                                        onValueChange={(value) => setEditingMould({ ...editingMould, status: value })}>
+                                        onValueChange={(value: "Active" | "In Active") => setEditingMould({ ...editingMould, status: value })}>
                                         <SelectTrigger>
                                             <SelectValue />
                                         </SelectTrigger>
@@ -493,7 +489,7 @@ export default function InventoryManagement() {
                             </div>
                         </ScrollArea>
                     )}
-                    <Button onClick={() => updateMould(editingMould)} className="mt-4 w-full">Save Mould Changes</Button>
+                    <Button onClick={() => updateMould(editingMould!)} className="mt-4 w-full">Save Mould Changes</Button>
                 </DialogContent>
             </Dialog>
         </div>
