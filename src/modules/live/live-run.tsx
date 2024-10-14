@@ -278,8 +278,8 @@ export default function LiveRun() {
                 transition={{ duration: 0.5 }}
                 className="flex justify-between items-center">
                 <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, z: -20 }}
+                    animate={{ opacity: 1, z: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}>
                     <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -306,8 +306,8 @@ export default function LiveRun() {
                     </div>
                 </motion.div>
                 <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, z: 20 }}
+                    animate={{ opacity: 1, z: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="flex items-center space-x-2">
                     <Button onClick={exportToExcel} className="flex items-center space-x-2">
@@ -322,20 +322,26 @@ export default function LiveRun() {
                         <TableHeader className="sticky top-0 bg-background z-10">
                             <TableRow>
                                 <TableHead className="text-center cursor-pointer" onClick={() => requestSort('uid')}>
-                                    Machine
+                                    <span className="uppercase text-xs">Machine</span>
                                     {getSortIcon('uid')}
                                 </TableHead>
-                                <TableHead className="text-center">Component</TableHead>
+                                <TableHead className="text-center">
+                                    <span className="uppercase text-xs">Component</span>
+                                </TableHead>
                                 <TableHead className="text-center cursor-pointer" onClick={() => requestSort('production')}>
-                                    Production
+                                    <span className="uppercase text-xs">Production</span>
                                     {getSortIcon('production')}
                                 </TableHead>
                                 <TableHead className="text-center cursor-pointer" onClick={() => requestSort('cycleTime')}>
-                                    Cycle Time
+                                    <span className="uppercase text-xs">Cycle Time</span>
                                     {getSortIcon('cycleTime')}
                                 </TableHead>
-                                <TableHead className="text-center">Status</TableHead>
-                                <TableHead className="text-center">Actions</TableHead>
+                                <TableHead className="text-center">
+                                    <span className="uppercase text-xs">Status</span>
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    <span className="uppercase text-xs">Actions</span>
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

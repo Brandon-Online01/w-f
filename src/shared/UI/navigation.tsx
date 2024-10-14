@@ -9,7 +9,6 @@ import signOutIcon from '../../assets/icons/signout.png';
 import {
     Component,
     LayoutDashboard,
-    LibraryBig,
     Settings,
     TrendingUpDown,
     UsersIcon,
@@ -60,12 +59,6 @@ export const MobileNavigation = () => {
                                         </Link>
                                     </li>
                                     <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/reports" className="flex items-center justify-center gap-2" aria-label="Reports">
-                                            <LibraryBig strokeWidth={1} size={18} className="stroke-card-foreground" />
-                                            <p>Reports</p>
-                                        </Link>
-                                    </li>
-                                    <li className="flex items-center justify-center cursor-pointer">
                                         <Link href="/inventory" className="flex items-center justify-center gap-2" aria-label="Inventory">
                                             <Component strokeWidth={1} size={18} className="stroke-card-foreground" />
                                             <p>Inventory</p>
@@ -95,7 +88,6 @@ export const DesktopNavigation = () => {
                 {[
                     { href: "/", Icon: TrendingUpDown, ariaLabel: "Dashboard" },
                     { href: "/staff", Icon: UsersIcon, ariaLabel: "Staff" },
-                    { href: "/reports", Icon: LibraryBig, ariaLabel: "Reports" },
                     { href: "/inventory", Icon: Component, ariaLabel: "Inventory" },
                 ].map((item, index) => (
                     <motion.li
@@ -103,8 +95,7 @@ export const DesktopNavigation = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: index * 0.1 }}
-                        className="flex items-center justify-center cursor-pointer"
-                    >
+                        className="flex items-center justify-center cursor-pointer">
                         <Link href={item.href} aria-label={item.ariaLabel}>
                             <item.Icon
                                 strokeWidth={1}

@@ -139,8 +139,8 @@ export default function InventoryManagement() {
                 transition={{ duration: 0.5 }}
                 className="flex justify-between items-center">
                 <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, z: -20 }}
+                    animate={{ opacity: 1, z: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}>
                     <div className="flex items-center space-x-2">
                         <div className="relative">
@@ -165,8 +165,8 @@ export default function InventoryManagement() {
                     </div>
                 </motion.div>
                 <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, z: 20 }}
+                    animate={{ opacity: 1, z: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="flex items-center space-x-2">
                     <div className="space-x-2">
@@ -272,8 +272,8 @@ export default function InventoryManagement() {
                 transition={{ duration: 0.5 }}
                 className="flex justify-between items-center mt-2">
                 <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, z: -20 }}
+                    animate={{ opacity: 1, z: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}>
                     <Select
                         value={itemsPerPage.toString()}
@@ -289,8 +289,8 @@ export default function InventoryManagement() {
                     </Select>
                 </motion.div>
                 <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, z: 20 }}
+                    animate={{ opacity: 1, z: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="flex items-center space-x-2">
                     <div className="flex items-center space-x-2">
@@ -325,13 +325,27 @@ export default function InventoryManagement() {
             <Table className="rounded border">
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="text-center">Component</TableHead>
-                        <TableHead className="text-center">Status</TableHead>
-                        <TableHead className="text-center">Info</TableHead>
-                        <TableHead className="text-center">Weight</TableHead>
-                        <TableHead className="text-center">Volume</TableHead>
-                        <TableHead className="text-center">Cycle Time</TableHead>
-                        <TableHead className="text-center">Actions</TableHead>
+                        <TableHead className="text-center">
+                            <span className="uppercase text-xs">Component</span>
+                        </TableHead>
+                        <TableHead className="text-center">
+                            <span className="uppercase text-xs">Status</span>
+                        </TableHead>
+                        <TableHead className="text-center">
+                            <span className="uppercase text-xs">Info</span>
+                        </TableHead>
+                        <TableHead className="text-center">
+                            <span className="uppercase text-xs">Weight</span>
+                        </TableHead>
+                        <TableHead className="text-center">
+                            <span className="uppercase text-xs">Volume</span>
+                        </TableHead>
+                        <TableHead className="text-center">
+                            <span className="uppercase text-xs">Cycle Time</span>
+                        </TableHead>
+                        <TableHead className="text-center">
+                            <span className="uppercase text-xs">Actions</span>
+                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
