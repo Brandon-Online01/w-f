@@ -3,8 +3,6 @@
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
 import { motion, } from 'framer-motion'
 import {
     Table,
@@ -35,7 +33,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     ChevronLeft,
     ChevronRight,
@@ -55,6 +52,8 @@ import { CreateComponentForm } from "./components/create-component"
 import { CreateMouldForm } from "./moulds/create-mould"
 import { useInventoryStore } from "@/state-managers/components"
 import { getComponentsData, removeComponent } from "@/helpers/components"
+import { EditComponentForm } from "./components/edit-component"
+import { EditMouldForm } from "./moulds/edit-mould"
 
 export default function InventoryManagement() {
     const {
@@ -130,11 +129,6 @@ export default function InventoryManagement() {
 
     const updateMould = (updatedMould: Partial<Mould>) => {
         console.log(updatedMould, 'updatedMould')
-    }
-
-    const handleEditImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-        console.log(file, 'uploaded file')
     }
 
     const PageHeader = () => {
@@ -328,7 +322,6 @@ export default function InventoryManagement() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-
             <Table className="rounded border">
                 <TableHeader>
                     <TableRow>
@@ -346,169 +339,21 @@ export default function InventoryManagement() {
                 </TableBody>
             </Table>
             <TablePagination />
-
             <Dialog open={!!editingProduct} onOpenChange={() => setEditingProduct(null)}>
                 <DialogContent className="sm:max-w-[900px]">
                     <DialogHeader>
                         <DialogTitle>Edit Component</DialogTitle>
                     </DialogHeader>
-                    {editingProduct && (
-                        <ScrollArea className="max-h-[600px] pr-4">
-                            <div className="space-y-6">
-                                <div className="col-span-3">
-                                    <Label htmlFor="editImage" className="block mb-2">Image</Label>
-                                    <div className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400 transition-colors">
-                                        <input
-                                            type="file"
-                                            id="editImage"
-                                            accept="image/*"
-                                            className="hidden"
-                                            onChange={handleEditImageUpload}
-                                        />
-                                        <label htmlFor="editImage" className="cursor-pointer">
-                                            <Image
-                                                src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${editingProduct?.photoURL}`}
-                                                alt={editingProduct.name}
-                                                width={128}
-                                                height={128}
-                                                priority
-                                                quality={100}
-                                                className="mx-auto rounded-lg" />
-                                            <p className="mt-2 text-sm text-gray-500">Click to change image</p>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="flex items-start flex-col gap-0 w-full">
-                                        <Label htmlFor="editName">Name</Label>
-                                        <Input
-                                            id="editName"
-                                            value={editingProduct.name}
-                                            onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="flex items-start flex-col gap-0 w-full">
-                                        <Label htmlFor="editCode">Code</Label>
-                                        <Input
-                                            id="editCode"
-                                            value={editingProduct.code || ''}
-                                            onChange={(e) => setEditingProduct({ ...editingProduct, code: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="flex items-start flex-col gap-0 w-full">
-                                        <Label htmlFor="editStatus">Status</Label>
-                                        <Select
-                                            value={editingProduct.status}
-                                            onValueChange={(value: "Active" | "In Active") => setEditingProduct({ ...editingProduct, status: value })}>
-                                            <SelectTrigger>
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Active">Active</SelectItem>
-                                                <SelectItem value="Inactive">Inactive</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="flex items-start flex-col gap-0 w-full">
-                                        <Label htmlFor="editWeight">Weight (g)</Label>
-                                        <Input
-                                            id="editWeight"
-                                            value={editingProduct.weight}
-                                            onChange={(e) => setEditingProduct({ ...editingProduct, weight: Number(e.target.value) })}
-                                        />
-                                    </div>
-                                    <div className="flex items-start flex-col gap-0 w-full">
-                                        <Label htmlFor="editVolume">Volume (cm³)</Label>
-                                        <Input
-                                            id="editVolume"
-                                            value={editingProduct.volume}
-                                            onChange={(e) => setEditingProduct({ ...editingProduct, volume: Number(e.target.value) })}
-                                        />
-                                    </div>
-                                    <div className="flex items-start flex-col gap-0 w-full">
-                                        <Label htmlFor="editCycleTime">Cycle Time (s)</Label>
-                                        <Input
-                                            id="editCycleTime"
-                                            value={editingProduct.cycleTime}
-                                            onChange={(e) => setEditingProduct({ ...editingProduct, cycleTime: Number(e.target.value) })}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editDescription">Description</Label>
-                                    <Textarea
-                                        id="editDescription"
-                                        value={editingProduct.description}
-                                        onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
-                                        className="min-h-[100px]"
-                                    />
-                                </div>
-                            </div>
-                        </ScrollArea>
-                    )}
+                    {editingProduct && <EditComponentForm product={editingProduct} />}
                     <Button onClick={() => updateComponent(editingProduct!)} className="mt-4 w-full">Save Changes</Button>
                 </DialogContent>
             </Dialog>
-
             <Dialog open={!!editingMould} onOpenChange={() => setEditingMould(null)}>
                 <DialogContent className="sm:max-w-[625px]">
                     <DialogHeader>
                         <DialogTitle>Edit Mould</DialogTitle>
                     </DialogHeader>
-                    {editingMould && (
-                        <ScrollArea className="max-h-[600px] pr-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editMouldName">Name</Label>
-                                    <Input
-                                        id="editMouldName"
-                                        value={editingMould.name}
-                                        onChange={(e) => setEditingMould({ ...editingMould, name: e.target.value })}
-                                    />
-                                </div>
-                                <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editSerialNumber">Serial Number</Label>
-                                    <Input
-                                        id="editSerialNumber"
-                                        value={editingMould.serialNumber}
-                                        onChange={(e) => setEditingMould({ ...editingMould, serialNumber: e.target.value })}
-                                    />
-                                </div>
-                                <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editLastRepairDate">Last Repair Date</Label>
-                                    <Input
-                                        id="editLastRepairDate"
-                                        type="date"
-                                        value={editingMould.lastRepairDate}
-                                        onChange={(e) => setEditingMould({ ...editingMould, lastRepairDate: e.target.value })}
-                                    />
-                                </div>
-                                <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editServicingMileage">Servicing Mileage</Label>
-                                    <Input
-                                        id="editServicingMileage"
-                                        type="number"
-                                        value={editingMould.servicingMileage}
-                                        onChange={(e) => setEditingMould({ ...editingMould, servicingMileage: Number(e.target.value) })}
-                                    />
-                                </div>
-                                <div className="flex items-start flex-col gap-0 w-full">
-                                    <Label htmlFor="editMouldStatus">Status</Label>
-                                    <Select
-                                        value={editingMould.status}
-                                        onValueChange={(value: "Active" | "In Active") => setEditingMould({ ...editingMould, status: value })}>
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="active">Active</SelectItem>
-                                            <SelectItem value="inactive">Inactive</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        </ScrollArea>
-                    )}
+                    {editingMould && <EditMouldForm mould={editingMould} />}
                     <Button onClick={() => updateMould(editingMould!)} className="mt-4 w-full">Save Mould Changes</Button>
                 </DialogContent>
             </Dialog>

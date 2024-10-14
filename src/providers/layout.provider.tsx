@@ -41,6 +41,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
                     if (pathname === '/sign-in') {
                         router.push('/');
                     }
+
                 } catch (error) {
                     console.error('Error decoding token:', error);
                     signOut();
@@ -57,6 +58,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
         };
 
         validateSession();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status, token, pathname]);
 
     const PageLoader = () => (
