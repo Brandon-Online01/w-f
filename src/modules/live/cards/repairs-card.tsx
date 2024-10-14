@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, Droplet } from "lucide-react"
+import { Clock, Droplet, Wrench } from "lucide-react"
 import { motion } from "framer-motion"
 
 type MouldRepairEntry = {
@@ -73,7 +73,12 @@ export default function MouldRepairCard() {
     return (
         <Card className="w-full max-w-2xl mx-auto h-[450px] overflow-hidden">
             <CardHeader>
-                <CardTitle className="text-2xl font-bold">Tool Room</CardTitle>
+                <CardTitle className="text-2xl font-bold">
+                    <p className="font-normal flex items-center justify-start gap-1">
+                        <span className="text-sm">Toolroom</span>
+                        <Wrench className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                    </p>
+                </CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="space-y-6 h-[400px] overflow-y-scroll pb-20">

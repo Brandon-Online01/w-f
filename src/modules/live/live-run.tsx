@@ -90,6 +90,7 @@ export default function LiveRun() {
         if (liveRunData?.data) {
             setMachineData(liveRunData.data);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [liveRunData?.data]);
 
     useEffect(() => {
@@ -121,6 +122,7 @@ export default function LiveRun() {
 
         setFilteredMachines(filtered)
         setPage(1)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchTerm, statusFilter, machineData, sortConfig])
 
     const totalPages = Math.ceil(filteredMachines.length / itemsPerPage)
@@ -285,11 +287,11 @@ export default function LiveRun() {
                         <div className="relative">
                             <Search className="h-4 w-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <Input
+                                className="pl-8 w-64"
                                 type="text"
-                                placeholder="Search machines..."
+                                placeholder="search machines"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-8 w-64"
                             />
                         </div>
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -306,64 +308,73 @@ export default function LiveRun() {
                     </div>
                 </motion.div>
                 <motion.div
+                    className="flex items-center space-x-2"
+
                     initial={{ opacity: 0, z: 20 }}
                     animate={{ opacity: 1, z: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="flex items-center space-x-2">
+                    transition={{ duration: 0.5, delay: 0.2 }}>
                     <Button onClick={exportToExcel} className="flex items-center space-x-2">
                         <Download className="h-4 w-4" />
                         <span>Export to Excel</span>
                     </Button>
                 </motion.div>
             </motion.div>
-            <div className="rounded mt-2 border overflow-hidden">
-                <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader className="sticky top-0 bg-background z-10">
-                            <TableRow>
-                                <TableHead className="text-center cursor-pointer" onClick={() => requestSort('uid')}>
-                                    <span className="uppercase text-xs">Machine</span>
-                                    {getSortIcon('uid')}
-                                </TableHead>
-                                <TableHead className="text-center">
-                                    <span className="uppercase text-xs">Component</span>
-                                </TableHead>
-                                <TableHead className="text-center cursor-pointer" onClick={() => requestSort('production')}>
-                                    <span className="uppercase text-xs">Production</span>
-                                    {getSortIcon('production')}
-                                </TableHead>
-                                <TableHead className="text-center cursor-pointer" onClick={() => requestSort('cycleTime')}>
-                                    <span className="uppercase text-xs">Cycle Time</span>
-                                    {getSortIcon('cycleTime')}
-                                </TableHead>
-                                <TableHead className="text-center">
-                                    <span className="uppercase text-xs">Status</span>
-                                </TableHead>
-                                <TableHead className="text-center">
-                                    <span className="uppercase text-xs">Actions</span>
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            <TableContent />
-                        </TableBody>
-                    </Table>
+            <motion.div
+                className='w-full'
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}>
+                <div className="rounded mt-2 border overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader className="sticky top-0 bg-background z-10 ease-in-out duration-400">
+                                <TableRow>
+                                    <TableHead className="text-center cursor-pointer" onClick={() => requestSort('uid')}>
+                                        <span className="uppercase text-xs">Machine</span>
+                                        {getSortIcon('uid')}
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                        <span className="uppercase text-xs">Component</span>
+                                    </TableHead>
+                                    <TableHead className="text-center cursor-pointer" onClick={() => requestSort('production')}>
+                                        <span className="uppercase text-xs">Production</span>
+                                        {getSortIcon('production')}
+                                    </TableHead>
+                                    <TableHead className="text-center cursor-pointer" onClick={() => requestSort('cycleTime')}>
+                                        <span className="uppercase text-xs">Cycle Time</span>
+                                        {getSortIcon('cycleTime')}
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                        <span className="uppercase text-xs">Status</span>
+                                    </TableHead>
+                                    <TableHead className="text-center">
+                                        <span className="uppercase text-xs">Actions</span>
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableContent />
+                            </TableBody>
+                        </Table>
+                    </div>
                 </div>
-            </div >
+            </motion.div>
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 className="flex justify-between items-center mt-2">
                 <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, z: -20 }}
+                    animate={{ opacity: 1, z: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}>
                     <ItemsPerPageSelect value={itemsPerPage} onChange={setItemsPerPage} />
                 </motion.div>
                 <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, z: 20 }}
+                    animate={{ opacity: 1, z: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="flex items-center space-x-2">
                     <Button

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, Server } from "lucide-react"
+import { Clock, Server, Weight } from "lucide-react"
 import { motion } from "framer-motion"
 
 type TimelineEntry = {
@@ -94,7 +94,12 @@ export default function ActivityCard() {
     return (
         <Card className="w-full max-w-2xl mx-auto h-[450px] overflow-hidden">
             <CardHeader>
-                <CardTitle className="text-2xl font-bold">Production</CardTitle>
+                <CardTitle className="text-2xl font-bold">
+                    <p className="font-normal flex items-center justify-start gap-1">
+                        <span className="text-sm">Production Notes</span>
+                        <Weight className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                    </p>
+                </CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="space-y-6 h-[400px] overflow-y-scroll pb-20">
