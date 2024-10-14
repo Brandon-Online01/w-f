@@ -243,16 +243,16 @@ export default function InventoryManagement() {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => editComponent(component, 'mould')}>
-                                        <Weight className="mr-2 h-4 w-4" />
+                                    <DropdownMenuItem onClick={() => editComponent(component, 'mould')} disabled>
+                                        <Weight className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={16} />
                                         <span>Edit Mould</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => editComponent(component, 'component')}>
-                                        <ComponentIcon className="mr-2 h-4 w-4" />
+                                    <DropdownMenuItem onClick={() => editComponent(component, 'component')} disabled>
+                                        <ComponentIcon className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={16} />
                                         <span>Edit Component</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => deleteComponents(component?.uid)}>
-                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        <Trash2 className="mr-2 stroke-destructive" strokeWidth={1.5} size={16} />
                                         <span>Delete Component</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>

@@ -50,7 +50,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
             }
 
             const elapsedTime = Date.now() - startTime;
-            const remainingTime = Math.max(0, 100 - elapsedTime);
+            const remainingTime = Math.max(0, 10 - elapsedTime);
 
             setTimeout(() => {
                 setIsLoading(false);

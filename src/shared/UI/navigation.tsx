@@ -11,7 +11,6 @@ import {
     LayoutDashboard,
     Settings,
     TrendingUpDown,
-    UsersIcon,
 } from "lucide-react";
 import {
     Dialog,
@@ -53,12 +52,6 @@ export const MobileNavigation = () => {
                                         </Link>
                                     </li>
                                     <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/staff" className="flex items-center justify-center gap-2" aria-label="Staff">
-                                            <UsersIcon strokeWidth={1} size={18} className="stroke-card-foreground" />
-                                            <p>Staff</p>
-                                        </Link>
-                                    </li>
-                                    <li className="flex items-center justify-center cursor-pointer">
                                         <Link href="/inventory" className="flex items-center justify-center gap-2" aria-label="Inventory">
                                             <Component strokeWidth={1} size={18} className="stroke-card-foreground" />
                                             <p>Inventory</p>
@@ -87,7 +80,6 @@ export const DesktopNavigation = () => {
             <ul className="flex w-full flex-col gap-5">
                 {[
                     { href: "/", Icon: TrendingUpDown, ariaLabel: "Dashboard" },
-                    { href: "/staff", Icon: UsersIcon, ariaLabel: "Staff" },
                     { href: "/inventory", Icon: Component, ariaLabel: "Inventory" },
                 ].map((item, index) => (
                     <motion.li
