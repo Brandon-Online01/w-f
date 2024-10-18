@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Clock, Plus, AlertTriangle, CheckCircle, BarChart as BarChartIcon, Search, ChevronLeft, ChevronRight, Weight } from 'lucide-react'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -17,33 +17,19 @@ import { Machine, noteTypes } from '@/types/common.types'
 import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { getMachineData } from '@/helpers/live-run'
+import { isEmpty } from 'lodash'
 
 const materialColors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a4de6c']
 
 export const LiveRunCard = ({ machine, index }: { machine: Machine, index: number }) => {
 	const [showNoteForm, setShowNoteForm] = useState(false)
 
-	console.log(machine, '- machine')
-
 	const handleAddNote = () => console.log('add note')
-
-	// const averageCycleTime = useMemo(() =>
-	// 	machine.insertHistory.reduce((sum: number, cycle: { time: number }) => sum + cycle.time, 0) / machine.insertHistory.length,
-	// 	[machine.insertHistory]
-	// )
-
-	// const cycleTimeVariance = useMemo(() =>
-	// 	Math.sqrt(machine.insertHistory.reduce((sum: number, cycle: { time: number }) => sum + Math.pow(cycle.time - averageCycleTime, 2), 0) / machine.insertHistory.length),
-	// 	[machine.insertHistory, averageCycleTime]
-	// )
-
-	// const isCycleTimeNormal = cycleTimeVariance < 1
-	// const needsMaintenance = machine.mould.nextServiceDate ? new Date(machine.mould.nextServiceDate) <= new Date() : false
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 50 }}
-			animate={{ opacity: 1, y: 0 }}
+			initial={{ opacity: 0, z: -50 }}
+			animate={{ opacity: 1, z: 0 }}
 			transition={{ duration: 0.5, delay: index * 0.1 }}>
 			<Dialog>
 				<DialogTrigger asChild>
@@ -84,7 +70,7 @@ export const LiveRunCard = ({ machine, index }: { machine: Machine, index: numbe
 				<DialogContent className="sm:max-w-[700px] bg-card">
 					<DialogHeader>
 						<DialogTitle>
-							<span className="text-sm font-medium uppercase text-card-foreground">{machine.machine.name} - {machine.component.name}</span>
+							<span className="text-sm font-medium uppercase text-card-foreground">{machine.machine.name} {machine?.machine?.machineNumber} - {machine.component.name}</span>
 						</DialogTitle>
 					</DialogHeader>
 					<Tabs defaultValue="overview" className="w-full">
@@ -173,56 +159,64 @@ export const LiveRunCard = ({ machine, index }: { machine: Machine, index: numbe
 						<TabsContent value="performance">
 							<div className="space-y-4 mt-6">
 								<div className="flex items-center justify-start gap-3 flex-col mt-2">
-									<ResponsiveContainer width="100%" height={200}>
-										<BarChart data={machine.insertHistory} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-											<CartesianGrid strokeDasharray="3 3" stroke="transparent" />
-											<XAxis
-												dataKey="insertTime"
-												angle={-45}
-												textAnchor="end"
-												height={50}
-												axisLine={true}
-												tickLine={true}
-												tick={{
-													textAnchor: 'end',
-													fontSize: 12,
-													dy: 2,
-													color: 'hsl(var(--card-foreground))'
-												}}
-											/>
-											<YAxis
-												label={{ value: 'time', angle: -90, position: 'insideLeft' }}
-												axisLine={true}
-												tickLine={true}
-												tick={{
-													fontSize: 10,
-													fontStyle: 'uppercase'
-												}}
-												tickFormatter={(value) => `${value}s`}
-												style={{
-													fontSize: 12,
-													textAnchor: 'end',
-													color: 'hsl(var(--card-foreground))'
-												}}
-											/>
-											<Tooltip />
-											<Bar
-												dataKey="time"
-												name="Time">
-												radius={[2, 2, 2, 2]}
-												barSize={7}
-												{machine?.insertHistory?.map((entry, index) => (
-													<Cell key={`cell-${index}`} fill={entry?.time > machine.component.targetTime ? '#ff0000' : '#00ff00'} />
-												))}
-											</Bar>
-											<ReferenceLine y={machine.component.targetTime} stroke="#ff0000" strokeDasharray="4 4" strokeWidth={1} />
-										</BarChart>
-									</ResponsiveContainer>
-									<div className="flex items-center justify-center gap-2 -mt-8 w-full">
-										<p className="flex items-center justify-center gap-1">
-											<span className="text-xs uppercase text-card-foreground">Insert Times</span>
-										</p>
-									</div>
+									{!isEmpty(machine?.insertHistory) ?
+										<>
+											<ResponsiveContainer width="100%" height={200}>
+												<BarChart data={machine.insertHistory} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+													<CartesianGrid strokeDasharray="3 3" stroke="transparent" />
+													<XAxis
+														dataKey="insertTime"
+														angle={-45}
+														textAnchor="end"
+														height={50}
+														axisLine={true}
+														tickLine={true}
+														tick={{
+															textAnchor: 'end',
+															fontSize: 12,
+															dy: 2,
+															color: 'hsl(var(--card-foreground))'
+														}}
+													/>
+													<YAxis
+														label={{ value: 'time', angle: -90, position: 'insideLeft' }}
+														axisLine={true}
+														tickLine={true}
+														tick={{
+															fontSize: 10,
+															fontStyle: 'uppercase'
+														}}
+														tickFormatter={(value) => `${value}s`}
+														style={{
+															fontSize: 12,
+															textAnchor: 'end',
+															color: 'hsl(var(--card-foreground))'
+														}}
+													/>
+													<Tooltip />
+													<Bar
+														dataKey="time"
+														name="Time">
+														radius={[2, 2, 2, 2]}
+														barSize={7}
+														{machine?.insertHistory?.map((entry, index) => (
+															<Cell key={`cell-${index}`} fill={entry?.time > machine.component.targetTime ? '#ff0000' : '#00ff00'} />
+														))}
+													</Bar>
+													<ReferenceLine y={machine.component.targetTime} stroke="#ff0000" strokeDasharray="4 4" strokeWidth={1} />
+												</BarChart>
+											</ResponsiveContainer>
+											<div className="flex items-center justify-center gap-2 -mt-8 w-full">
+												<p className="flex items-center justify-center gap-1">
+													<span className="text-xs uppercase text-card-foreground">Insert Times</span>
+												</p>
+											</div>
+										</>
+										:
+										<div className="flex items-center justify-center gap-2 h-48 w-full">
+											<p className="text-xs uppercase text-card-foreground">There are no latest insert times history for this machine.</p>
+										</div>
+									}
 								</div>
 								<div className="flex items-center space-x-1">
 									<Clock className="stroke-card-foreground" strokeWidth={1} size={20} />
@@ -298,8 +292,8 @@ export const LiveRunCard = ({ machine, index }: { machine: Machine, index: numbe
 									<AlertDescription>
 										<ul className="list-disc list-inside">
 											<li className="text-[12px]">Efficiency: {machine?.efficiency}%</li>
-											<li className="text-[12px]">Virgin Material: ({machine?.virginMaterial.toFixed(2)})</li>
-											<li className="text-[12px]">Total Materials Used: {machine?.totalMaterialsUsed.toFixed(2)}</li>
+											<li className="text-[12px]">Virgin Material: {machine?.virginMaterial.toFixed(2)}kg</li>
+											<li className="text-[12px]">Total Materials Used: {machine?.totalMaterialsUsed.toFixed(2)}kg</li>
 										</ul>
 									</AlertDescription>
 								</Alert>
