@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getMachineData } from '@/helpers/live-run'
 import { isEmpty } from 'lodash'
 
-const materialColors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a4de6c']
+const materialColors = ['#ff0000', '#00ff00']
 
 export const LiveRunCard = ({ machine, index }: { machine: Machine, index: number }) => {
 	const [showNoteForm, setShowNoteForm] = useState(false)
@@ -35,7 +35,7 @@ export const LiveRunCard = ({ machine, index }: { machine: Machine, index: numbe
 				<DialogTrigger asChild>
 					<Card className="h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out p-3">
 						<div className='flex items-center justify-between p-2'>
-							<span className="uppercase text-sm text-card-foreground">{machine.machine.name}</span>
+							<span className="uppercase text-sm text-card-foreground">{machine.machine.name} {machine.machine.machineNumber}</span>
 							<Badge className={`text-white rounded px-4 py-[2px] ${machine.status === 'Running' ? 'bg-success' : machine.status === 'Stopped' ? 'bg-destructive' : 'bg-warning'}`}>
 								<span className="text-[10px] uppercase text-white">{machine.status}</span>
 							</Badge>
@@ -277,11 +277,11 @@ export const LiveRunCard = ({ machine, index }: { machine: Machine, index: numbe
 								<div className="flex items-center justify-center gap-2 -mt-8 w-full">
 									<p className="flex items-center justify-center gap-1">
 										<span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#ff0000' }}></span>
-										<span className="text-xs uppercase text-card-foreground">Master Batch</span>
+										<span className="text-xs uppercase text-card-foreground">Virgin</span>
 									</p>
 									<p className="flex items-center justify-center gap-1">
 										<span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#00ff00' }}></span>
-										<span className="text-xs uppercase text-card-foreground">Virgin Material</span>
+										<span className="text-xs uppercase text-card-foreground">Master Batch</span>
 									</p>
 								</div>
 								<Alert>
@@ -408,7 +408,7 @@ export default function LiveRunCards() {
 								<SelectValue placeholder="Filter by status" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="all">All Statuses</SelectItem>
+								<SelectItem value="all">All</SelectItem>
 								<SelectItem value="idle">Idling</SelectItem>
 								<SelectItem value="running">Running</SelectItem>
 								<SelectItem value="stopped">Stopped</SelectItem>

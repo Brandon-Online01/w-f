@@ -79,13 +79,13 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <div className={`w-full h-screen flex flex-col xl:flex-row items-center justify-center xl:gap-2 gap-1 relative ${pathname === '/sign-in' ? '' : 'p-1 xl:p-2'}`}>
+            <div className={`w-full h-screen flex flex-col xl:flex-row items-center justify-center xl:gap-2 gap-1 relative ${pathname === '/sign-in' ? '' : 'p-1 xl:p-2'} outline-none`}>
                 {pathname !== '/sign-in' && (
                     <div className="border h-10 w-full xl:w-[3%] rounded p-2 flex justify-center h-[5%] xl:h-full ease-in-out duration-300 bg-card">
                         <Navigation />
                     </div>
                 )}
-                <div className={`${pathname === '/sign-in' ? 'w-full h-full' : 'xl:w-[97%] rounded'} xl:h-full h-[95%] ease-in-out duration-300`}>
+                <div className={`${pathname === '/sign-in' ? 'w-full h-full' : 'xl:w-[97%] rounded'} xl:h-full h-[95%] ease-in-out duration-300 outline-none`}>
                     {children}
                 </div>
             </div>
