@@ -16,6 +16,13 @@ export type Machine = {
     palletsNeeded: number;
     packagingType: string;
     eventTimeStamp: string;
+    recordAge: string;
+    signalQuality: string;
+    firmwareVersion: string;
+    averageCycleTime: number;
+    cycleTimeVariance: number;
+    cycleTimeVariancePercentage: string;
+    insertHistory: Array<{ time: number; insertTime: string }>;
     component: {
         uid: number;
         name: string;
@@ -116,3 +123,10 @@ export interface ImageFile {
     lastModified: number;
     webkitRelativePath: string;
 }
+
+
+export const noteTypes = [
+    'Mechanical', 'Electrical', 'Oil Change', 'Missing Operator', 'Shift Change',
+    'Repairs', 'Production', 'Quality Control', 'Safety', 'Cleaning',
+    'Material Change', 'Software Update', 'Training', 'Inspection', 'Other'
+]

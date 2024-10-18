@@ -26,7 +26,7 @@ export const LiveHighlights = () => {
     const { runningMachines, stoppedMachines, totalMasterBatch, totalVirginMaterials, totalDowntime, overallEfficiency } = liveRunData?.data
 
     const highlights = [
-        { title: "Material Usage", value: `${totalMasterBatch} / ${totalVirginMaterials}`, Icon: Layers, subTitle: "MasterBatch / Virgin Material" },
+        { title: "Material Usage", value: `${totalMasterBatch} / ${totalVirginMaterials}`, Icon: Layers, subTitle: "MasterBatch / Virgin" },
         { title: "Machine Utilization", value: `${runningMachines} / ${stoppedMachines}`, Icon: Gauge, subTitle: `Running / Stopped` },
         { title: "Total Downtime", value: `${totalDowntime} hrs`, Icon: Clock, subTitle: "Total Downtime" },
         { title: "Overall Efficiency", value: `${overallEfficiency}%`, Icon: Activity, subTitle: "Overall Efficiency" },
