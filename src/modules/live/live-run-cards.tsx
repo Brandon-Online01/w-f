@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Clock, Package, Plus, AlertTriangle, CheckCircle, BarChart as BarChartIcon, Search, ChevronLeft, ChevronRight, Wifi } from 'lucide-react'
+import { Clock, Package, Plus, CheckCircle, Search, ChevronLeft, ChevronRight, Wifi, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -14,89 +14,24 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell, Refere
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { cn } from "@/lib/utils"
 import Image from 'next/image'
+import { io } from 'socket.io-client';
+import { create } from 'zustand';
+import { isEmpty } from 'lodash'
+import { Badge } from '@/components/ui/badge'
 
-const generateMachineData = (count: number) => {
-	const statuses = ['Idle', 'Running', 'Stopped']
-	const shifts = ['Day', 'Night']
-	const packagingTypes = ['Box', 'Bag', 'Pallet']
-	const signalQualities = ['Excellent', 'Good', 'Fair', 'Poor']
-
-	return Array.from({ length: count }, (_, i) => ({
-		uid: i + 1,
-		machineNumber: `machine${(i + 1).toString().padStart(3, '0')}`,
-		status: statuses[Math.floor(Math.random() * statuses.length)],
-		cycleTime: Math.random() * 20,
-		cycleCounts: Math.floor(Math.random() * 2000).toString(),
-		statusCount: Math.floor(Math.random() * 30).toString(),
-		shift: shifts[Math.floor(Math.random() * shifts.length)],
-		currentProduction: Math.floor(Math.random() * 2000),
-		targetProduction: Math.floor(Math.random() * 1000) + 1500,
-		masterBatchMaterial: Math.random() * 1,
-		virginMaterial: Math.random() * 20,
-		totalMaterialsUsed: Math.random() * 21,
-		totalDownTime: Math.floor(Math.random() * 120),
-		efficiency: Math.random() * 5000,
-		packagingTypeQtyRequired: Math.floor(Math.random() * 500),
-		palletsNeeded: Math.floor(Math.random() * 50),
-		packagingType: packagingTypes[Math.floor(Math.random() * packagingTypes.length)],
-		eventTimeStamp: new Date().toISOString(),
-		recordAge: `${Math.floor(Math.random() * 60)} minutes ago`,
-		signalQuality: signalQualities[Math.floor(Math.random() * signalQualities.length)],
-		firmwareVersion: Math.random() < 0.8 ? `v${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}.${Math.floor(Math.random() * 10)}` : null,
-		averageCycleTime: Math.random() * 20,
-		cycleTimeVariance: Math.random() * 15,
-		cycleTimeVariancePercentage: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)],
-		insertHistory: Array.from({ length: 10 }, () => ({
-			cycleTime: (Math.random() * 20).toFixed(3),
-			eventTimeStamp: new Date(Date.now() - Math.floor(Math.random() * 3600000)).toISOString()
-		})),
-		component: {
-			name: `Component ${String.fromCharCode(65 + i % 26)}`,
-			description: `This is a description of Component ${String.fromCharCode(65 + i % 26)}.`,
-			photoURL: "naartjie.png",
-			weight: Math.floor(Math.random() * 100) + 1,
-			volume: Math.floor(Math.random() * 1000) + 100,
-			code: `COMP-${String.fromCharCode(65 + i % 26)}-${(i + 1).toString().padStart(3, '0')}`,
-			color: ['Red', 'Blue', 'Green', 'Yellow', 'White', 'Black'][Math.floor(Math.random() * 6)],
-			cycleTime: Math.floor(Math.random() * 60) + 10,
-			targetTime: Math.floor(Math.random() * 30) + 10,
-			coolingTime: Math.floor(Math.random() * 20) + 5,
-			chargingTime: Math.floor(Math.random() * 15) + 5,
-			cavity: Math.floor(Math.random() * 8) + 1,
-			configuration: packagingTypes[Math.floor(Math.random() * packagingTypes.length)],
-			configQTY: Math.floor(Math.random() * 100) + 10,
-			palletQty: Math.floor(Math.random() * 20) + 1,
-			testMachine: `Test Machine ${String.fromCharCode(65 + i % 26)}`,
-			masterBatch: Math.floor(Math.random() * 5) + 1,
-			status: ['Active', 'Inactive'][Math.floor(Math.random() * 2)],
-			createdAt: new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString(),
-			updatedAt: new Date().toISOString()
-		},
-		mould: {
-			uid: i + 1,
-			name: `Mould ${String.fromCharCode(65 + i % 26)}`,
-			serialNumber: `MOULD-${(i + 1).toString().padStart(3, '0')}`,
-			creationDate: new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString(),
-			lastRepairDate: new Date(Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
-			mileage: Math.floor(Math.random() * 10000),
-			servicingMileage: Math.floor(Math.random() * 5000) + 5000,
-			nextServiceDate: new Date(Date.now() + Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)).toISOString(),
-			status: ['Active', 'Inactive', 'Maintenance'][Math.floor(Math.random() * 3)]
-		},
-		notes: [],
-		machine: {
-			uid: i + 1,
-			name: `Machine ${i + 1}`,
-			machineNumber: (i + 1).toString(),
-			macAddress: `mac${(i + 1).toString().padStart(3, '0')}`,
-			description: `This is a description of Machine ${i + 1}`,
-			creationDate: new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000)).toISOString(),
-			status: ['Active', 'Inactive', 'Maintenance'][Math.floor(Math.random() * 3)]
-		}
-	}))
+interface LiveRunStore {
+	isLoading: boolean;
+	machineData: Machine[];
+	setMachineData: (data: Machine[]) => void;
+	setIsLoading: (state: boolean) => void;
 }
 
-const machineData = generateMachineData(20)
+const liveRunStore = create<LiveRunStore>((set) => ({
+	isLoading: false,
+	machineData: [],
+	setMachineData: (data: Machine[]) => set({ machineData: data }),
+	setIsLoading: (state: boolean) => set({ isLoading: state }),
+}))
 
 const materialColors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a4de6c']
 
@@ -190,18 +125,6 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 		setShowNoteForm(false)
 	}
 
-	const averageCycleTime = useMemo(() =>
-		machine.insertHistory.reduce((sum, cycle) => sum + parseFloat(cycle.cycleTime), 0) / machine.insertHistory.length,
-		[machine.insertHistory]
-	)
-
-	const cycleTimeVariance = useMemo(() =>
-		Math.sqrt(machine.insertHistory.reduce((sum, cycle) => sum + Math.pow(parseFloat(cycle.cycleTime) - averageCycleTime, 2), 0) / machine.insertHistory.length),
-		[machine.insertHistory, averageCycleTime]
-	)
-
-	const isCycleTimeNormal = cycleTimeVariance < 1
-
 	const getWifiIcon = (signalQuality: string) => {
 		switch (signalQuality.toLowerCase()) {
 			case 'excellent':
@@ -226,8 +149,9 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 				<DialogTrigger asChild>
 					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")}>
 						<CardHeader className="flex flex-row items-center justify-between py-2 px-4">
-							<span className="text-card-foreground uppercase">{machine?.machine?.machineNumber} - {machine?.machine?.name}</span>
+							<span className="text-card-foreground uppercase">{machine?.machine?.name} - {machine?.machine?.machineNumber}</span>
 							<div className="flex items-center space-x-2">
+								<Badge variant={`${machine.status === 'Active' ? 'success' : machine.status === 'Idle' ? 'warning' : 'destructive'}`}>{machine.status}</Badge>
 							</div>
 						</CardHeader>
 						<CardContent className="p-2 space-y-2">
@@ -316,7 +240,7 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 									</div>
 								</div>
 								<div className="flex flex-col sm:flex-row gap-4 mt-4">
-									<Alert variant={isCycleTimeNormal ? "default" : "destructive"} className="flex-1">
+									{/* <Alert variant={isCycleTimeNormal ? "default" : "destructive"} className="flex-1">
 										<AlertTriangle className="h-4 w-4" />
 										<AlertTitle className="uppercase">Cycle Time Status</AlertTitle>
 										<AlertDescription>
@@ -333,7 +257,7 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 												<li>Average Cycle Time: {averageCycleTime?.toFixed(2)}s</li>
 											</ul>
 										</AlertDescription>
-									</Alert>
+									</Alert> */}
 								</div>
 							</div>
 						</TabsContent>
@@ -381,8 +305,8 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 									<AlertTitle className="uppercase">Performance Insights</AlertTitle>
 									<AlertDescription>
 										<ul className="list-disc list-inside">
-											<li>Average Cycle Time: {averageCycleTime.toFixed(2)}s</li>
-											<li>Cycle Time Variance: {cycleTimeVariance.toFixed(2)}s</li>
+											{/* <li>Average Cycle Time: {averageCycleTime.toFixed(2)}s</li> */}
+											{/* <li>Cycle Time Variance: {cycleTimeVariance.toFixed(2)}s</li> */}
 											<li>Efficiency: {machine.efficiency.toFixed(2)}%</li>
 											<li>Units Produced: {machine.currentProduction.toFixed(2)} / {machine.targetProduction.toFixed(2)}</li>
 										</ul>
@@ -392,10 +316,6 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 						</TabsContent>
 						<TabsContent value="material">
 							<div className="space-y-4">
-								<div className="flex items-center space-x-2">
-									<Package className="h-5 w-5" />
-									<span className="uppercase text-card-foreground">Material Usage</span>
-								</div>
 								<ResponsiveContainer width="100%" height={200}>
 									<BarChart data={[{ name: 'Virgin Material', value: machine.virginMaterial }, { name: 'Master Batch', value: machine.masterBatchMaterial }]}>
 										<XAxis dataKey="name" />
@@ -481,24 +401,50 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 }
 
 export default function Component() {
+	const {
+		setMachineData,
+		setIsLoading,
+		isLoading,
+		machineData,
+	} = liveRunStore();
+
 	const [searchTerm, setSearchTerm] = useState('')
 	const [statusFilter, setStatusFilter] = useState('all')
 	const [currentPage, setCurrentPage] = useState(1)
 	const [itemsPerPage, setItemsPerPage] = useState(8)
 
-	const filteredMachines = machineData.filter(machine =>
-		(machine.machine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			machine.component.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
-		(statusFilter === 'all' || machine.status.toLowerCase() === statusFilter)
-	)
+	useEffect(() => {
+		const fetchLiveRunData = () => {
+			setIsLoading(true);
+			const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`, {
+				transports: ['websocket'],
+				withCredentials: true,
+			});
 
-	const indexOfLastItem = currentPage * itemsPerPage
-	const indexOfFirstItem = indexOfLastItem - itemsPerPage
-	const currentMachines = filteredMachines.slice(indexOfFirstItem, indexOfLastItem)
+			socket.on('connect', () => {
+				//
+			});
 
-	const totalPages = Math.ceil(filteredMachines.length / itemsPerPage)
+			socket.on('live-run', (data) => {
+				setMachineData(data?.data);
+				setIsLoading(false);
+			});
 
-	const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+			socket.on('disconnect', () => {
+				setIsLoading(false);
+			});
+
+			socket.on('error', () => {
+				setIsLoading(false);
+			});
+
+			return () => {
+				socket.disconnect();
+			};
+		};
+
+		fetchLiveRunData();
+	}, [setMachineData, setIsLoading]);
 
 	const SectionHeader = () => {
 		return (
@@ -521,7 +467,7 @@ export default function Component() {
 						<SelectContent>
 							<SelectItem value="all">All</SelectItem>
 							<SelectItem value="idle">Idle</SelectItem>
-							<SelectItem value="running">Running</SelectItem>
+							<SelectItem value="active">Running</SelectItem>
 							<SelectItem value="stopped">Stopped</SelectItem>
 						</SelectContent>
 					</Select>
@@ -541,14 +487,42 @@ export default function Component() {
 
 	}
 
+	if (isLoading || isEmpty(machineData)) {
+		return (
+			<>
+				<p>Loading...</p>
+			</>
+		)
+	}
+
+	const filteredMachines = machineData?.filter(machine =>
+		(machine.machine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+			machine.component.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+		(statusFilter === 'all' || machine.status.toLowerCase() === statusFilter)
+	)
+
+	const indexOfLastItem = currentPage * itemsPerPage
+	const indexOfFirstItem = indexOfLastItem - itemsPerPage
+	const currentMachines = filteredMachines.slice(indexOfFirstItem, indexOfLastItem)
+
+	const totalPages = Math.ceil(filteredMachines.length / itemsPerPage)
+
+	const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+
 	return (
 		<div className="w-full">
 			<SectionHeader />
-			<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
-				{currentMachines.map((machine, index) => (
-					<MachineCard key={index} machine={machine} index={index} />
-				))}
-			</div>
+			{
+				!isLoading &&
+				<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
+					{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
+				</div>
+			}
+			{isLoading &&
+				<div className="flex items-center justify-center border w-full h-96 border bg-card">
+					<Loader2 className="h-4 w-4 animate-spin stroke-primary" />
+				</div>
+			}
 			{filteredMachines.length > itemsPerPage && (
 				<div className="mt-4 flex justify-center items-center">
 					<Button
@@ -568,8 +542,7 @@ export default function Component() {
 						disabled={currentPage === totalPages}
 						variant="ghost"
 						size="icon"
-						className="ml-2"
-					>
+						className="ml-2">
 						<ChevronRight className="h-4 w-4" />
 					</Button>
 				</div>

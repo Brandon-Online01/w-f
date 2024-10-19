@@ -42,7 +42,7 @@ export default function MachineStatsCard() {
 
     const liveStreamData = () => {
         setIsLoading(true);
-        const socket = io('http://localhost:4400', {
+        const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`, {
             transports: ['websocket'],
             withCredentials: true,
         });
