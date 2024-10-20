@@ -1,6 +1,6 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
+import { ChartSpline } from "lucide-react"
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts"
 
 import {
@@ -110,7 +110,7 @@ export function FactoryUtilization({ data }: { data: string | null }) {
                     </p>
                 </div>
                 <div className="flex items-center gap-2 font-medium leading-none text-card-foreground text-center">
-                    Factory Utilization <TrendingUp className="stroke-card-foreground" size={20} strokeWidth={1} />
+                    Factory Utilization <ChartSpline className="stroke-card-foreground" size={20} strokeWidth={1} />
                 </div>
                 <div className="leading-none text-card-foreground text-center">
                     Usage of machines in the factory

@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Clock, Package, Plus, CheckCircle, Search, ChevronLeft, ChevronRight, Wifi, Loader2 } from 'lucide-react'
+import { Clock, Package, Plus, CheckCircle, ChevronLeft, ChevronRight, Wifi, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell, ReferenceLine } from 'recharts'
@@ -22,15 +21,31 @@ import { Badge } from '@/components/ui/badge'
 interface LiveRunStore {
 	isLoading: boolean;
 	machineData: Machine[];
+	searchQuery: string;
+	statusFilter: string;
+	currentPage: number;
+	itemsPerPage: number;
 	setMachineData: (data: Machine[]) => void;
+	setSearchQuery: (query: string) => void;
 	setIsLoading: (state: boolean) => void;
+	setStatusFilter: (filter: string) => void;
+	setCurrentPage: (page: number) => void;
+	setItemsPerPage: (items: number) => void;
 }
 
 const liveRunStore = create<LiveRunStore>((set) => ({
 	isLoading: false,
 	machineData: [],
+	searchQuery: '',
+	statusFilter: 'all',
+	currentPage: 1,
+	itemsPerPage: 8,
 	setMachineData: (data: Machine[]) => set({ machineData: data }),
+	setSearchQuery: (query: string) => set({ searchQuery: query }),
 	setIsLoading: (state: boolean) => set({ isLoading: state }),
+	setStatusFilter: (filter: string) => set({ statusFilter: filter }),
+	setCurrentPage: (page: number) => set({ currentPage: page }),
+	setItemsPerPage: (items: number) => set({ itemsPerPage: items }),
 }))
 
 const materialColors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a4de6c']
@@ -406,12 +421,14 @@ export default function Component() {
 		setIsLoading,
 		isLoading,
 		machineData,
+		searchQuery,
+		statusFilter,
+		currentPage,
+		itemsPerPage,
+		setStatusFilter,
+		setCurrentPage,
+		setItemsPerPage,
 	} = liveRunStore();
-
-	const [searchTerm, setSearchTerm] = useState('')
-	const [statusFilter, setStatusFilter] = useState('all')
-	const [currentPage, setCurrentPage] = useState(1)
-	const [itemsPerPage, setItemsPerPage] = useState(8)
 
 	useEffect(() => {
 		const fetchLiveRunData = () => {
@@ -421,20 +438,8 @@ export default function Component() {
 				withCredentials: true,
 			});
 
-			socket.on('connect', () => {
-				//
-			});
-
 			socket.on('live-run', (data) => {
 				setMachineData(data?.data);
-				setIsLoading(false);
-			});
-
-			socket.on('disconnect', () => {
-				setIsLoading(false);
-			});
-
-			socket.on('error', () => {
 				setIsLoading(false);
 			});
 
@@ -450,23 +455,13 @@ export default function Component() {
 		return (
 			<div className="mb-4 flex justify-between items-center">
 				<div className="flex items-center gap-4">
-					<div className="relative w-64">
-						<Input
-							type="text"
-							placeholder="Search machines..."
-							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
-							className="pl-10"
-						/>
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-					</div>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className="w-[180px]">
 							<SelectValue placeholder="Filter by status" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="all">All</SelectItem>
-							<SelectItem value="idle">Idle</SelectItem>
+							<SelectItem value="idle">Idling</SelectItem>
 							<SelectItem value="active">Running</SelectItem>
 							<SelectItem value="stopped">Stopped</SelectItem>
 						</SelectContent>
@@ -496,24 +491,60 @@ export default function Component() {
 	}
 
 	const filteredMachines = machineData?.filter(machine =>
-		(machine.machine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			machine.component.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+		(machine.machine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			machine.component.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
 		(statusFilter === 'all' || machine.status.toLowerCase() === statusFilter)
 	)
 
 	const indexOfLastItem = currentPage * itemsPerPage
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage
 	const currentMachines = filteredMachines.slice(indexOfFirstItem, indexOfLastItem)
-
 	const totalPages = Math.ceil(filteredMachines.length / itemsPerPage)
 
 	const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
 
+	const TablePagination = () => {
+		return (
+			<motion.div
+				className="flex justify-between items-center mt-2"
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5 }}>
+				<motion.div
+					className="flex items-center space-x-2"
+					initial={{ opacity: 0, z: 20 }}
+					animate={{ opacity: 1, z: 0 }}
+					transition={{ duration: 0.5, delay: 0.2 }}>
+					<div className="mt-4 flex justify-center items-center">
+						<Button
+							className="mr-2"
+							onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
+							disabled={currentPage === 1}
+							variant="ghost"
+							size="icon">
+							<ChevronLeft className="h-4 w-4" />
+						</Button>
+						<span className="mx-4">
+							{currentPage} of {totalPages}
+						</span>
+						<Button
+							className="ml-2"
+							onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : totalPages)}
+							disabled={currentPage === totalPages}
+							variant="ghost"
+							size="icon">
+							<ChevronRight className="h-4 w-4" />
+						</Button>
+					</div>
+				</motion.div>
+			</motion.div>
+		)
+	}
+
 	return (
 		<div className="w-full">
 			<SectionHeader />
-			{
-				!isLoading &&
+			{!isLoading &&
 				<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
 					{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
 				</div>
@@ -523,30 +554,7 @@ export default function Component() {
 					<Loader2 className="h-4 w-4 animate-spin stroke-primary" />
 				</div>
 			}
-			{filteredMachines.length > itemsPerPage && (
-				<div className="mt-4 flex justify-center items-center">
-					<Button
-						onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
-						disabled={currentPage === 1}
-						variant="ghost"
-						size="icon"
-						className="mr-2"
-					>
-						<ChevronLeft className="h-4 w-4" />
-					</Button>
-					<span className="mx-4">
-						{currentPage} of {totalPages}
-					</span>
-					<Button
-						onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : totalPages)}
-						disabled={currentPage === totalPages}
-						variant="ghost"
-						size="icon"
-						className="ml-2">
-						<ChevronRight className="h-4 w-4" />
-					</Button>
-				</div>
-			)}
+			<TablePagination />
 		</div>
 	)
 }
