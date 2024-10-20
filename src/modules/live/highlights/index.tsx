@@ -58,7 +58,6 @@ export default function LiveRunHighlights() {
             });
 
             socket.on('highlights', (data) => {
-                console.log(data?.data);
                 setHighlightsData(data?.data);
                 setIsLoading(false);
             });

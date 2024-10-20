@@ -20,25 +20,28 @@ import {
 const chartConfig = {
     desktop: {
         label: "Desktop",
-        color: "hsl(var(--chart-1))",
+        color: "hsl(var(--chart-3))",
     },
     mobile: {
         label: "Mobile",
-        color: "hsl(var(--chart-3))",
+        color: "hsl(var(--chart-1))",
     },
 } satisfies ChartConfig
 
 export function ShiftUtilization({ data }: { data: string | null }) {
 
-    const chartData = [{ month: "january", desktop: 1260, mobile: 570 }]
+    const chartValue = Number(data?.replace('%', ''))
+    const chartDifference = Number((100 - chartValue)?.toFixed(2))
 
-    console.log(data, '- use this value')
+    console.log(chartValue, '- chartValue', chartDifference, '- chartDifference')
+
+    const chartData = [{ month: "january", desktop: chartDifference, mobile: chartValue }]
 
     return (
         <Card className="flex flex-col w-full">
             <CardHeader className="items-center pb-0">
                 <CardDescription>
-                    <p className="text-sm text-muted-foreground -mt-3">Current Shift</p>
+                    <p className="text-sm text-card-foreground -mt-3">Current Shift</p>
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-1 items-center pb-0">
@@ -48,7 +51,7 @@ export function ShiftUtilization({ data }: { data: string | null }) {
                     <RadialBarChart
                         data={chartData}
                         endAngle={180}
-                        innerRadius={80}
+                        innerRadius={100}
                         outerRadius={130}>
                         <ChartTooltip
                             cursor={false}
@@ -63,9 +66,14 @@ export function ShiftUtilization({ data }: { data: string | null }) {
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) - 16}
-                                                    className="fill-foreground text-2xl"
-                                                >
-                                                    %
+                                                    className="fill-foreground text-[30px]">
+                                                    {chartValue}%
+                                                </tspan>
+                                                <tspan
+                                                    x={viewBox.cx}
+                                                    y={(viewBox.cy || 0) + 2}
+                                                    className="fill-card-foreground text-[12px] -mt-8">
+                                                    Machine Utilization
                                                 </tspan>
                                             </text>
                                         )
@@ -91,10 +99,20 @@ export function ShiftUtilization({ data }: { data: string | null }) {
                 </ChartContainer>
             </CardContent>
             <CardFooter className="flex-col gap-1 text-sm">
-                <div className="flex items-center gap-2 font-medium leading-none">
-                    Shift Utilization <TrendingUp className="h-4 w-4" />
+                <div className="flex items-center gap-2 font-medium leading-none mb-6">
+                    <p className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1))" }}></span>
+                        <span className="text-card-foreground text-[10px] uppercase">Running</span>
+                    </p>
+                    <p className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-3))" }}></span>
+                        <span className="text-card-foreground text-[10px] uppercase">Stopped & Idling</span>
+                    </p>
                 </div>
-                <div className="leading-none text-muted-foreground">
+                <div className="flex items-center gap-2 font-medium leading-none text-card-foreground text-center">
+                    Shift Utilization <TrendingUp className="stroke-card-foreground" size={20} strokeWidth={1} />
+                </div>
+                <div className="leading-none text-card-foreground text-center">
                     Machine utilization for reporting machines
                 </div>
             </CardFooter>

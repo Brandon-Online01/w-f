@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { TrendingUp } from "lucide-react"
+import { CpuIcon } from "lucide-react"
 import { Label, Pie, PieChart } from "recharts"
 
 import {
@@ -64,7 +64,7 @@ export function DeviceStatistics({ data }: DeviceStatisticsProps) {
         <Card className="flex flex-col w-full">
             <CardHeader className="items-center pb-0">
                 <CardDescription>
-                    <p className="text-sm text-muted-foreground -mt-3">Current Shift</p>
+                    <p className="text-sm text-card-foreground -mt-3">Current Shift</p>
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
@@ -100,7 +100,7 @@ export function DeviceStatistics({ data }: DeviceStatisticsProps) {
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 18}
-                                                    className="fill-muted-foreground text-[12px]">
+                                                    className="fill-card-foreground text-[12px]">
                                                     Registered Machines
                                                 </tspan>
                                             </text>
@@ -113,10 +113,20 @@ export function DeviceStatistics({ data }: DeviceStatisticsProps) {
                 </ChartContainer>
             </CardContent>
             <CardFooter className="flex-col gap-1 text-sm">
-                <div className="flex items-center gap-2 font-medium leading-none">
-                    Registered Machines <TrendingUp className="h-4 w-4" />
+                <div className="flex items-center gap-2 font-medium leading-none mb-6">
+                    <p className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1))" }}></span>
+                        <span className="text-card-foreground text-[10px] uppercase">In Use</span>
+                    </p>
+                    <p className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-3))" }}></span>
+                        <span className="text-card-foreground text-[10px] uppercase">Not In Use</span>
+                    </p>
                 </div>
-                <div className="leading-none text-muted-foreground">
+                <div className="flex items-center gap-2 font-medium leading-none text-card-foreground text-center">
+                    Registered Machines <CpuIcon className="stroke-card-foreground" size={20} strokeWidth={1} />
+                </div>
+                <div className="leading-none text-card-foreground text-center">
                     Registred machines with devices and usage
                 </div>
             </CardFooter>
