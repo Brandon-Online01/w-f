@@ -64,7 +64,7 @@ export function MachineStatistics({ data }: MachineStatisticsProps) {
         <Card className="flex flex-col w-full">
             <CardHeader className="items-center pb-0">
                 <CardDescription>
-                    <p className="text-sm text-card-foreground -mt-3">Current Shift</p>
+                    <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">

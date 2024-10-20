@@ -33,15 +33,13 @@ export function ShiftUtilization({ data }: { data: string | null }) {
     const chartValue = Number(data?.replace('%', ''))
     const chartDifference = Number((100 - chartValue)?.toFixed(2))
 
-    console.log(chartValue, '- chartValue', chartDifference, '- chartDifference')
-
     const chartData = [{ month: "january", desktop: chartDifference, mobile: chartValue }]
 
     return (
         <Card className="flex flex-col w-full">
             <CardHeader className="items-center pb-0">
                 <CardDescription>
-                    <p className="text-sm text-card-foreground -mt-3">Current Shift</p>
+                    <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-1 items-center pb-0">

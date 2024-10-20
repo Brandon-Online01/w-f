@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Clock, Package, Plus, CheckCircle, ChevronLeft, ChevronRight, Wifi, Loader2 } from 'lucide-react'
+import { Package, Plus, CheckCircle, ChevronLeft, ChevronRight, Wifi, Loader2, WifiLow, WifiHigh, WifiZero, BarChartIcon, AlertTriangle, PackageCheck, ChartSpline, Clock } from 'lucide-react'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -129,7 +129,7 @@ interface Machine {
 const MachineCard = ({ machine, index }: { machine: Machine, index: number }) => {
 	const [showNoteForm, setShowNoteForm] = useState(false)
 	const [newNote, setNewNote] = useState({ type: '', content: '' })
-	const [notes, setNotes] = useState(machine.notes)
+	const [notes, setNotes] = useState(machine?.notes)
 
 	const handleAddNote = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -141,17 +141,15 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 	}
 
 	const getWifiIcon = (signalQuality: string) => {
-		switch (signalQuality.toLowerCase()) {
-			case 'excellent':
-				return <Wifi className="h-4 w-4 text-green-500" />
+		switch (signalQuality?.toLowerCase()) {
 			case 'good':
-				return <Wifi className="h-4 w-4 text-green-500" />
+				return <Wifi className="stroke-success" strokeWidth={1.5} size={30} />
 			case 'fair':
-				return <Wifi className="h-4 w-4 text-yellow-500" />
+				return <WifiHigh className="stroke-warning" strokeWidth={1.5} size={30} />
 			case 'poor':
-				return <Wifi className="h-4 w-4 text-red-500" />
+				return <WifiLow className="stroke-destructive" strokeWidth={1.5} size={30} />
 			default:
-				return <Wifi className="h-4 w-4 text-gray-500" />
+				return <WifiZero className="stroke-destructive" strokeWidth={1.5} size={30} />
 		}
 	}
 
@@ -166,15 +164,15 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 						<CardHeader className="flex flex-row items-center justify-between py-2 px-4">
 							<span className="text-card-foreground uppercase">{machine?.machine?.name} - {machine?.machine?.machineNumber}</span>
 							<div className="flex items-center space-x-2">
-								<Badge variant={`${machine.status === 'Active' ? 'success' : machine.status === 'Idle' ? 'warning' : 'destructive'}`}>{machine.status}</Badge>
+								<Badge variant={`${machine?.status === 'Active' ? 'success' : machine?.status === 'Idle' ? 'warning' : 'destructive'}`}>{machine?.status}</Badge>
 							</div>
 						</CardHeader>
-						<CardContent className="p-2 space-y-2">
+						<CardContent className="p-2 space-y-2 mt-4">
 							<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden">
 								<div className="flex items-center justify-center border rounded border-[1px]">
 									<Image
-										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine.component.photoURL}`}
-										alt={machine.component.name}
+										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component.photoURL}`}
+										alt={machine?.component.name}
 										width={300}
 										height={300}
 										priority
@@ -183,21 +181,30 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 								</div>
 							</div>
 							<div className='flex items-center justify-between flex-row w-full'>
-								<h3 className="text-card-foreground">{machine.component.name} - {machine.mould.name}</h3>
-								{getWifiIcon(machine.signalQuality)}
+								<h3 className="text-card-foreground">{machine?.component.name} - {machine?.mould.name}</h3>
+								<div className="flex items-center gap-0 flex-col">
+									{getWifiIcon(machine?.signalQuality)}
+									<span className="text-card-foreground text-[10px] uppercase">{machine?.signalQuality}</span>
+								</div>
 							</div>
 							<div className="flex justify-between items-center text-xs">
-								<div className="flex flex-col items-center">
-									<span className="text-sm text-card-foreground">Cycle Time</span>
-									<span>{machine.cycleTime.toFixed(2)}/{machine.averageCycleTime.toFixed(2)}</span>
+								<div className="flex flex-col items-center gap-1">
+									<span className="text[10px] text-card-foreground uppercase">
+										<Clock className={`stroke-${machine?.cycleTime > machine?.component.targetTime ? 'destructive' : 'success'}`} size={20} strokeWidth={1.5} />
+									</span>
+									<span className="text-card-foreground text-[14px]">{machine?.cycleTime}s / {machine?.component.targetTime}s</span>
 								</div>
-								<div className="flex flex-col items-center">
-									<span className="text-sm text-card-foreground">Production</span>
-									<span>{machine.currentProduction.toFixed(2)}/{machine.targetProduction.toFixed(2)}</span>
+								<div className="flex flex-col items-center gap-1">
+									<span className="text[10px] text-card-foreground uppercase">
+										<PackageCheck className="stroke-card-foreground" size={20} strokeWidth={1.5} />
+									</span>
+									<span className="text-card-foreground text-[14px]">{machine?.currentProduction} / {machine?.targetProduction}units</span>
 								</div>
-								<div className="flex flex-col items-center">
-									<span className="text-sm text-card-foreground">Efficiency</span>
-									<span>{machine.efficiency.toFixed(2)}%</span>
+								<div className="flex flex-col items-center gap-1">
+									<span className="text[10px] text-card-foreground uppercase">
+										<ChartSpline className={`stroke-${machine?.efficiency < 50 ? 'destructive' : machine?.efficiency < 75 ? 'warning' : 'success'}`} size={20} strokeWidth={1.5} />
+									</span>
+									<span className="text-card-foreground text-[14px]">{machine?.efficiency}%</span>
 								</div>
 							</div>
 						</CardContent>
@@ -205,7 +212,9 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 				</DialogTrigger>
 				<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
 					<DialogHeader>
-						<DialogTitle>{machine.machine.name} - {machine.component.name}</DialogTitle>
+						<DialogTitle>
+							<p className="text-card-foreground text-[16px] uppercase font-normal">{machine?.machine?.name} - {machine?.component.name} - {machine?.mould.name}</p>
+						</DialogTitle>
 					</DialogHeader>
 					<Tabs defaultValue="overview" className="w-full">
 						<TabsList>
@@ -219,8 +228,8 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 								<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden h-48">
 									<div className="flex items-center justify-center border rounded border-[1px] h-full">
 										<Image
-											src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine.component.photoURL}`}
-											alt={machine.component.name}
+											src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component.photoURL}`}
+											alt={machine?.component.name}
 											width={300}
 											height={300}
 											priority
@@ -231,35 +240,35 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 								<div className="grid grid-cols-3 gap-4 text-center">
 									<div>
 										<h4 className="text-md uppercase text-card-foreground">Status</h4>
-										<p className="text-xs uppercase">{machine.status}</p>
+										<p className="text-xs uppercase">{machine?.status}</p>
 									</div>
 									<div>
 										<h4 className="text-md uppercase text-card-foreground">Cycle Time</h4>
-										<p className="text-xs uppercase">{machine.cycleTime.toFixed(2)}s / {machine.component.targetTime.toFixed(2)}s</p>
+										<p className="text-xs">{machine?.cycleTime}s / {machine?.component.targetTime}s</p>
 									</div>
 									<div>
 										<h4 className="text-md uppercase text-card-foreground">Efficiency</h4>
-										<p className="text-xs uppercase">{machine.efficiency.toFixed(2)}%</p>
+										<p className="text-xs uppercase">{machine?.efficiency.toFixed(2)}%</p>
 									</div>
 									<div>
 										<h4 className="text-md uppercase text-card-foreground">Units Produced</h4>
-										<p className="text-xs uppercase">{machine.currentProduction.toFixed(2)}</p>
+										<p className="text-xs uppercase">{machine?.currentProduction.toFixed(2)}</p>
 									</div>
 									<div>
 										<h4 className="text-md uppercase text-card-foreground">Target Units</h4>
-										<p className="text-xs uppercase">{machine.targetProduction.toFixed(2)}</p>
+										<p className="text-xs uppercase">{machine?.targetProduction.toFixed(2)}</p>
 									</div>
 									<div>
 										<h4 className="text-md uppercase text-card-foreground">Last Inserted</h4>
-										<p className="text-xs uppercase">{machine.recordAge}</p>
+										<p className="text-xs uppercase">{machine?.recordAge}</p>
 									</div>
 								</div>
 								<div className="flex flex-col sm:flex-row gap-4 mt-4">
-									{/* <Alert variant={isCycleTimeNormal ? "default" : "destructive"} className="flex-1">
+									<Alert variant={machine?.cycleTimeVariancePercentage === 'Low' ? "default" : "destructive"} className="flex-1">
 										<AlertTriangle className="h-4 w-4" />
 										<AlertTitle className="uppercase">Cycle Time Status</AlertTitle>
 										<AlertDescription>
-											<p className="text-xs uppercase">{isCycleTimeNormal
+											<p className="text-xs uppercase">{machine?.cycleTimeVariancePercentage === 'Low'
 												? "Cycle times are within normal range."
 												: "Cycle times are showing high variance. Machine may need inspection."}</p>
 										</AlertDescription>
@@ -269,23 +278,19 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 										<AlertTitle className="uppercase">Additional Metrics</AlertTitle>
 										<AlertDescription>
 											<ul className="list-disc list-inside">
-												<li>Average Cycle Time: {averageCycleTime?.toFixed(2)}s</li>
+												<li>Average Cycle Time: {machine?.averageCycleTime?.toFixed(2)}s</li>
 											</ul>
 										</AlertDescription>
-									</Alert> */}
+									</Alert>
 								</div>
 							</div>
 						</TabsContent>
 						<TabsContent value="performance">
 							<div className="space-y-4">
-								<div className="flex items-center justify-center">
-									<Clock className="h-5 w-5 mr-2" />
-									<span>Last inserted: {machine.recordAge}</span>
-								</div>
 								<div>
 									<h4 className="text-sm uppercase mb-2 text-card-foreground">Last 10 Cycle Times</h4>
 									<ResponsiveContainer width="100%" height={200}>
-										<BarChart data={machine.insertHistory}>
+										<BarChart data={machine?.insertHistory}>
 											<XAxis
 												dataKey="eventTimeStamp"
 												angle={-45}
@@ -298,20 +303,20 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 												}}
 											/>
 											<YAxis
-												label={{ value: 'Cycle Time (s)', angle: -90, position: 'insideLeft' }}
+												label={{ value: 'Time (s)', angle: -90, position: 'insideLeft' }}
 												tick={{ fontSize: 10 }}
 											/>
 											<Tooltip cursor={false} />
-											<Bar dataKey="cycleTime" name="Cycle Time">
-												{machine.insertHistory.map((entry, index) => (
+											<Bar dataKey="cycleTime" name="Time (s)">
+												{machine?.insertHistory.map((entry, index) => (
 													<Cell
 														key={`cell-${index}`}
-														fill={parseFloat(entry.cycleTime) > machine.component.targetTime ? '#ff0000' : '#00ff00'}
+														fill={parseFloat(entry.cycleTime) > machine?.component.targetTime ? '#ff0000' : '#00ff00'}
 													/>
 												))}
 											</Bar>
-											<ReferenceLine y={machine.component.targetTime} stroke="red" strokeDasharray="3 3" />
-											<ReferenceLine y={machine.component.targetTime} stroke="red" strokeDasharray="3 3" label={{ value: 'Target', position: 'insideTopRight' }} />
+											<ReferenceLine y={machine?.component.targetTime} stroke="red" strokeDasharray="3 3" />
+											<ReferenceLine y={machine?.component.targetTime} stroke="red" strokeDasharray="3 3" label={{ value: 'Target Cycle Time', position: 'insideTopRight' }} />
 										</BarChart>
 									</ResponsiveContainer>
 								</div>
@@ -320,10 +325,10 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 									<AlertTitle className="uppercase">Performance Insights</AlertTitle>
 									<AlertDescription>
 										<ul className="list-disc list-inside">
-											{/* <li>Average Cycle Time: {averageCycleTime.toFixed(2)}s</li> */}
-											{/* <li>Cycle Time Variance: {cycleTimeVariance.toFixed(2)}s</li> */}
-											<li>Efficiency: {machine.efficiency.toFixed(2)}%</li>
-											<li>Units Produced: {machine.currentProduction.toFixed(2)} / {machine.targetProduction.toFixed(2)}</li>
+											<li>Average Cycle Time: {machine?.averageCycleTime.toFixed(2)}s</li>
+											<li>Cycle Time Variance: {machine?.cycleTimeVariance.toFixed(2)}s</li>
+											<li>Efficiency: {machine?.efficiency.toFixed(2)}%</li>
+											<li>Units Produced: {machine?.currentProduction.toFixed(2)} / {machine?.targetProduction.toFixed(2)}</li>
 										</ul>
 									</AlertDescription>
 								</Alert>
@@ -332,13 +337,13 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 						<TabsContent value="material">
 							<div className="space-y-4">
 								<ResponsiveContainer width="100%" height={200}>
-									<BarChart data={[{ name: 'Virgin Material', value: machine.virginMaterial }, { name: 'Master Batch', value: machine.masterBatchMaterial }]}>
+									<BarChart data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
 										<XAxis dataKey="name" />
 										<YAxis />
 										<Tooltip cursor={false} />
-										<ReferenceLine y={machine.totalMaterialsUsed * 0.9} stroke="red" strokeDasharray="3 3" label={{ value: 'Target', position: 'insideTopRight' }} />
+										<ReferenceLine y={machine?.totalMaterialsUsed * 0.9} stroke="red" strokeDasharray="3 3" label={{ value: 'Target', position: 'insideTopRight' }} />
 										<Bar dataKey="value">
-											{[{ name: 'Virgin Material', value: machine.virginMaterial }, { name: 'Master Batch', value: machine.masterBatchMaterial }].map((entry, index) => (
+											{[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }].map((entry, index) => (
 												<Cell key={`cell-${index}`} fill={materialColors[index % materialColors.length]} />
 											))}
 										</Bar>
@@ -349,9 +354,9 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 									<AlertTitle className="uppercase">Material Insights</AlertTitle>
 									<AlertDescription>
 										<ul className="list-disc list-inside">
-											<li>Primary Material: Virgin Material ({machine.virginMaterial.toFixed(2)})</li>
-											<li>Total Materials Used: {machine.totalMaterialsUsed.toFixed(2)}</li>
-											<li>Material Efficiency: {machine.efficiency.toFixed(2)}%</li>
+											<li>Primary Material: Virgin Material ({machine?.virginMaterial.toFixed(2)})</li>
+											<li>Total Materials Used: {machine?.totalMaterialsUsed.toFixed(2)}</li>
+											<li>Material Efficiency: {machine?.efficiency.toFixed(2)}%</li>
 										</ul>
 									</AlertDescription>
 								</Alert>
@@ -484,16 +489,16 @@ export default function Component() {
 
 	if (isLoading || isEmpty(machineData)) {
 		return (
-			<>
-				<p>Loading...</p>
-			</>
+			<div className="flex items-center justify-center border w-full h-[500px] border bg-card">
+				<Loader2 className="h-4 w-4 animate-spin stroke-primary" />
+			</div>
 		)
 	}
 
 	const filteredMachines = machineData?.filter(machine =>
-		(machine.machine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			machine.component.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
-		(statusFilter === 'all' || machine.status.toLowerCase() === statusFilter)
+		(machine?.machine?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			machine?.component.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
+		(statusFilter === 'all' || machine?.status.toLowerCase() === statusFilter)
 	)
 
 	const indexOfLastItem = currentPage * itemsPerPage
@@ -506,7 +511,7 @@ export default function Component() {
 	const TablePagination = () => {
 		return (
 			<motion.div
-				className="flex justify-between items-center mt-2"
+				className="flex justify-center items-center mt-2 w-full"
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}>
@@ -547,11 +552,6 @@ export default function Component() {
 			{!isLoading &&
 				<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
 					{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
-				</div>
-			}
-			{isLoading &&
-				<div className="flex items-center justify-center border w-full h-96 border bg-card">
-					<Loader2 className="h-4 w-4 animate-spin stroke-primary" />
 				</div>
 			}
 			<TablePagination />
