@@ -1,16 +1,67 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import {
+	useState,
+	useEffect
+} from 'react'
 import { motion } from 'framer-motion'
-import { Package, Plus, CheckCircle, ChevronLeft, ChevronRight, Wifi, Loader2, WifiLow, WifiHigh, WifiZero, BarChartIcon, AlertTriangle, PackageCheck, ChartSpline, Clock } from 'lucide-react'
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+	Plus,
+	ChevronLeft,
+	ChevronRight,
+	Loader2,
+	WifiLow,
+	WifiHigh,
+	WifiZero,
+	BarChartIcon,
+	AlertTriangle,
+	PackageCheck,
+	ChartSpline,
+	Clock,
+	Weight,
+} from 'lucide-react'
+import {
+	Card,
+	CardContent,
+	CardHeader
+} from "@/components/ui/card"
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger
+} from "@/components/ui/dialog"
+import {
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger
+} from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell, ReferenceLine } from 'recharts'
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue
+} from "@/components/ui/select"
+import {
+	Bar,
+	BarChart,
+	ResponsiveContainer,
+	XAxis,
+	YAxis,
+	Tooltip,
+	Cell,
+	ReferenceLine
+} from 'recharts'
+import {
+	Alert,
+	AlertDescription,
+	AlertTitle
+} from "@/components/ui/alert"
 import { cn } from "@/lib/utils"
 import Image from 'next/image'
 import { io } from 'socket.io-client';
@@ -39,7 +90,7 @@ const liveRunStore = create<LiveRunStore>((set) => ({
 	searchQuery: '',
 	statusFilter: 'all',
 	currentPage: 1,
-	itemsPerPage: 8,
+	itemsPerPage: 30,
 	setMachineData: (data: Machine[]) => set({ machineData: data }),
 	setSearchQuery: (query: string) => set({ searchQuery: query }),
 	setIsLoading: (state: boolean) => set({ isLoading: state }),
@@ -143,7 +194,7 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 	const getWifiIcon = (signalQuality: string) => {
 		switch (signalQuality?.toLowerCase()) {
 			case 'good':
-				return <Wifi className="stroke-success" strokeWidth={1.5} size={30} />
+				return <WifiHigh className="stroke-success" strokeWidth={1.5} size={30} />
 			case 'fair':
 				return <WifiHigh className="stroke-warning" strokeWidth={1.5} size={30} />
 			case 'poor':
@@ -155,14 +206,18 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 
 	return (
 		<motion.div
+			className='bg-card'
 			initial={{ opacity: 0, y: 50 }}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5, delay: index * 0.1 }} className='bg-card'>
+			transition={{ duration: 0.5, delay: index * 0.1 }}>
 			<Dialog>
 				<DialogTrigger asChild>
 					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")}>
 						<CardHeader className="flex flex-row items-center justify-between py-2 px-4">
-							<span className="text-card-foreground uppercase">{machine?.machine?.name} - {machine?.machine?.machineNumber}</span>
+							<div className="flex flex-col gap-0">
+								<span className="text-card-foreground uppercase text-[12px]">Machine {machine?.machine?.machineNumber} - {machine?.machine?.name}</span>
+								<span className="text-card-foreground text-[11px] -mt-1">{machine?.recordAge}</span>
+							</div>
 							<div className="flex items-center space-x-2">
 								<Badge variant={`${machine?.status === 'Active' ? 'success' : machine?.status === 'Idle' ? 'warning' : 'destructive'}`}>{machine?.status}</Badge>
 							</div>
@@ -228,8 +283,8 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 								<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden h-48">
 									<div className="flex items-center justify-center border rounded border-[1px] h-full">
 										<Image
-											src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component.photoURL}`}
-											alt={machine?.component.name}
+											src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
+											alt={machine?.component?.name}
 											width={300}
 											height={300}
 											priority
@@ -244,7 +299,7 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 									</div>
 									<div>
 										<h4 className="text-md uppercase text-card-foreground">Cycle Time</h4>
-										<p className="text-xs">{machine?.cycleTime}s / {machine?.component.targetTime}s</p>
+										<p className="text-xs">{machine?.cycleTime}s / {machine?.component?.targetTime}s</p>
 									</div>
 									<div>
 										<h4 className="text-md uppercase text-card-foreground">Efficiency</h4>
@@ -286,9 +341,9 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 							</div>
 						</TabsContent>
 						<TabsContent value="performance">
-							<div className="space-y-4">
-								<div>
-									<h4 className="text-sm uppercase mb-2 text-card-foreground">Last 10 Cycle Times</h4>
+							<div className="space-y-4 flex flex-col justify-start gap-3">
+								<div className='w-full flex flex-col gap-2 justify-start'>
+									<h4 className="text-sm uppercase mb-2 text-card-foreground text-center">Last 10 Cycle Times</h4>
 									<ResponsiveContainer width="100%" height={200}>
 										<BarChart data={machine?.insertHistory}>
 											<XAxis
@@ -303,11 +358,11 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 												}}
 											/>
 											<YAxis
-												label={{ value: 'Time (s)', angle: -90, position: 'insideLeft' }}
+												label={{ value: 'time (s)', angle: -90, position: 'insideLeft' }}
 												tick={{ fontSize: 10 }}
 											/>
 											<Tooltip cursor={false} />
-											<Bar dataKey="cycleTime" name="Time (s)">
+											<Bar dataKey="cycleTime" name="time (s)">
 												{machine?.insertHistory.map((entry, index) => (
 													<Cell
 														key={`cell-${index}`}
@@ -315,14 +370,14 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 													/>
 												))}
 											</Bar>
-											<ReferenceLine y={machine?.component.targetTime} stroke="red" strokeDasharray="3 3" />
-											<ReferenceLine y={machine?.component.targetTime} stroke="red" strokeDasharray="3 3" label={{ value: 'Target Cycle Time', position: 'insideTopRight' }} />
+											<ReferenceLine y={machine?.component?.targetTime} stroke="red" strokeDasharray="3 3" />
+											<ReferenceLine y={machine?.component?.targetTime} stroke="red" strokeDasharray="3 3" label={{ value: 'Target Cycle Time', position: 'insideTopRight' }} />
 										</BarChart>
 									</ResponsiveContainer>
 								</div>
 								<Alert>
-									<CheckCircle className="h-4 w-4" />
-									<AlertTitle className="uppercase">Performance Insights</AlertTitle>
+									<ChartSpline className="h-4 w-4" />
+									<AlertTitle className="uppercase">Performance</AlertTitle>
 									<AlertDescription>
 										<ul className="list-disc list-inside">
 											<li>Average Cycle Time: {machine?.averageCycleTime.toFixed(2)}s</li>
@@ -335,7 +390,7 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 							</div>
 						</TabsContent>
 						<TabsContent value="material">
-							<div className="space-y-4">
+							<div className="space-y-4 flex flex-col justify-start gap-3">
 								<ResponsiveContainer width="100%" height={200}>
 									<BarChart data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
 										<XAxis dataKey="name" />
@@ -350,13 +405,12 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 									</BarChart>
 								</ResponsiveContainer>
 								<Alert>
-									<Package className="h-4 w-4" />
-									<AlertTitle className="uppercase">Material Insights</AlertTitle>
+									<Weight className="h-4 w-4" />
+									<AlertTitle className="uppercase">Material Usage</AlertTitle>
 									<AlertDescription>
 										<ul className="list-disc list-inside">
-											<li>Primary Material: Virgin Material ({machine?.virginMaterial.toFixed(2)})</li>
+											<li>Virgin Material: {machine?.virginMaterial.toFixed(2)}</li>
 											<li>Total Materials Used: {machine?.totalMaterialsUsed.toFixed(2)}</li>
-											<li>Material Efficiency: {machine?.efficiency.toFixed(2)}%</li>
 										</ul>
 									</AlertDescription>
 								</Alert>
@@ -364,49 +418,45 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 						</TabsContent>
 						<TabsContent value="notes">
 							<div className="space-y-4">
-								{showNoteForm ? (
+								{showNoteForm ?
 									<form onSubmit={handleAddNote} className="space-y-4">
 										<Select
 											value={newNote.type}
 											onValueChange={(value) => setNewNote({ ...newNote, type: value })}
-											required
-										>
+											required>
 											<SelectTrigger>
 												<SelectValue placeholder="Select note type" />
 											</SelectTrigger>
 											<SelectContent>
-												{noteTypes.map((type) => (
-													<SelectItem key={type} value={type}>{type}</SelectItem>
-												))}
+												{noteTypes.map((type) => <SelectItem key={type} value={type}>{type}</SelectItem>)}
 											</SelectContent>
 										</Select>
 										<Textarea
 											placeholder="Note Content"
 											value={newNote.content}
 											onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-											required
-										/>
+											required />
 										<div className="flex justify-end space-x-2">
 											<Button type="submit">Save Note</Button>
 											<Button variant="outline" onClick={() => setShowNoteForm(false)}>Cancel</Button>
 										</div>
 									</form>
-								) : (
+									:
 									<Button onClick={() => setShowNoteForm(true)}>
 										<Plus className="mr-2 h-4 w-4" /> Add Note
 									</Button>
-								)}
+								}
 								<div className="space-y-2">
 									{notes.map((note) => (
-										<Card key={note.id}>
+										<Card key={note?.id}>
 											<CardHeader className="py-2 px-4">
 												<div className="flex justify-between items-center">
-													<h4 className="text-sm">{note.type}</h4>
-													<span className="text-xs text-gray-500">{note.timestamp}</span>
+													<h4 className="text-sm">{note?.type}</h4>
+													<span className="text-xs text-gray-500">{note?.timestamp}</span>
 												</div>
 											</CardHeader>
 											<CardContent className="py-2 px-4">
-												<p className="text-sm">{note.content}</p>
+												<p className="text-sm">{note?.content}</p>
 											</CardContent>
 										</Card>
 									))}
@@ -484,13 +534,15 @@ export default function Component() {
 				</Select>
 			</div>
 		)
-
 	}
 
 	if (isLoading || isEmpty(machineData)) {
 		return (
-			<div className="flex items-center justify-center border w-full h-[500px] border bg-card">
-				<Loader2 className="h-4 w-4 animate-spin stroke-primary" />
+			<div className="w-full">
+				<SectionHeader />
+				<div className="flex items-center justify-center border w-full h-[500px] border bg-card">
+					<Loader2 className="h-4 w-4 animate-spin stroke-primary" />
+				</div>
 			</div>
 		)
 	}
