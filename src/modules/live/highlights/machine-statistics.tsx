@@ -112,20 +112,29 @@ export function MachineStatistics({ data }: MachineStatisticsProps) {
                     </PieChart>
                 </ChartContainer>
             </CardContent>
-            <CardFooter className="flex-col gap-1 text-sm">
-                <div className="flex items-center gap-2 font-medium leading-none mb-6">
-                    <p className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1))" }}></span>
+            <CardFooter className="flex-col gap-1 text-sm p-2">
+                <div className="flex items-center gap-5 font-medium leading-none mb-6 w-full justify-center">
+                    <div className="flex items-center gap-1 justify-center">
+                        <p className="flex items-center gap-1">
+                            <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1))" }}></span>
+                            <span className="text-card-foreground text-[16px] uppercase">{data.activeReporters}</span>
+                        </p>
                         <span className="text-card-foreground text-[10px] uppercase">Running</span>
-                    </p>
-                    <p className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-2))" }}></span>
+                    </div>
+                    <div className="flex items-center gap-1 justify-center">
+                        <p className="flex items-center gap-1">
+                            <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-2))" }}></span>
+                            <span className="text-card-foreground text-[16px] uppercase">{data.idleReporters}</span>
+                        </p>
                         <span className="text-card-foreground text-[10px] uppercase">Idling</span>
-                    </p>
-                    <p className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-3))" }}></span>
+                    </div>
+                    <div className="flex items-center gap-1 justify-center">
+                        <p className="flex items-center gap-1">
+                            <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-3))" }}></span>
+                            <span className="text-card-foreground text-[16px] uppercase">{data.stoppedReporters}</span>
+                        </p>
                         <span className="text-card-foreground text-[10px] uppercase">Stopped</span>
-                    </p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-2 font-medium leading-none text-card-foreground text-center">
                     Machine Statistics <RadioTower className="stroke-card-foreground" size={20} strokeWidth={1} />
