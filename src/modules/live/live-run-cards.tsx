@@ -247,13 +247,13 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 									<span className="text[10px] text-card-foreground uppercase">
 										<Clock className={`stroke-${machine?.cycleTime > machine?.component.targetTime ? 'destructive' : 'success'}`} size={20} strokeWidth={1.5} />
 									</span>
-									<span className="text-card-foreground text-[14px]">{machine?.cycleTime}s / {machine?.component.targetTime}s</span>
+									<span className="text-card-foreground text-[14px]">{machine?.cycleTime}s/{machine?.component.targetTime}s</span>
 								</div>
 								<div className="flex flex-col items-center gap-1">
 									<span className="text[10px] text-card-foreground uppercase">
 										<PackageCheck className="stroke-card-foreground" size={20} strokeWidth={1.5} />
 									</span>
-									<span className="text-card-foreground text-[14px]">{machine?.currentProduction} / {machine?.targetProduction}units</span>
+									<span className="text-card-foreground text-[14px]">{machine?.currentProduction}/{machine?.targetProduction}units</span>
 								</div>
 								<div className="flex flex-col items-center gap-1">
 									<span className="text[10px] text-card-foreground uppercase">
@@ -493,9 +493,24 @@ export default function Component() {
 				withCredentials: true,
 			});
 
+			socket.on('connect', () => {
+				console.log('connected to live stream');
+			});
+
 			socket.on('live-run', (data) => {
+				console.log('live run data received', data);
 				setMachineData(data?.data);
 				setIsLoading(false);
+			});
+
+			socket.on('disconnect', () => {
+				setIsLoading(false);
+				console.log('disconnected from live stream');
+			});
+
+			socket.on('error', () => {
+				setIsLoading(false);
+				console.log('error from live stream');
 			});
 
 			return () => {
@@ -505,6 +520,8 @@ export default function Component() {
 
 		fetchLiveRunData();
 	}, [setMachineData, setIsLoading]);
+
+	console.log(machineData, isLoading, 'machine data');
 
 	const SectionHeader = () => {
 		return (
