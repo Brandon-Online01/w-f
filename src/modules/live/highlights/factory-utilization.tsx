@@ -81,6 +81,7 @@ export function FactoryUtilization({ data }: { data: string | null }) {
                         </PolarRadiusAxis>
                         <RadialBar
                             dataKey="desktop"
+                            name="Idle"
                             stackId="a"
                             cornerRadius={5}
                             fill="var(--color-desktop)"
@@ -88,9 +89,10 @@ export function FactoryUtilization({ data }: { data: string | null }) {
                         />
                         <RadialBar
                             dataKey="mobile"
-                            fill="var(--color-mobile)"
+                            name="In Use"
                             stackId="a"
                             cornerRadius={5}
+                            fill="var(--color-mobile)"
                             className="stroke-transparent stroke-2"
                         />
                     </RadialBarChart>
