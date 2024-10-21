@@ -65,7 +65,7 @@ export default function LiveRunHighlights() {
             });
 
             socket.on('connect', () => {
-                //
+                console.log('connected to live stream');
             });
 
             socket.on('highlights', (data) => {
