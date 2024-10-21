@@ -81,6 +81,7 @@ export function ShiftUtilization({ data }: { data: string | null }) {
                         </PolarRadiusAxis>
                         <RadialBar
                             dataKey="desktop"
+                            name="Other"
                             stackId="a"
                             cornerRadius={5}
                             fill="var(--color-desktop)"
@@ -88,9 +89,10 @@ export function ShiftUtilization({ data }: { data: string | null }) {
                         />
                         <RadialBar
                             dataKey="mobile"
-                            fill="var(--color-mobile)"
+                            name="Running"
                             stackId="a"
                             cornerRadius={5}
+                            fill="var(--color-mobile)"
                             className="stroke-transparent stroke-2"
                         />
                     </RadialBarChart>
@@ -104,7 +106,7 @@ export function ShiftUtilization({ data }: { data: string | null }) {
                     </p>
                     <p className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-3))" }}></span>
-                        <span className="text-card-foreground text-[10px] uppercase">Stopped & Idling</span>
+                        <span className="text-card-foreground text-[10px] uppercase">Stopped + Idling</span>
                     </p>
                 </div>
                 <div className="flex items-center gap-2 font-medium leading-none text-card-foreground text-center">

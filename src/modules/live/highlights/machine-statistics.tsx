@@ -56,8 +56,8 @@ const chartConfig = {
 export function MachineStatistics({ data }: MachineStatisticsProps) {
     const chartData = [
         { browser: "Running (Producing Components) ", visitors: data.activeReporters || 0, fill: "hsl(var(--chart-1))" },
-        { browser: "Idling (Waiting To Start) ", visitors: data.idleReporters || 0, fill: "hsl(var(--chart-2))" },
-        { browser: "Stopped (Not Reporting) ", visitors: data.stoppedReporters || 0, fill: "hsl(var(--chart-3))" },
+        { browser: "Idling (Waiting To Start Producing) ", visitors: data.idleReporters || 0, fill: "hsl(var(--chart-2))" },
+        { browser: "Stopped (Not Reporting Or Producing) ", visitors: data.stoppedReporters || 0, fill: "hsl(var(--chart-3))" },
     ];
 
     return (

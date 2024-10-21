@@ -56,8 +56,8 @@ export function DeviceStatistics({ data }: DeviceStatisticsProps) {
     const { registeredMachines, machinesNotInUse } = data;
 
     const chartData = [
-        { browser: "In Use", visitors: (registeredMachines || 0) - (machinesNotInUse || 0), fill: "hsl(var(--chart-1))" },
-        { browser: "Not In Use", visitors: machinesNotInUse || 0, fill: "hsl(var(--chart-3))" },
+        { browser: "In Use (Reporting This Shift)", visitors: (registeredMachines || 0) - (machinesNotInUse || 0), fill: "hsl(var(--chart-1))" },
+        { browser: "Not In Use (Not Reporting This Shift)", visitors: machinesNotInUse || 0, fill: "hsl(var(--chart-3))" },
     ]
 
     return (
