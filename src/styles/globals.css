@@ -91,3 +91,26 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+::-webkit-scrollbar {
+  width: 1px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: 'red';
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: 'red';
+  border-radius: 2px;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  height: 100%;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}

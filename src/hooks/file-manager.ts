@@ -1,11 +1,11 @@
 'use client'
 
-import { ImageFile } from "@/types/common.types";
+import { UploadedFile } from "@/types/common.types";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
 export const CloudFileManager = () => {
-    const uploadMedia = async (file: ImageFile): Promise<{ uploaded: boolean, newFileName: { name: string } | null }> => {
+    const uploadMedia = async (file: UploadedFile): Promise<{ uploaded: boolean, newFileName: { name: string } | null }> => {
         if (typeof file === 'string' && /\.(png|jpe?g|svg|mp4|ico)$/i.test(file)) {
             return { uploaded: true, newFileName: file };
         }

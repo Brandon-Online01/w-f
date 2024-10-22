@@ -1,7 +1,6 @@
 'use client'
 
 import {
-	useState,
 	useEffect
 } from 'react'
 import { motion } from 'framer-motion'
@@ -10,9 +9,6 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Loader2,
-	WifiLow,
-	WifiHigh,
-	WifiZero,
 	BarChartIcon,
 	AlertTriangle,
 	PackageCheck,
@@ -68,21 +64,12 @@ import { io } from 'socket.io-client';
 import { create } from 'zustand';
 import { isEmpty } from 'lodash'
 import { Badge } from '@/components/ui/badge'
-
-interface LiveRunStore {
-	isLoading: boolean;
-	machineData: Machine[];
-	searchQuery: string;
-	statusFilter: string;
-	currentPage: number;
-	itemsPerPage: number;
-	setMachineData: (data: Machine[]) => void;
-	setSearchQuery: (query: string) => void;
-	setIsLoading: (state: boolean) => void;
-	setStatusFilter: (filter: string) => void;
-	setCurrentPage: (page: number) => void;
-	setItemsPerPage: (items: number) => void;
-}
+import { MachineLiveRun } from '../../types/common.types'
+import { chartColors, noteTypes } from '../../tools/data'
+import { LiveRunStore } from './state/state'
+import { signalIcon } from './helpers/signal-icons'
+import { Input } from '@/components/ui/input'
+import { useForm, Controller } from 'react-hook-form';
 
 const liveRunStore = create<LiveRunStore>((set) => ({
 	isLoading: false,
@@ -90,119 +77,25 @@ const liveRunStore = create<LiveRunStore>((set) => ({
 	searchQuery: '',
 	statusFilter: 'all',
 	currentPage: 1,
-	itemsPerPage: 30,
-	setMachineData: (data: Machine[]) => set({ machineData: data }),
+	itemsPerPage: 20,
+	noteFormVisible: false,
+	setMachineData: (data: MachineLiveRun[]) => set({ machineData: data }),
 	setSearchQuery: (query: string) => set({ searchQuery: query }),
 	setIsLoading: (state: boolean) => set({ isLoading: state }),
 	setStatusFilter: (filter: string) => set({ statusFilter: filter }),
 	setCurrentPage: (page: number) => set({ currentPage: page }),
 	setItemsPerPage: (items: number) => set({ itemsPerPage: items }),
+	setNoteFormVisible: (visible: boolean) => set({ noteFormVisible: visible }),
 }))
 
-const materialColors = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#a4de6c']
+const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: number }) => {
+	const { noteFormVisible, setNoteFormVisible } = liveRunStore();
+	const { control, handleSubmit, formState: { errors } } = useForm<{ noteContent: string }>();
 
-const noteTypes = [
-	'Mechanical', 'Electrical', 'Oil Change', 'Missing Operator', 'Shift Change',
-	'Repairs', 'Production', 'Quality Control', 'Safety', 'Cleaning',
-	'Material Change', 'Software Update', 'Training', 'Inspection', 'Other'
-]
-
-interface Machine {
-	status: string;
-	cycleTime: number;
-	cycleCounts: string;
-	statusCount: string;
-	shift: string;
-	currentProduction: number;
-	targetProduction: number;
-	masterBatchMaterial: number;
-	virginMaterial: number;
-	totalMaterialsUsed: number;
-	totalDownTime: number;
-	efficiency: number;
-	packagingTypeQtyRequired: number;
-	palletsNeeded: number;
-	packagingType: string;
-	eventTimeStamp: string;
-	recordAge: string;
-	signalQuality: string;
-	averageCycleTime: number;
-	cycleTimeVariance: number;
-	cycleTimeVariancePercentage: string;
-	insertHistory: {
-		cycleTime: string;
-		eventTimeStamp: string;
-	}[];
-	notes: {
-		id: number;
-		type: string;
-		content: string;
-		timestamp: string;
-	}[];
-	machine: {
-		name: string;
-		machineNumber: string;
-		macAddress: string;
-		description: string;
-		creationDate: string;
-		status: string;
+	const saveNote = (data: { noteContent: string }) => {
+		console.log('save the note:', data.noteContent);
+		// Additional logic to save the note can be added here
 	};
-	component: {
-		name: string;
-		targetTime: number;
-		photoURL: string;
-		weight: number;
-		volume: number;
-		code: string;
-		color: string;
-		cycleTime: number;
-		coolingTime: number;
-		chargingTime: number;
-		cavity: number;
-		configuration: string;
-		configQTY: number;
-		palletQty: number;
-		testMachine: string;
-		masterBatch: number;
-		status: string;
-		createdAt: string;
-		updatedAt: string;
-	};
-	mould: {
-		name: string;
-		serialNumber: string;
-		nextServiceDate: string;
-		status: string;
-	};
-	firmwareVersion: string | null;
-}
-
-const MachineCard = ({ machine, index }: { machine: Machine, index: number }) => {
-	const [showNoteForm, setShowNoteForm] = useState(false)
-	const [newNote, setNewNote] = useState({ type: '', content: '' })
-	const [notes, setNotes] = useState(machine?.notes)
-
-	const handleAddNote = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-		const timestamp = new Date().toLocaleString()
-		const newNoteWithId = { ...newNote, id: Date.now(), timestamp }
-		setNotes([newNoteWithId, ...notes])
-		setNewNote({ type: '', content: '' })
-		setShowNoteForm(false)
-	}
-
-	const getWifiIcon = (signalQuality: string) => {
-		switch (signalQuality?.toLowerCase()) {
-			case 'good':
-				return <WifiHigh className="stroke-success" strokeWidth={1.5} size={30} />
-			case 'fair':
-				return <WifiHigh className="stroke-warning" strokeWidth={1.5} size={30} />
-			case 'poor':
-				return <WifiLow className="stroke-destructive" strokeWidth={1.5} size={30} />
-			default:
-				return <WifiZero className="stroke-destructive" strokeWidth={1.5} size={30} />
-		}
-	}
 
 	return (
 		<motion.div
@@ -226,8 +119,8 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 							<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden">
 								<div className="flex items-center justify-center border rounded border-[1px]">
 									<Image
-										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component.photoURL}`}
-										alt={machine?.component.name}
+										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
+										alt={machine?.component?.name}
 										width={300}
 										height={300}
 										priority
@@ -236,30 +129,30 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 								</div>
 							</div>
 							<div className='flex items-center justify-between flex-row w-full'>
-								<h3 className="text-card-foreground">{machine?.component.name} - {machine?.mould.name}</h3>
+								<h3 className="text-card-foreground">{machine?.component?.name} - {machine?.mould?.name}</h3>
 								<div className="flex items-center gap-0 flex-col">
-									{getWifiIcon(machine?.signalQuality)}
+									{signalIcon(machine?.signalQuality)}
 									<span className="text-card-foreground text-[10px] uppercase">{machine?.signalQuality}</span>
 								</div>
 							</div>
 							<div className="flex justify-between items-center text-xs">
-								<div className="flex flex-col items-center gap-1">
+								<div className="flex flex-col items-start gap-1">
 									<span className="text[10px] text-card-foreground uppercase">
 										<Clock className={`stroke-${machine?.cycleTime > machine?.component.targetTime ? 'destructive' : 'success'}`} size={20} strokeWidth={1.5} />
 									</span>
-									<span className="text-card-foreground text-[14px]">{machine?.cycleTime}s/{machine?.component.targetTime}s</span>
+									<p className="text-card-foreground text-[14px]">{machine?.cycleTime}/{machine?.component?.targetTime}<span className="text-card-foreground text-[12px]">s</span></p>
 								</div>
 								<div className="flex flex-col items-center gap-1">
 									<span className="text[10px] text-card-foreground uppercase">
 										<PackageCheck className="stroke-card-foreground" size={20} strokeWidth={1.5} />
 									</span>
-									<span className="text-card-foreground text-[14px]">{machine?.currentProduction}/{machine?.targetProduction}units</span>
+									<p className="text-card-foreground text-[14px]">{machine?.currentProduction}/{machine?.targetProduction}<span className="text-card-foreground text-[12px]">units</span></p>
 								</div>
-								<div className="flex flex-col items-center gap-1">
+								<div className="flex flex-col items-end gap-1">
 									<span className="text[10px] text-card-foreground uppercase">
 										<ChartSpline className={`stroke-${machine?.efficiency < 50 ? 'destructive' : machine?.efficiency < 75 ? 'warning' : 'success'}`} size={20} strokeWidth={1.5} />
 									</span>
-									<span className="text-card-foreground text-[14px]">{machine?.efficiency}%</span>
+									<p className="text-card-foreground text-[14px]">{machine?.efficiency}<span className="text-card-foreground text-[12px]">%</span></p>
 								</div>
 							</div>
 						</CardContent>
@@ -268,7 +161,7 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 				<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
 					<DialogHeader>
 						<DialogTitle>
-							<p className="text-card-foreground text-[16px] uppercase font-normal">{machine?.machine?.name} - {machine?.component.name} - {machine?.mould.name}</p>
+							<p className="text-card-foreground text-[16px] uppercase font-normal">{machine?.machine?.name} - {machine?.component?.name} - {machine?.mould?.name}</p>
 						</DialogTitle>
 					</DialogHeader>
 					<Tabs defaultValue="overview" className="w-full">
@@ -366,7 +259,7 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 												{machine?.insertHistory.map((entry, index) => (
 													<Cell
 														key={`cell-${index}`}
-														fill={parseFloat(entry.cycleTime) > machine?.component.targetTime ? '#ff0000' : '#00ff00'}
+														fill={parseFloat(entry?.cycleTime) > machine?.component?.targetTime ? '#ff0000' : '#00ff00'}
 													/>
 												))}
 											</Bar>
@@ -399,7 +292,7 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 										<ReferenceLine y={machine?.totalMaterialsUsed * 0.9} stroke="red" strokeDasharray="3 3" label={{ value: 'Target', position: 'insideTopRight' }} />
 										<Bar dataKey="value">
 											{[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }].map((entry, index) => (
-												<Cell key={`cell-${index}`} fill={materialColors[index % materialColors.length]} />
+												<Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
 											))}
 										</Bar>
 									</BarChart>
@@ -418,11 +311,9 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 						</TabsContent>
 						<TabsContent value="notes">
 							<div className="space-y-4">
-								{showNoteForm ?
-									<form onSubmit={handleAddNote} className="space-y-4">
+								{noteFormVisible ?
+									<form onSubmit={handleSubmit(saveNote)} className="space-y-4">
 										<Select
-											value={newNote.type}
-											onValueChange={(value) => setNewNote({ ...newNote, type: value })}
 											required>
 											<SelectTrigger>
 												<SelectValue placeholder="Select note type" />
@@ -431,23 +322,31 @@ const MachineCard = ({ machine, index }: { machine: Machine, index: number }) =>
 												{noteTypes.map((type) => <SelectItem key={type} value={type}>{type}</SelectItem>)}
 											</SelectContent>
 										</Select>
-										<Textarea
-											placeholder="Note Content"
-											value={newNote.content}
-											onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
-											required />
+										<Controller
+											name="noteContent"
+											control={control}
+											defaultValue=""
+											rules={{ required: "Note content is required" }}
+											render={({ field }) => (
+												<Textarea
+													placeholder="Note Content"
+													{...field}
+												/>
+											)}
+										/>
+										{errors?.noteContent && <span className="text-red-500">{errors?.noteContent?.message}</span>}
 										<div className="flex justify-end space-x-2">
 											<Button type="submit">Save Note</Button>
-											<Button variant="outline" onClick={() => setShowNoteForm(false)}>Cancel</Button>
+											<Button variant="outline" onClick={() => setNoteFormVisible(false)}>Cancel</Button>
 										</div>
 									</form>
 									:
-									<Button onClick={() => setShowNoteForm(true)}>
+									<Button onClick={() => setNoteFormVisible(true)}>
 										<Plus className="mr-2 h-4 w-4" /> Add Note
 									</Button>
 								}
 								<div className="space-y-2">
-									{notes.map((note) => (
+									{machine?.notes?.map((note) => (
 										<Card key={note?.id}>
 											<CardHeader className="py-2 px-4">
 												<div className="flex justify-between items-center">
@@ -476,13 +375,14 @@ export default function Component() {
 		setIsLoading,
 		isLoading,
 		machineData,
-		searchQuery,
 		statusFilter,
 		currentPage,
 		itemsPerPage,
 		setStatusFilter,
 		setCurrentPage,
 		setItemsPerPage,
+		setSearchQuery,
+		searchQuery
 	} = liveRunStore();
 
 	useEffect(() => {
@@ -498,19 +398,19 @@ export default function Component() {
 			});
 
 			socket.on('live-run', (data) => {
-				console.log('live run data received', data);
+				console.log('streaming live');
 				setMachineData(data?.data);
 				setIsLoading(false);
 			});
 
 			socket.on('disconnect', () => {
 				setIsLoading(false);
-				console.log('disconnected from live stream');
+				console.log('Live stream disconnected');
 			});
 
 			socket.on('error', () => {
 				setIsLoading(false);
-				console.log('error from live stream');
+				console.log('Live stream ended');
 			});
 
 			return () => {
@@ -521,12 +421,17 @@ export default function Component() {
 		fetchLiveRunData();
 	}, [setMachineData, setIsLoading]);
 
-	console.log(machineData, isLoading, 'machine data');
-
 	const SectionHeader = () => {
 		return (
 			<div className="mb-4 flex justify-between items-center">
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-2">
+					<Input
+						type="text"
+						value={searchQuery}
+						placeholder="search live run"
+						onChange={(e) => setSearchQuery(e.target.value)}
+						className="border rounded placeholder:text-xs placeholder:text-card-foreground/50 w-[300px] placeholder:italic"
+					/>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className="w-[180px]">
 							<SelectValue placeholder="Filter by status" />
@@ -544,9 +449,9 @@ export default function Component() {
 						<SelectValue placeholder="Items per page" />
 					</SelectTrigger>
 					<SelectContent>
-						<SelectItem value="8">8 per page</SelectItem>
 						<SelectItem value="16">16 per page</SelectItem>
-						<SelectItem value="32">32 per page</SelectItem>
+						<SelectItem value="20">20 per page</SelectItem>
+						<SelectItem value="40">40 per page</SelectItem>
 					</SelectContent>
 				</Select>
 			</div>
@@ -618,11 +523,9 @@ export default function Component() {
 	return (
 		<div className="w-full">
 			<SectionHeader />
-			{!isLoading &&
-				<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
-					{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
-				</div>
-			}
+			<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
+				{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
+			</div>
 			<TablePagination />
 		</div>
 	)
