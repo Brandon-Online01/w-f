@@ -119,8 +119,8 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 							<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden">
 								<div className="flex items-center justify-center border rounded border-[1px]">
 									<Image
-										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component.photoURL}`}
-										alt={machine?.component.name}
+										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
+										alt={machine?.component?.name}
 										width={300}
 										height={300}
 										priority
@@ -129,7 +129,7 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 								</div>
 							</div>
 							<div className='flex items-center justify-between flex-row w-full'>
-								<h3 className="text-card-foreground">{machine?.component.name} - {machine?.mould.name}</h3>
+								<h3 className="text-card-foreground">{machine?.component?.name} - {machine?.mould?.name}</h3>
 								<div className="flex items-center gap-0 flex-col">
 									{signalIcon(machine?.signalQuality)}
 									<span className="text-card-foreground text-[10px] uppercase">{machine?.signalQuality}</span>
@@ -140,7 +140,7 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 									<span className="text[10px] text-card-foreground uppercase">
 										<Clock className={`stroke-${machine?.cycleTime > machine?.component.targetTime ? 'destructive' : 'success'}`} size={20} strokeWidth={1.5} />
 									</span>
-									<p className="text-card-foreground text-[14px]">{machine?.cycleTime}/{machine?.component.targetTime}<span className="text-card-foreground text-[12px]">s</span></p>
+									<p className="text-card-foreground text-[14px]">{machine?.cycleTime}/{machine?.component?.targetTime}<span className="text-card-foreground text-[12px]">s</span></p>
 								</div>
 								<div className="flex flex-col items-center gap-1">
 									<span className="text[10px] text-card-foreground uppercase">
@@ -161,7 +161,7 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 				<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
 					<DialogHeader>
 						<DialogTitle>
-							<p className="text-card-foreground text-[16px] uppercase font-normal">{machine?.machine?.machineNumber} - {machine?.component.name} - {machine?.mould.name}</p>
+							<p className="text-card-foreground text-[16px] uppercase font-normal">{machine?.machine?.name} - {machine?.component?.name} - {machine?.mould?.name}</p>
 						</DialogTitle>
 					</DialogHeader>
 					<Tabs defaultValue="overview" className="w-full">
@@ -259,7 +259,7 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 												{machine?.insertHistory.map((entry, index) => (
 													<Cell
 														key={`cell-${index}`}
-														fill={parseFloat(entry.cycleTime) > machine?.component.targetTime ? '#ff0000' : '#00ff00'}
+														fill={parseFloat(entry?.cycleTime) > machine?.component?.targetTime ? '#ff0000' : '#00ff00'}
 													/>
 												))}
 											</Bar>
@@ -334,7 +334,7 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 												/>
 											)}
 										/>
-										{errors.noteContent && <span className="text-red-500">{errors.noteContent.message}</span>}
+										{errors?.noteContent && <span className="text-red-500">{errors?.noteContent?.message}</span>}
 										<div className="flex justify-end space-x-2">
 											<Button type="submit">Save Note</Button>
 											<Button variant="outline" onClick={() => setNoteFormVisible(false)}>Cancel</Button>
@@ -398,19 +398,19 @@ export default function Component() {
 			});
 
 			socket.on('live-run', (data) => {
-				console.log('live run data received', data);
+				console.log('streaming live');
 				setMachineData(data?.data);
 				setIsLoading(false);
 			});
 
 			socket.on('disconnect', () => {
 				setIsLoading(false);
-				console.log('disconnected from live stream');
+				console.log('Live stream disconnected');
 			});
 
 			socket.on('error', () => {
 				setIsLoading(false);
-				console.log('error from live stream');
+				console.log('Live stream ended');
 			});
 
 			return () => {
