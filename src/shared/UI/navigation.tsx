@@ -9,8 +9,10 @@ import signOutIcon from '../../assets/icons/signout.png';
 import {
     Component,
     LayoutDashboard,
+    Library,
     Settings,
     TrendingUpDown,
+    Users,
 } from "lucide-react";
 import {
     Dialog,
@@ -81,6 +83,8 @@ export const DesktopNavigation = () => {
                 {[
                     { href: "/", Icon: TrendingUpDown, ariaLabel: "Dashboard" },
                     { href: "/inventory", Icon: Component, ariaLabel: "Inventory" },
+                    { href: "/reports", Icon: Library, ariaLabel: "Reports" },
+                    { href: "/staff", Icon: Users, ariaLabel: "Staff" },
                 ].map((item, index) => (
                     <motion.li
                         key={item.href}

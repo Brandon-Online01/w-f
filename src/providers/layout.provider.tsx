@@ -57,7 +57,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
                 }
             }
 
-            setTimeout(() => setIsLoading(false), 500);
+            setTimeout(() => setIsLoading(false), 1000);
         };
 
         validateSession();

@@ -1,0 +1,32 @@
+export const chartColors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))']
+
+export const noteTypes = [
+    'Mechanical', 
+    'Electrical', 
+    'Oil Change', 
+    'Missing Operator', 
+    'Shift Change',
+    'Repairs', 
+    'Production', 
+    'Quality Control', 
+    'Safety', 
+    'Cleaning',
+    'Material Change', 
+    'Software Update', 
+    'Training', 
+    'Inspection', 
+    'Incident Report',
+    'General Note',
+    'Mechanical Breakdown',
+    'Electrical Issue',
+    'Maintenance Request',
+    'Safety Concern',
+    'Production Delay',
+    'Material Shortage',
+    'Equipment Malfunction',
+    'Process Improvement Suggestion',
+    'Training Need',
+    'Shift Handover',
+    'Environmental Concern',
+    'Other'
+]
