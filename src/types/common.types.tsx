@@ -1,9 +1,66 @@
-export type Machine = {
-    uid: number;
+export interface UploadedFile {
+    size: number;
+    name: string;
+    type: string;
+    lastModified: number;
+    webkitRelativePath: string;
+}
+
+export interface Note {
+    id: number;
+    type: string;
+    content: string;
+    timestamp: string;
+}
+
+export interface InsertHistory {
+    cycleTime: string;
+    eventTimeStamp: string;
+}
+
+export interface Mould {
+    name: string;
+    serialNumber: string;
+    nextServiceDate: string;
+    status: string;
+}
+
+export interface Machine {
+    name: string;
     machineNumber: string;
+    macAddress: string;
+    description: string;
+    creationDate: string;
+    status: string;
+}
+
+export interface Component {
+    name: string;
+    targetTime: number;
+    photoURL: string;
+    weight: number;
+    volume: number;
+    code: string;
+    color: string;
+    cycleTime: number;
+    coolingTime: number;
+    chargingTime: number;
+    cavity: number;
+    configuration: string;
+    configQTY: number;
+    palletQty: number;
+    testMachine: string;
+    masterBatch: number;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface MachineLiveRun {
     status: string;
     cycleTime: number;
-    cycleCounts: number;
+    cycleCounts: string;
+    statusCount: string;
     shift: string;
     currentProduction: number;
     targetProduction: number;
@@ -18,115 +75,13 @@ export type Machine = {
     eventTimeStamp: string;
     recordAge: string;
     signalQuality: string;
-    firmwareVersion: string;
     averageCycleTime: number;
     cycleTimeVariance: number;
     cycleTimeVariancePercentage: string;
-    insertHistory: Array<{ time: number; insertTime: string }>;
-    component: {
-        uid: number;
-        name: string;
-        description: string;
-        photoURL: string;
-        weight: number;
-        volume: number;
-        code: string;
-        color: string;
-        cycleTime: number;
-        targetTime: number;
-        coolingTime: number;
-        chargingTime: number;
-        cavity: number;
-        configuration: string;
-        configQTY: number;
-        palletQty: number;
-        testMachine: string;
-        masterBatch: number;
-        status: string;
-        createdAt: string;
-        updatedAt: string;
-    };
-    mould: {
-        uid: number;
-        name: string;
-        serialNumber: string;
-        creationDate: string;
-        lastRepairDate: string;
-        mileage: number;
-        servicingMileage: number;
-        nextServiceDate: string | null;
-        status: string;
-    };
+    insertHistory: InsertHistory[];
     notes: Note[];
-    machine: {
-        uid: number;
-        name: string;
-        machineNumber: string;
-        macAddress: string;
-        description: string;
-        creationDate: string;
-        status: string;
-    };
-};
-
-export type Note = {
-    uid: number;
-    creationDate: string;
-    note: string;
-    type: string;
+    machine: Machine;
+    component: Component;
+    mould: Mould;
+    firmwareVersion: string | null;
 }
-
-export type SortConfig = { key: string | null; direction: 'asc' | 'desc' | null };
-
-
-export type Component = {
-    uid: number;
-    name: string;
-    description: string;
-    photoURL: string;
-    weight: number;
-    volume: number;
-    code: string;
-    color: string;
-    cycleTime: number;
-    targetTime: number;
-    coolingTime: number;
-    chargingTime: number;
-    cavity: number;
-    configuration: string;
-    configQTY: number;
-    palletQty: number;
-    testMachine: string;
-    masterBatch: number;
-    status: "Active" | "In Active";
-    createdAt: string;
-    updatedAt: string;
-};
-
-
-export type Mould = {
-    uid: number;
-    name: string;
-    serialNumber: string;
-    creationDate: string;
-    lastRepairDate: string;
-    mileage: number;
-    servicingMileage: number;
-    nextServiceDate: string | null;
-    status: "Active" | "In Active";
-};
-
-export interface ImageFile {
-    size: number;
-    name: string;
-    type: string;
-    lastModified: number;
-    webkitRelativePath: string;
-}
-
-
-export const noteTypes = [
-    'Mechanical', 'Electrical', 'Oil Change', 'Missing Operator', 'Shift Change',
-    'Repairs', 'Production', 'Quality Control', 'Safety', 'Cleaning',
-    'Material Change', 'Software Update', 'Training', 'Inspection', 'Other'
-]

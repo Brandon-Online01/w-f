@@ -81,6 +81,7 @@ export function DeviceStatistics({ data }: DeviceStatisticsProps) {
                             nameKey="browser"
                             innerRadius={75}
                             outerRadius={100}
+                            cornerRadius={5}
                             strokeWidth={5}>
                             <Label
                                 content={({ viewBox }) => {
