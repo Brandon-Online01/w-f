@@ -5,7 +5,6 @@ import {
 } from 'react'
 import { motion } from 'framer-motion'
 import {
-	Plus,
 	ChevronLeft,
 	ChevronRight,
 	BarChartIcon,
@@ -16,6 +15,8 @@ import {
 	Weight,
 	Info,
 	Loader2,
+	RotateCcw,
+	NotebookPen,
 } from 'lucide-react'
 import {
 	Card,
@@ -53,7 +54,7 @@ import {
 	Tooltip,
 	Cell,
 	ReferenceLine,
-	LabelList
+	LabelList,
 } from 'recharts'
 import {
 	Alert,
@@ -88,6 +89,7 @@ const liveRunStore = create<LiveRunStore>((set) => ({
 	noteFormVisible: false,
 	noteType: '',
 	socketStatus: '',
+	updateLiveRunFormVisible: false,
 	setMachineData: (data: MachineLiveRun[]) => set({ machineData: data }),
 	setSearchQuery: (query: string) => set({ searchQuery: query }),
 	setIsLoading: (state: boolean) => set({ isLoading: state }),
@@ -97,10 +99,11 @@ const liveRunStore = create<LiveRunStore>((set) => ({
 	setNoteFormVisible: (visible: boolean) => set({ noteFormVisible: visible }),
 	setSocketStatus: (status: string) => set({ socketStatus: status }),
 	setNoteType: (type: string) => set({ noteType: type }),
+	setUpdateLiveRunFormVisible: (visible: boolean) => set({ updateLiveRunFormVisible: visible }),
 }))
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
-	const { noteFormVisible, setNoteFormVisible, setNoteType, noteType, setIsLoading, isLoading } = liveRunStore();
+	const { noteFormVisible, setNoteFormVisible, setNoteType, noteType, setIsLoading, isLoading, updateLiveRunFormVisible, setUpdateLiveRunFormVisible } = liveRunStore();
 	const { control, handleSubmit, formState: { errors } } = useForm<{ noteContent: string }>();
 
 	const saveNote = useCallback(async (data: { noteContent: string }) => {
@@ -246,7 +249,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							<TabsTrigger value="overview">Overview</TabsTrigger>
 							{machine?.insertHistory?.length > 0 && <TabsTrigger value="performance">Performance</TabsTrigger>}
 							<TabsTrigger value="material">Material</TabsTrigger>
-							<TabsTrigger value="notes">Notes</TabsTrigger>
+							<TabsTrigger value="management">Management</TabsTrigger>
 						</TabsList>
 						<TabsContent value="overview">
 							<div className="space-y-4">
@@ -347,7 +350,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 													<>
 														<Cell
 															key={`cell-${index}`}
-															fill={parseFloat(entry?.cycleTime) > machine?.component?.targetTime ? 'hsl(var(--chart-3))' : 'hsl(var(--success))'}
+															fill={'hsl(var(--chart-1))'}
 														/>
 														<LabelList
 															dataKey="cycleTime"
@@ -390,7 +393,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 											tick={{ fontSize: 8 }}
 										/>
 										<Tooltip cursor={false} />
-										<ReferenceLine y={machine?.totalMaterialsUsed * 0.9} stroke="red" strokeDasharray="3 3" label={{ value: 'Target', position: 'insideTopRight' }} />
+										<ReferenceLine y={machine?.totalMaterialsUsed * 0.9} stroke="red" strokeDasharray="3 3" label={{ value: 'Target Material Usage', position: 'insideTopRight' }} />
 										<Bar
 											radius={5}
 											dataKey="value">
@@ -412,13 +415,14 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 								</Alert>
 							</div>
 						</TabsContent>
-						<TabsContent value="notes">
-							<div className="space-y-4">
-								{noteFormVisible ?
-									<form onSubmit={handleSubmit(saveNote)} className="space-y-4">
+						<TabsContent value="management">
+							<div className="space-y-2 mt-4">
+								{noteFormVisible &&
+									<form onSubmit={handleSubmit(saveNote)} className="space-y-2">
+										<h3>Add A Note</h3>
 										<Select required onValueChange={(value) => setNoteType(value)}>
 											<SelectTrigger>
-												<SelectValue placeholder="Select note type" />
+												<SelectValue placeholder="Select Note Type" />
 											</SelectTrigger>
 											<SelectContent>
 												{noteTypes.map((type) => <SelectItem key={type} value={type}>{type}</SelectItem>)}
@@ -431,23 +435,67 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 											rules={{ required: "Note content is required" }}
 											render={({ field }) => (
 												<Textarea
-													placeholder="Note Content"
+													placeholder="write your notes here..."
 													{...field}
 												/>
 											)}
 										/>
 										{errors?.noteContent && <span className="text-red-500 text-[10px] -mt-4">{errors?.noteContent?.message}</span>}
 										<div className="flex justify-end space-x-2">
-											<Button variant="destructive" onClick={() => setNoteFormVisible(false)}>Cancel</Button>
+											<Button
+												className="w-20"
+												variant="destructive" onClick={() => {
+													setNoteFormVisible(false)
+													setUpdateLiveRunFormVisible(false)
+												}}>Cancel</Button>
 											<Button type="submit">
 												{isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : 'Save Note'}
 											</Button>
 										</div>
 									</form>
-									:
-									<Button onClick={() => setNoteFormVisible(true)}>
-										<Plus className="mr-2 h-4 w-4" /> Add Note
-									</Button>
+								}
+								{updateLiveRunFormVisible &&
+									<div className="space-y-4">
+										<h3>Update Live Run</h3>
+										<div className="flex items-center gap-2 justify-between">
+											<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
+												<p className="text-sm text-card-foreground">Component</p>
+											</div>
+											<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
+												<p className="text-sm text-card-foreground">Colour</p>
+											</div>
+										</div>
+										<div className="flex items-center gap-2 justify-between">
+											<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
+												<p className="text-sm text-card-foreground">Mould</p>
+											</div>
+										</div>
+										<div className="flex justify-end space-x-2">
+											<Button variant="destructive" onClick={() => {
+												setUpdateLiveRunFormVisible(false)
+												setNoteFormVisible(false)
+											}}>Cancel</Button>
+											<Button type="submit">
+												{isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : 'Save Changes'}
+											</Button>
+										</div>
+									</div>
+								}
+								{(!noteFormVisible && !updateLiveRunFormVisible) &&
+									<div className="flex justify-end gap-2 items-center mt-4">
+										<Button onClick={() => {
+											setNoteFormVisible(true)
+											setUpdateLiveRunFormVisible(false)
+										}}>
+											<NotebookPen className="mr-2 h-4 w-4" /> Add A Note
+										</Button>
+										<Button onClick={() => {
+											setNoteFormVisible(false)
+											setUpdateLiveRunFormVisible(true)
+										}}>
+											<RotateCcw className="mr-2 h-4 w-4" /> Update Live Run
+										</Button>
+									</div>
 								}
 								<div className="space-y-2">
 									{machine?.notes?.map((note) => (

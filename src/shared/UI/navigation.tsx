@@ -7,12 +7,9 @@ import { Button } from "@/components/ui/button";
 import logoIcon from '../../assets/logo/waresense.png';
 import signOutIcon from '../../assets/icons/signout.png';
 import {
-    Component,
     LayoutDashboard,
-    Library,
     Settings,
     TrendingUpDown,
-    Users,
 } from "lucide-react";
 import {
     Dialog,
@@ -35,6 +32,8 @@ export const Navigation = () => {
 }
 
 export const MobileNavigation = () => {
+    const signOut = useSessionStore(state => state.signOut)
+
     return (
         <div className="flex w-full xl:hidden items-center justify-between">
             <Image src={logoIcon} alt="logo" width={30} height={30} className="rounded-full" />
@@ -53,14 +52,8 @@ export const MobileNavigation = () => {
                                             <p>Dashboard</p>
                                         </Link>
                                     </li>
-                                    <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/inventory" className="flex items-center justify-center gap-2" aria-label="Inventory">
-                                            <Component strokeWidth={1} size={18} className="stroke-card-foreground" />
-                                            <p>Inventory</p>
-                                        </Link>
-                                    </li>
                                 </ul>
-                                <Button className="w-full" variant="destructive">
+                                <Button className="w-full" variant="destructive" onClick={signOut}>
                                     <p>Logout</p>
                                 </Button>
                             </div>
@@ -82,9 +75,6 @@ export const DesktopNavigation = () => {
             <ul className="flex w-full flex-col gap-5">
                 {[
                     { href: "/", Icon: TrendingUpDown, ariaLabel: "Dashboard" },
-                    { href: "/inventory", Icon: Component, ariaLabel: "Inventory" },
-                    { href: "/reports", Icon: Library, ariaLabel: "Reports" },
-                    { href: "/staff", Icon: Users, ariaLabel: "Staff" },
                 ].map((item, index) => (
                     <motion.li
                         key={item.href}

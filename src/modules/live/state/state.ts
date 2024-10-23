@@ -10,6 +10,7 @@ export interface LiveRunStore {
     noteFormVisible: boolean;
     socketStatus: string;
     noteType: string;
+    updateLiveRunFormVisible: boolean;
     setMachineData: (data: MachineLiveRun[]) => void;
     setSearchQuery: (query: string) => void;
     setIsLoading: (state: boolean) => void;
@@ -19,4 +20,5 @@ export interface LiveRunStore {
     setNoteFormVisible: (visible: boolean) => void;
     setSocketStatus: (status: string) => void;
     setNoteType: (type: string) => void;
+    setUpdateLiveRunFormVisible: (visible: boolean) => void;
 }
