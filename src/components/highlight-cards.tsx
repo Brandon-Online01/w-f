@@ -24,8 +24,7 @@ export default function HighlightsCards({ highlights }: HighlightsCardsProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: index * 0.1 }}
-                        className="flex-1 min-w-[250px] overflow-hidden transition-all hover:shadow-lg"
-                    >
+                        className="flex-1 min-w-[250px] overflow-hidden transition-all hover:shadow-lg">
                         <Card className="flex-1 min-w-[250px] overflow-hidden transition-all hover:shadow-lg">
                             <CardContent className="p-6">
                                 <div className="flex justify-between items-start">
