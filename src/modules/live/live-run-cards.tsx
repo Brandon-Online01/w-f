@@ -8,13 +8,13 @@ import {
 	Plus,
 	ChevronLeft,
 	ChevronRight,
-	Loader2,
 	BarChartIcon,
 	AlertTriangle,
 	PackageCheck,
 	ChartSpline,
 	Clock,
 	Weight,
+	Info,
 } from 'lucide-react'
 import {
 	Card,
@@ -51,7 +51,8 @@ import {
 	YAxis,
 	Tooltip,
 	Cell,
-	ReferenceLine
+	ReferenceLine,
+	LabelList
 } from 'recharts'
 import {
 	Alert,
@@ -63,13 +64,14 @@ import Image from 'next/image'
 import { io } from 'socket.io-client';
 import { create } from 'zustand';
 import { isEmpty } from 'lodash'
-import { Badge } from '@/components/ui/badge'
 import { MachineLiveRun } from '../../types/common.types'
 import { chartColors, noteTypes } from '../../tools/data'
 import { LiveRunStore } from './state/state'
 import { signalIcon } from './helpers/signal-icons'
 import { Input } from '@/components/ui/input'
 import { useForm, Controller } from 'react-hook-form';
+import { formatDistanceToNow } from 'date-fns';
+import React, { useMemo, useCallback } from 'react';
 
 const liveRunStore = create<LiveRunStore>((set) => ({
 	isLoading: false,
@@ -79,6 +81,7 @@ const liveRunStore = create<LiveRunStore>((set) => ({
 	currentPage: 1,
 	itemsPerPage: 20,
 	noteFormVisible: false,
+	socketStatus: '', // Add socket status state
 	setMachineData: (data: MachineLiveRun[]) => set({ machineData: data }),
 	setSearchQuery: (query: string) => set({ searchQuery: query }),
 	setIsLoading: (state: boolean) => set({ isLoading: state }),
@@ -86,16 +89,19 @@ const liveRunStore = create<LiveRunStore>((set) => ({
 	setCurrentPage: (page: number) => set({ currentPage: page }),
 	setItemsPerPage: (items: number) => set({ itemsPerPage: items }),
 	setNoteFormVisible: (visible: boolean) => set({ noteFormVisible: visible }),
+	setSocketStatus: (status: string) => set({ socketStatus: status }),
 }))
 
-const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: number }) => {
+const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
 	const { noteFormVisible, setNoteFormVisible } = liveRunStore();
 	const { control, handleSubmit, formState: { errors } } = useForm<{ noteContent: string }>();
 
-	const saveNote = (data: { noteContent: string }) => {
+	const saveNote = useCallback((data: { noteContent: string }) => {
 		console.log('save the note:', data.noteContent);
 		// Additional logic to save the note can be added here
-	};
+	}, []);
+
+	console.log(machine);
 
 	return (
 		<motion.div
@@ -108,11 +114,15 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")}>
 						<CardHeader className="flex flex-row items-center justify-between py-2 px-4">
 							<div className="flex flex-col gap-0">
-								<span className="text-card-foreground uppercase text-[12px]">Machine {machine?.machine?.machineNumber} - {machine?.machine?.name}</span>
-								<span className="text-card-foreground text-[11px] -mt-1">{machine?.recordAge}</span>
-							</div>
-							<div className="flex items-center space-x-2">
-								<Badge variant={`${machine?.status === 'Active' ? 'success' : machine?.status === 'Idle' ? 'warning' : 'destructive'}`}>{machine?.status}</Badge>
+								<span className="text-card-foreground text-[16px]">{machine?.machine?.name} {machine?.machine?.machineNumber} - {machine?.machine?.macAddress}</span>
+								<span className="text-card-foreground text-[11px] -mt-1">
+									{machine?.eventTimeStamp ?
+										(() => {
+											const elapsedTime = formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true });
+											return elapsedTime;
+										})()
+										: ''}
+								</span>
 							</div>
 						</CardHeader>
 						<CardContent className="p-2 space-y-2 mt-4">
@@ -129,10 +139,11 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 								</div>
 							</div>
 							<div className='flex items-center justify-between flex-row w-full'>
-								<h3 className="text-card-foreground">{machine?.component?.name} - {machine?.mould?.name}</h3>
+								<h3 className="text-card-foreground">{machine?.component?.name}</h3>
 								<div className="flex items-center gap-0 flex-col">
 									{signalIcon(machine?.signalQuality)}
 									<span className="text-card-foreground text-[10px] uppercase">{machine?.signalQuality}</span>
+									<span className="text-card-foreground text-[10px] uppercase">{machine?.status}</span>
 								</div>
 							</div>
 							<div className="flex justify-between items-center text-xs">
@@ -161,13 +172,22 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 				<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
 					<DialogHeader>
 						<DialogTitle>
-							<p className="text-card-foreground text-[16px] uppercase font-normal">{machine?.machine?.name} - {machine?.component?.name} - {machine?.mould?.name}</p>
-						</DialogTitle>
+							<div className="flex flex-col gap-1">
+								<span className="text-card-foreground text-[18px] font-normal">{machine?.machine?.name} {machine?.machine?.machineNumber} - {machine?.machine?.macAddress}</span>
+								<span className="text-card-foreground text-[12px] font-normal">
+									{machine?.eventTimeStamp ?
+										(() => {
+											const elapsedTime = formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true });
+											return elapsedTime;
+										})()
+										: ''}
+								</span>
+							</div>						</DialogTitle>
 					</DialogHeader>
 					<Tabs defaultValue="overview" className="w-full">
 						<TabsList>
 							<TabsTrigger value="overview">Overview</TabsTrigger>
-							<TabsTrigger value="performance">Performance</TabsTrigger>
+							{machine?.insertHistory?.length > 0 && <TabsTrigger value="performance">Performance</TabsTrigger>}
 							<TabsTrigger value="material">Material</TabsTrigger>
 							<TabsTrigger value="notes">Notes</TabsTrigger>
 						</TabsList>
@@ -226,7 +246,7 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 										<AlertTitle className="uppercase">Additional Metrics</AlertTitle>
 										<AlertDescription>
 											<ul className="list-disc list-inside">
-												<li>Average Cycle Time: {machine?.averageCycleTime?.toFixed(2)}s</li>
+												<li>Average Cycle Time: {machine?.averageCycleTime}s</li>
 											</ul>
 										</AlertDescription>
 									</Alert>
@@ -237,8 +257,13 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 							<div className="space-y-4 flex flex-col justify-start gap-3">
 								<div className='w-full flex flex-col gap-2 justify-start'>
 									<h4 className="text-sm uppercase mb-2 text-card-foreground text-center">Last 10 Cycle Times</h4>
-									<ResponsiveContainer width="100%" height={200}>
-										<BarChart data={machine?.insertHistory}>
+									<ResponsiveContainer width="100%" height={300}>
+										<BarChart
+											barGap={5}
+											barSize={30}
+											margin={{ top: 30, bottom: 30 }}
+											accessibilityLayer
+											data={machine?.insertHistory?.slice().reverse()}>
 											<XAxis
 												dataKey="eventTimeStamp"
 												angle={-45}
@@ -252,15 +277,28 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 											/>
 											<YAxis
 												label={{ value: 'time (s)', angle: -90, position: 'insideLeft' }}
-												tick={{ fontSize: 10 }}
+												tick={{
+													fontSize: 8,
+													fill: 'hsl(var(--card-foreground))'
+												}}
 											/>
-											<Tooltip cursor={false} />
-											<Bar dataKey="cycleTime" name="time (s)">
+											<Bar
+												radius={5}
+												name="time (s)"
+												dataKey="cycleTime">
 												{machine?.insertHistory.map((entry, index) => (
-													<Cell
-														key={`cell-${index}`}
-														fill={parseFloat(entry?.cycleTime) > machine?.component?.targetTime ? '#ff0000' : '#00ff00'}
-													/>
+													<>
+														<Cell
+															key={`cell-${index}`}
+															fill={parseFloat(entry?.cycleTime) > machine?.component?.targetTime ? 'hsl(var(--chart-3))' : 'hsl(var(--success))'}
+														/>
+														<LabelList
+															dataKey="cycleTime"
+															position="top"
+															fill="hsl(var(--card-foreground))"
+															fontSize={10}
+														/>
+													</>
 												))}
 											</Bar>
 											<ReferenceLine y={machine?.component?.targetTime} stroke="red" strokeDasharray="3 3" />
@@ -273,10 +311,9 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 									<AlertTitle className="uppercase">Performance</AlertTitle>
 									<AlertDescription>
 										<ul className="list-disc list-inside">
-											<li>Average Cycle Time: {machine?.averageCycleTime.toFixed(2)}s</li>
-											<li>Cycle Time Variance: {machine?.cycleTimeVariance.toFixed(2)}s</li>
-											<li>Efficiency: {machine?.efficiency.toFixed(2)}%</li>
-											<li>Units Produced: {machine?.currentProduction.toFixed(2)} / {machine?.targetProduction.toFixed(2)}</li>
+											<li>Efficiency: {machine?.efficiency}%</li>
+											<li>Average Cycle Time: {machine?.averageCycleTime}s</li>
+											<li>Cycle Time Variance: {machine?.cycleTimeVariance}s</li>
 										</ul>
 									</AlertDescription>
 								</Alert>
@@ -285,12 +322,21 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 						<TabsContent value="material">
 							<div className="space-y-4 flex flex-col justify-start gap-3">
 								<ResponsiveContainer width="100%" height={200}>
-									<BarChart data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
+									<BarChart
+										barGap={5}
+										barSize={50}
+										margin={{ top: 10, right: 10, left: 10 }}
+										data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
 										<XAxis dataKey="name" />
-										<YAxis />
+										<YAxis
+											label={{ value: 'weight (kg)', angle: -90, position: 'insideLeft' }}
+											tick={{ fontSize: 8 }}
+										/>
 										<Tooltip cursor={false} />
 										<ReferenceLine y={machine?.totalMaterialsUsed * 0.9} stroke="red" strokeDasharray="3 3" label={{ value: 'Target', position: 'insideTopRight' }} />
-										<Bar dataKey="value">
+										<Bar
+											radius={5}
+											dataKey="value">
 											{[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }].map((entry, index) => (
 												<Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
 											))}
@@ -366,8 +412,10 @@ const MachineCard = ({ machine, index }: { machine: MachineLiveRun, index: numbe
 				</DialogContent>
 			</Dialog>
 		</motion.div>
-	)
-}
+	);
+});
+
+MachineCard.displayName = 'MachineCard';
 
 export default function Component() {
 	const {
@@ -382,7 +430,8 @@ export default function Component() {
 		setCurrentPage,
 		setItemsPerPage,
 		setSearchQuery,
-		searchQuery
+		searchQuery,
+		setSocketStatus,
 	} = liveRunStore();
 
 	useEffect(() => {
@@ -395,6 +444,7 @@ export default function Component() {
 
 			socket.on('connect', () => {
 				console.log('connected to live stream');
+				setSocketStatus('Connected to live stream'); // Update socket status
 			});
 
 			socket.on('live-run', (data) => {
@@ -405,11 +455,13 @@ export default function Component() {
 
 			socket.on('disconnect', () => {
 				setIsLoading(false);
+				setSocketStatus('Live stream disconnected'); // Update socket status
 				console.log('Live stream disconnected');
 			});
 
 			socket.on('error', () => {
 				setIsLoading(false);
+				setSocketStatus('Live stream ended'); // Update socket status
 				console.log('Live stream ended');
 			});
 
@@ -419,7 +471,7 @@ export default function Component() {
 		};
 
 		fetchLiveRunData();
-	}, [setMachineData, setIsLoading]);
+	}, [setMachineData, setIsLoading, setSocketStatus]);
 
 	const SectionHeader = () => {
 		return (
@@ -458,27 +510,18 @@ export default function Component() {
 		)
 	}
 
-	if (isLoading || isEmpty(machineData)) {
-		return (
-			<div className="w-full">
-				<SectionHeader />
-				<div className="flex items-center justify-center border w-full h-[500px] border bg-card">
-					<Loader2 className="h-4 w-4 animate-spin stroke-primary" />
-				</div>
-			</div>
-		)
-	}
-
-	const filteredMachines = machineData?.filter(machine =>
-		(machine?.machine?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			machine?.component.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
-		(statusFilter === 'all' || machine?.status.toLowerCase() === statusFilter)
-	)
+	const filteredMachines = useMemo(() => {
+		return machineData?.filter(machine =>
+			(machine?.machine?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				machine?.component?.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
+			(statusFilter === 'all' || machine?.status.toLowerCase() === statusFilter)
+		);
+	}, [machineData, searchQuery, statusFilter]);
 
 	const indexOfLastItem = currentPage * itemsPerPage
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage
 	const currentMachines = filteredMachines.slice(indexOfFirstItem, indexOfLastItem)
-	const totalPages = Math.ceil(filteredMachines.length / itemsPerPage)
+	const totalPages = Math.ceil(filteredMachines?.length / itemsPerPage)
 
 	const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
 
@@ -486,12 +529,12 @@ export default function Component() {
 		return (
 			<motion.div
 				className="flex justify-center items-center mt-2 w-full"
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
+				initial={{ opacity: 0, z: -50 }}
+				animate={{ opacity: 1, z: 0 }}
 				transition={{ duration: 0.5 }}>
 				<motion.div
 					className="flex items-center space-x-2"
-					initial={{ opacity: 0, z: 20 }}
+					initial={{ opacity: 0, z: -50 }}
 					animate={{ opacity: 1, z: 0 }}
 					transition={{ duration: 0.5, delay: 0.2 }}>
 					<div className="mt-4 flex justify-center items-center">
@@ -520,6 +563,15 @@ export default function Component() {
 		)
 	}
 
+	if (isLoading || isEmpty(machineData)) {
+		return (
+			<div className="w-full h-screen">
+				<SectionHeader />
+				<MachineCardsLoader />
+			</div>
+		)
+	}
+
 	return (
 		<div className="w-full">
 			<SectionHeader />
@@ -530,3 +582,20 @@ export default function Component() {
 		</div>
 	)
 }
+
+const MachineCardsLoader = () => {
+	const { socketStatus } = liveRunStore();
+
+	return (
+		<div className="flex flex-wrap items-center justify-center w-full h-[calc(100vh-100px)]">
+			{Array.from({ length: 1 }).map((_, index) => (
+				<div key={index} className="w-full h-full bg-gray-200 animate-pulse rounded-md m-2 flex items-center justify-center">
+					<p className="text-xs flex items-center">
+						<Info className="mr-2 h-4 w-4" />
+						{socketStatus}
+					</p>
+				</div>
+			))}
+		</div>
+	);
+};
