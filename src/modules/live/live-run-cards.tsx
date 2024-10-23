@@ -72,6 +72,7 @@ import { Input } from '@/components/ui/input'
 import { useForm, Controller } from 'react-hook-form';
 import { formatDistanceToNow } from 'date-fns';
 import React, { useMemo, useCallback } from 'react';
+import { Badge } from '@/components/ui/badge'
 
 const liveRunStore = create<LiveRunStore>((set) => ({
 	isLoading: false,
@@ -98,31 +99,33 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	const saveNote = useCallback((data: { noteContent: string }) => {
 		console.log('save the note:', data.noteContent);
-		// Additional logic to save the note can be added here
 	}, []);
-
-	console.log(machine);
 
 	return (
 		<motion.div
-			className='bg-card'
+			className='bg-card rounded'
 			initial={{ opacity: 0, y: 50 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5, delay: index * 0.1 }}>
 			<Dialog>
 				<DialogTrigger asChild>
-					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")}>
+					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")} >
 						<CardHeader className="flex flex-row items-center justify-between py-2 px-4">
-							<div className="flex flex-col gap-0">
-								<span className="text-card-foreground text-[16px]">{machine?.machine?.name} {machine?.machine?.machineNumber} - {machine?.machine?.macAddress}</span>
-								<span className="text-card-foreground text-[11px] -mt-1">
-									{machine?.eventTimeStamp ?
-										(() => {
-											const elapsedTime = formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true });
-											return elapsedTime;
-										})()
-										: ''}
-								</span>
+							<div className="flex items-center justify-between w-full gap-0">
+								<div className="flex flex-col">
+									<span className="text-card-foreground text-[16px]">{machine?.machine?.name} {machine?.machine?.machineNumber}</span>
+									<span className="text-card-foreground text-[11px] -mt-1">
+										{machine?.eventTimeStamp ?
+											(() => {
+												const elapsedTime = formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true });
+												return elapsedTime;
+											})()
+											: ''}
+									</span>
+								</div>
+								<div className="flex items-center space-x-2">
+									<Badge variant={`${machine?.status === 'Active' ? 'success' : machine?.status === 'Idle' ? 'warning' : 'destructive'}`}>{machine?.status}</Badge>
+								</div>
 							</div>
 						</CardHeader>
 						<CardContent className="p-2 space-y-2 mt-4">
@@ -143,7 +146,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 								<div className="flex items-center gap-0 flex-col">
 									{signalIcon(machine?.signalQuality)}
 									<span className="text-card-foreground text-[10px] uppercase">{machine?.signalQuality}</span>
-									<span className="text-card-foreground text-[10px] uppercase">{machine?.status}</span>
 								</div>
 							</div>
 							<div className="flex justify-between items-center text-xs">
