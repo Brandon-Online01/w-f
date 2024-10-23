@@ -15,6 +15,7 @@ import {
 	Clock,
 	Weight,
 	Info,
+	Loader2,
 } from 'lucide-react'
 import {
 	Card,
@@ -72,7 +73,10 @@ import { Input } from '@/components/ui/input'
 import { useForm, Controller } from 'react-hook-form';
 import { formatDistanceToNow } from 'date-fns';
 import React, { useMemo, useCallback } from 'react';
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const liveRunStore = create<LiveRunStore>((set) => ({
 	isLoading: false,
@@ -82,7 +86,8 @@ const liveRunStore = create<LiveRunStore>((set) => ({
 	currentPage: 1,
 	itemsPerPage: 20,
 	noteFormVisible: false,
-	socketStatus: '', // Add socket status state
+	noteType: '',
+	socketStatus: '',
 	setMachineData: (data: MachineLiveRun[]) => set({ machineData: data }),
 	setSearchQuery: (query: string) => set({ searchQuery: query }),
 	setIsLoading: (state: boolean) => set({ isLoading: state }),
@@ -91,15 +96,65 @@ const liveRunStore = create<LiveRunStore>((set) => ({
 	setItemsPerPage: (items: number) => set({ itemsPerPage: items }),
 	setNoteFormVisible: (visible: boolean) => set({ noteFormVisible: visible }),
 	setSocketStatus: (status: string) => set({ socketStatus: status }),
+	setNoteType: (type: string) => set({ noteType: type }),
 }))
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
-	const { noteFormVisible, setNoteFormVisible } = liveRunStore();
+	const { noteFormVisible, setNoteFormVisible, setNoteType, noteType, setIsLoading, isLoading } = liveRunStore();
 	const { control, handleSubmit, formState: { errors } } = useForm<{ noteContent: string }>();
 
-	const saveNote = useCallback((data: { noteContent: string }) => {
-		console.log('save the note:', data.noteContent);
-	}, []);
+	const saveNote = useCallback(async (data: { noteContent: string }) => {
+		setIsLoading(true)
+
+		const newNote = {
+			creationDate: format(new Date(), "EEE MMM dd yyyy HH:mm:ss 'GMT'xxx '(South Africa Standard Time)'"),
+			note: data.noteContent,
+			machineUid: Number(machine?.machine?.machineNumber),
+			type: noteType
+		}
+
+		try {
+			const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/live-run/notes/${machine?.machine?.machineNumber}`, newNote)
+
+			if (data?.message === 'Note Saved') {
+				toast(`${data?.message}`,
+					{
+						icon: '✅',
+						style: {
+							borderRadius: '5px',
+							background: '#333',
+							color: '#fff',
+						},
+					}
+				);
+			} else {
+				toast(`${data?.message}`,
+					{
+						icon: '⛔',
+						style: {
+							borderRadius: '5px',
+							background: '#333',
+							color: '#fff',
+						},
+					}
+				);
+			}
+
+		} catch {
+			toast(`Failed to save note`,
+				{
+					icon: '⛔',
+					style: {
+						borderRadius: '5px',
+						background: '#333',
+						color: '#fff',
+					},
+				}
+			);
+		} finally {
+			setIsLoading(false)
+		}
+	}, [machine?.machine?.machineNumber, noteType, setIsLoading]);
 
 	return (
 		<motion.div
@@ -361,8 +416,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							<div className="space-y-4">
 								{noteFormVisible ?
 									<form onSubmit={handleSubmit(saveNote)} className="space-y-4">
-										<Select
-											required>
+										<Select required onValueChange={(value) => setNoteType(value)}>
 											<SelectTrigger>
 												<SelectValue placeholder="Select note type" />
 											</SelectTrigger>
@@ -382,10 +436,12 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 												/>
 											)}
 										/>
-										{errors?.noteContent && <span className="text-red-500">{errors?.noteContent?.message}</span>}
+										{errors?.noteContent && <span className="text-red-500 text-[10px] -mt-4">{errors?.noteContent?.message}</span>}
 										<div className="flex justify-end space-x-2">
-											<Button type="submit">Save Note</Button>
-											<Button variant="outline" onClick={() => setNoteFormVisible(false)}>Cancel</Button>
+											<Button variant="destructive" onClick={() => setNoteFormVisible(false)}>Cancel</Button>
+											<Button type="submit">
+												{isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : 'Save Note'}
+											</Button>
 										</div>
 									</form>
 									:
