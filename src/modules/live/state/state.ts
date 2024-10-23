@@ -8,6 +8,9 @@ export interface LiveRunStore {
     currentPage: number;
     itemsPerPage: number;
     noteFormVisible: boolean;
+    socketStatus: string;
+    noteType: string;
+    updateLiveRunFormVisible: boolean;
     setMachineData: (data: MachineLiveRun[]) => void;
     setSearchQuery: (query: string) => void;
     setIsLoading: (state: boolean) => void;
@@ -15,4 +18,7 @@ export interface LiveRunStore {
     setCurrentPage: (page: number) => void;
     setItemsPerPage: (items: number) => void;
     setNoteFormVisible: (visible: boolean) => void;
+    setSocketStatus: (status: string) => void;
+    setNoteType: (type: string) => void;
+    setUpdateLiveRunFormVisible: (visible: boolean) => void;
 }
