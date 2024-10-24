@@ -18,12 +18,15 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 
-interface ComboboxDemoProps {
-    data: { value: string; label: string }[];
-    placeholder?: string;
-}
+const data = [
+    { value: 'next.js', label: 'Next.js' },
+    { value: 'sveltekit', label: 'SvelteKit' },
+    { value: 'nuxt.js', label: 'Nuxt.js' },
+    { value: 'remix', label: 'Remix' },
+    { value: 'astro', label: 'Astro' },
+];
 
-export function ComboboxDemo({ data, placeholder = "Select framework..." }: ComboboxDemoProps) {
+export function ComboboxDemo() {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("")
 
@@ -35,7 +38,7 @@ export function ComboboxDemo({ data, placeholder = "Select framework..." }: Comb
                     role="combobox"
                     variant="outline"
                     aria-expanded={open}>
-                    {value ? data.find((item) => item?.value === value)?.label : placeholder}
+                    {value ? data.find((item) => item?.value === value)?.label : ''}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
             </PopoverTrigger>

@@ -64,11 +64,9 @@ import {
 import { cn } from "@/lib/utils"
 import Image from 'next/image'
 import { io } from 'socket.io-client';
-import { create } from 'zustand';
 import { isEmpty } from 'lodash'
 import { MachineLiveRun } from '../../types/common.types'
 import { chartColors, noteTypes } from '../../tools/data'
-import { LiveRunStore } from './state/state'
 import { signalIcon } from './helpers/signal-icons'
 import { Input } from '@/components/ui/input'
 import { useForm, Controller } from 'react-hook-form';
@@ -78,38 +76,8 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { liveRunStore } from './state/state'
 import { ComboboxDemo } from './combobox/combo-box'
-
-const liveRunStore = create<LiveRunStore>((set) => ({
-	isLoading: false,
-	machineData: [],
-	searchQuery: '',
-	statusFilter: 'all',
-	currentPage: 1,
-	itemsPerPage: 20,
-	noteFormVisible: false,
-	noteType: '',
-	socketStatus: '',
-	updateLiveRunFormVisible: false,
-	setMachineData: (data: MachineLiveRun[]) => set({ machineData: data }),
-	setSearchQuery: (query: string) => set({ searchQuery: query }),
-	setIsLoading: (state: boolean) => set({ isLoading: state }),
-	setStatusFilter: (filter: string) => set({ statusFilter: filter }),
-	setCurrentPage: (page: number) => set({ currentPage: page }),
-	setItemsPerPage: (items: number) => set({ itemsPerPage: items }),
-	setNoteFormVisible: (visible: boolean) => set({ noteFormVisible: visible }),
-	setSocketStatus: (status: string) => set({ socketStatus: status }),
-	setNoteType: (type: string) => set({ noteType: type }),
-	setUpdateLiveRunFormVisible: (visible: boolean) => set({ updateLiveRunFormVisible: visible }),
-}))
-
-const data = [
-	{ value: 'next.js', label: 'Next.js' },
-	{ value: 'sveltekit', label: 'SvelteKit' },
-	{ value: 'nuxt.js', label: 'Nuxt.js' },
-	{ value: 'remix', label: 'Remix' },
-	{ value: 'astro', label: 'Astro' },
-];
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
 	const {
@@ -122,6 +90,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		updateLiveRunFormVisible,
 		setUpdateLiveRunFormVisible
 	} = liveRunStore();
+
 	const {
 		control,
 		handleSubmit,
@@ -286,7 +255,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							barSize={30}
 							margin={{ top: 30, bottom: 30 }}
 							accessibilityLayer
-							data={machine?.insertHistory?.slice().reverse()}>
+							data={machine?.insertHistory}>
 							<XAxis
 								dataKey="eventTimeStamp"
 								angle={-45}
@@ -347,7 +316,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 	const MaterialTab = () => {
 		return (
 			<div className="space-y-4 flex flex-col justify-start gap-3">
-				<ResponsiveContainer width="100%" height={200}>
+				<ResponsiveContainer width="100%" height={300}>
 					<BarChart
 						barGap={5}
 						barSize={50}
@@ -429,17 +398,17 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<div className="flex items-center gap-2 justify-between">
 							<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
 								<p className="text-sm text-card-foreground">Component</p>
-								<ComboboxDemo data={data} placeholder="Choose a component..." />
+								<ComboboxDemo />
 							</div>
 							<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
 								<p className="text-sm text-card-foreground">Colour</p>
-								<ComboboxDemo data={data} placeholder="Choose a colour..." />
+								<ComboboxDemo />
 							</div>
 						</div>
 						<div className="flex items-center gap-2 justify-between">
 							<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
 								<p className="text-sm text-card-foreground">Mould</p>
-								<ComboboxDemo data={data} placeholder="Choose a mould..." />
+								<ComboboxDemo />
 							</div>
 						</div>
 						<div className="flex justify-end space-x-2">
@@ -501,13 +470,8 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							<div className="flex items-center justify-between w-full gap-0">
 								<div className="flex flex-col">
 									<span className="text-card-foreground text-[16px]">{machine?.machine?.name} {machine?.machine?.machineNumber}</span>
-									<span className="text-card-foreground text-[11px] -mt-1">
-										{machine?.eventTimeStamp ?
-											(() => {
-												const elapsedTime = formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true });
-												return elapsedTime;
-											})()
-											: ''}
+									<span className="text-card-foreground text-[11px] -mt-1 flex-col flex">
+										{machine?.eventTimeStamp ? formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true }) : ''}
 									</span>
 								</div>
 								<div className="flex items-center space-x-2">
@@ -735,6 +699,7 @@ export default function Component() {
 		)
 	}
 
+
 	if (isLoading || isEmpty(machineData)) {
 		return (
 			<div className="w-full h-screen">
@@ -771,3 +736,4 @@ const MachineCardsLoader = () => {
 		</div>
 	);
 };
+
