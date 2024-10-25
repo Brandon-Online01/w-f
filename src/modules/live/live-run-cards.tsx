@@ -9,19 +9,13 @@ import {
 	ChevronRight,
 	BarChartIcon,
 	AlertTriangle,
-	PackageCheck,
 	ChartSpline,
-	Clock,
 	Weight,
 	Info,
-	Loader2,
-	RotateCcw,
-	NotebookPen,
 } from 'lucide-react'
 import {
 	Card,
 	CardContent,
-	CardHeader
 } from "@/components/ui/card"
 import {
 	Dialog,
@@ -37,7 +31,6 @@ import {
 	TabsTrigger
 } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import {
 	Select,
 	SelectContent,
@@ -64,125 +57,17 @@ import {
 import { cn } from "@/lib/utils"
 import Image from 'next/image'
 import { io } from 'socket.io-client';
-import { create } from 'zustand';
 import { isEmpty } from 'lodash'
 import { MachineLiveRun } from '../../types/common.types'
-import { chartColors, noteTypes } from '../../tools/data'
-import { LiveRunStore } from './state/state'
+import { chartColors } from '../../tools/data'
 import { signalIcon } from './helpers/signal-icons'
 import { Input } from '@/components/ui/input'
-import { useForm, Controller } from 'react-hook-form';
 import { formatDistanceToNow } from 'date-fns';
-import React, { useMemo, useCallback } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { ComboboxDemo } from './combobox/combo-box'
-
-const liveRunStore = create<LiveRunStore>((set) => ({
-	isLoading: false,
-	machineData: [],
-	searchQuery: '',
-	statusFilter: 'all',
-	currentPage: 1,
-	itemsPerPage: 20,
-	noteFormVisible: false,
-	noteType: '',
-	socketStatus: '',
-	updateLiveRunFormVisible: false,
-	setMachineData: (data: MachineLiveRun[]) => set({ machineData: data }),
-	setSearchQuery: (query: string) => set({ searchQuery: query }),
-	setIsLoading: (state: boolean) => set({ isLoading: state }),
-	setStatusFilter: (filter: string) => set({ statusFilter: filter }),
-	setCurrentPage: (page: number) => set({ currentPage: page }),
-	setItemsPerPage: (items: number) => set({ itemsPerPage: items }),
-	setNoteFormVisible: (visible: boolean) => set({ noteFormVisible: visible }),
-	setSocketStatus: (status: string) => set({ socketStatus: status }),
-	setNoteType: (type: string) => set({ noteType: type }),
-	setUpdateLiveRunFormVisible: (visible: boolean) => set({ updateLiveRunFormVisible: visible }),
-}))
-
-const data = [
-	{ value: 'next.js', label: 'Next.js' },
-	{ value: 'sveltekit', label: 'SvelteKit' },
-	{ value: 'nuxt.js', label: 'Nuxt.js' },
-	{ value: 'remix', label: 'Remix' },
-	{ value: 'astro', label: 'Astro' },
-];
+import React, { useMemo } from 'react';
+import { liveRunStore } from './state/state'
+import { Progress } from '@/components/ui/progress'
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
-	const {
-		noteFormVisible,
-		setNoteFormVisible,
-		setNoteType,
-		noteType,
-		setIsLoading,
-		isLoading,
-		updateLiveRunFormVisible,
-		setUpdateLiveRunFormVisible
-	} = liveRunStore();
-	const {
-		control,
-		handleSubmit,
-		formState: {
-			errors
-		}
-	} = useForm<{ noteContent: string }>();
-
-	const saveNote = useCallback(async (data: { noteContent: string }) => {
-		setIsLoading(true)
-
-		const newNote = {
-			creationDate: format(new Date(), "EEE MMM dd yyyy HH:mm:ss 'GMT'xxx '(South Africa Standard Time)'"),
-			note: data.noteContent,
-			machineUid: Number(machine?.machine?.machineNumber),
-			type: noteType
-		}
-
-		try {
-			const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/live-run/notes/${machine?.machine?.machineNumber}`, newNote)
-
-			if (data?.message === 'Note Saved') {
-				toast(`${data?.message}`,
-					{
-						icon: '✅',
-						style: {
-							borderRadius: '5px',
-							background: '#333',
-							color: '#fff',
-						},
-					}
-				);
-			} else {
-				toast(`${data?.message}`,
-					{
-						icon: '⛔',
-						style: {
-							borderRadius: '5px',
-							background: '#333',
-							color: '#fff',
-						},
-					}
-				);
-			}
-
-		} catch {
-			toast(`Failed to save note`,
-				{
-					icon: '⛔',
-					style: {
-						borderRadius: '5px',
-						background: '#333',
-						color: '#fff',
-					},
-				}
-			);
-		} finally {
-			setIsLoading(false)
-		}
-	}, [machine?.machine?.machineNumber, noteType, setIsLoading]);
-
 	const DialogSectionHeader = () => {
 		return (
 			<div className="flex flex-col gap-1">
@@ -205,7 +90,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 				<TabsTrigger value="overview">Overview</TabsTrigger>
 				{machine?.insertHistory?.length > 0 && <TabsTrigger value="performance">Performance</TabsTrigger>}
 				<TabsTrigger value="material">Material</TabsTrigger>
-				<TabsTrigger value="management">Management</TabsTrigger>
 			</>
 		)
 	}
@@ -286,7 +170,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							barSize={30}
 							margin={{ top: 30, bottom: 30 }}
 							accessibilityLayer
-							data={machine?.insertHistory?.slice().reverse()}>
+							data={machine?.insertHistory}>
 							<XAxis
 								dataKey="eventTimeStamp"
 								angle={-45}
@@ -347,7 +231,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 	const MaterialTab = () => {
 		return (
 			<div className="space-y-4 flex flex-col justify-start gap-3">
-				<ResponsiveContainer width="100%" height={200}>
+				<ResponsiveContainer width="100%" height={300}>
 					<BarChart
 						barGap={5}
 						barSize={50}
@@ -383,111 +267,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		)
 	}
 
-	const ManagementTab = () => {
-		return (
-			<div className="space-y-2 mt-4">
-				{noteFormVisible &&
-					<form onSubmit={handleSubmit(saveNote)} className="space-y-2">
-						<h3>Add A Note</h3>
-						<Select required onValueChange={(value) => setNoteType(value)}>
-							<SelectTrigger>
-								<SelectValue placeholder="Select Note Type" />
-							</SelectTrigger>
-							<SelectContent>
-								{noteTypes.map((type) => <SelectItem key={type} value={type}>{type}</SelectItem>)}
-							</SelectContent>
-						</Select>
-						<Controller
-							name="noteContent"
-							control={control}
-							defaultValue=""
-							rules={{ required: "Note content is required" }}
-							render={({ field }) => (
-								<Textarea
-									placeholder="write your notes here..."
-									{...field}
-								/>
-							)}
-						/>
-						{errors?.noteContent && <span className="text-red-500 text-[10px] -mt-4">{errors?.noteContent?.message}</span>}
-						<div className="flex justify-end space-x-2">
-							<Button
-								className="w-20"
-								variant="destructive" onClick={() => {
-									setNoteFormVisible(false)
-									setUpdateLiveRunFormVisible(false)
-								}}>Cancel</Button>
-							<Button type="submit">
-								{isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : 'Save Note'}
-							</Button>
-						</div>
-					</form>
-				}
-				{updateLiveRunFormVisible &&
-					<div className="space-y-4">
-						<h3>Update Live Run</h3>
-						<div className="flex items-center gap-2 justify-between">
-							<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
-								<p className="text-sm text-card-foreground">Component</p>
-								<ComboboxDemo data={data} placeholder="Choose a component..." />
-							</div>
-							<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
-								<p className="text-sm text-card-foreground">Colour</p>
-								<ComboboxDemo data={data} placeholder="Choose a colour..." />
-							</div>
-						</div>
-						<div className="flex items-center gap-2 justify-between">
-							<div className="flex items-start gap-1 flex-col w-1/2 flex-col">
-								<p className="text-sm text-card-foreground">Mould</p>
-								<ComboboxDemo data={data} placeholder="Choose a mould..." />
-							</div>
-						</div>
-						<div className="flex justify-end space-x-2">
-							<Button variant="destructive" onClick={() => {
-								setUpdateLiveRunFormVisible(false)
-								setNoteFormVisible(false)
-							}}>Cancel</Button>
-							<Button type="submit">
-								{isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : 'Save Changes'}
-							</Button>
-						</div>
-					</div>
-				}
-				{(!noteFormVisible && !updateLiveRunFormVisible) &&
-					<div className="flex justify-end gap-2 items-center mt-4">
-						<Button onClick={() => {
-							setNoteFormVisible(true)
-							setUpdateLiveRunFormVisible(false)
-						}}>
-							<NotebookPen className="mr-2 h-4 w-4" /> Add A Note
-						</Button>
-						<Button onClick={() => {
-							setNoteFormVisible(false)
-							setUpdateLiveRunFormVisible(true)
-						}}>
-							<RotateCcw className="mr-2 h-4 w-4" /> Update Live Run
-						</Button>
-					</div>
-				}
-				<div className="space-y-2">
-					{machine?.notes?.map((note) => (
-						<Card key={note?.id}>
-							<CardHeader className="py-2 px-4">
-								<div className="flex justify-between items-center">
-									<h4 className="text-sm">{note?.type}</h4>
-									<span className="text-xs text-gray-500">{note?.timestamp}</span>
-								</div>
-							</CardHeader>
-							<CardContent className="py-2 px-4">
-								<p className="text-sm">{note?.content}</p>
-							</CardContent>
-						</Card>
-					))}
-				</div>
-			</div>
-		)
-	}
-
 	return (
 		<motion.div
 			className='bg-card rounded'
@@ -497,27 +276,9 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 			<Dialog>
 				<DialogTrigger asChild>
 					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")} >
-						<CardHeader className="flex flex-row items-center justify-between py-2 px-4">
-							<div className="flex items-center justify-between w-full gap-0">
-								<div className="flex flex-col">
-									<span className="text-card-foreground text-[16px]">{machine?.machine?.name} {machine?.machine?.machineNumber}</span>
-									<span className="text-card-foreground text-[11px] -mt-1">
-										{machine?.eventTimeStamp ?
-											(() => {
-												const elapsedTime = formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true });
-												return elapsedTime;
-											})()
-											: ''}
-									</span>
-								</div>
-								<div className="flex items-center space-x-2">
-									<Badge variant={`${machine?.status === 'Active' ? 'success' : machine?.status === 'Idle' ? 'warning' : 'destructive'}`}>{machine?.status}</Badge>
-								</div>
-							</div>
-						</CardHeader>
-						<CardContent className="p-2 space-y-2 mt-4">
-							<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden">
-								<div className="flex items-center justify-center border rounded border-[1px] flex-col w-full h-full">
+						<CardContent className="p-2 space-y-2 h-full">
+							<div className={`aspect-video w-full rounded overflow-hidden ${machine?.status === 'Active' ? 'bg-green-500/80' : machine?.status === 'Idle' ? 'bg-yellow-500' : 'bg-red-500'}`}>
+								<div className="flex items-center justify-center rounded flex-col w-full h-full">
 									<Image
 										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
 										alt={machine?.component?.name}
@@ -528,31 +289,40 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 										className="rounded object-cover" />
 								</div>
 							</div>
-							<div className='flex items-center justify-between flex-row w-full'>
-								<h3 className="text-card-foreground">{machine?.component?.name}</h3>
-								<div className="flex items-center gap-0 flex-col">
-									{signalIcon(machine?.signalQuality)}
-									<span className="text-card-foreground text-[10px] uppercase">{machine?.signalQuality}</span>
+							<div className="flex items-center justify-between w-full gap-2 flex-col">
+								<div className="flex items-center justify-between w-full gap-2">
+									<div className="flex flex-col">
+										<span className="text-card-foreground text-[18px] font-medium uppercase">{machine?.machine?.name} {machine?.machine?.machineNumber}</span>
+										<span className="text-card-foreground text-[11px] -mt-1 flex-col flex">
+											{machine?.eventTimeStamp ? formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true }) : ''}
+										</span>
+									</div>
+									<div className="flex flex-col">
+										<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.component?.name?.slice(0, 20)}</span>
+									</div>
 								</div>
-							</div>
-							<div className="flex justify-between items-center text-xs">
-								<div className="flex flex-col items-start gap-1">
-									<span className="text[10px] text-card-foreground uppercase">
-										<Clock className={`stroke-${machine?.cycleTime > machine?.component.targetTime ? 'destructive' : 'success'}`} size={20} strokeWidth={1.5} />
-									</span>
-									<p className="text-card-foreground text-[14px]">{machine?.cycleTime}/{machine?.component?.targetTime}<span className="text-card-foreground text-[12px]">s</span></p>
+								<div className="flex items-center gap-2 justify-between gap-2 w-full">
+									<div className="flex items-center gap-0 flex-col">
+										<p className="text-card-foreground text-[10px] uppercase">ACT Time</p>
+										<p className="text-card-foreground text-[14px]">{machine?.cycleTime}<span className="text-card-foreground text-[12px]">s</span></p>
+									</div>
+									<div className="flex items-center gap-0 flex-col">
+										<p className="text-card-foreground text-[10px] uppercase">STD Time</p>
+										<p className="text-card-foreground text-[14px]">{machine?.component?.targetTime}<span className="text-card-foreground text-[12px]">s</span></p>
+									</div>
+									<div className="flex items-center gap-0 flex-col">
+										{signalIcon(machine?.signalQuality)}
+										<span className="text-card-foreground text-[10px] uppercase">{machine?.signalQuality}</span>
+									</div>
 								</div>
-								<div className="flex flex-col items-center gap-1">
-									<span className="text[10px] text-card-foreground uppercase">
-										<PackageCheck className="stroke-card-foreground" size={20} strokeWidth={1.5} />
-									</span>
-									<p className="text-card-foreground text-[14px]">{machine?.currentProduction}/{machine?.targetProduction}<span className="text-card-foreground text-[12px]">units</span></p>
-								</div>
-								<div className="flex flex-col items-end gap-1">
-									<span className="text[10px] text-card-foreground uppercase">
-										<ChartSpline className={`stroke-${machine?.efficiency < 50 ? 'destructive' : machine?.efficiency < 75 ? 'warning' : 'success'}`} size={20} strokeWidth={1.5} />
-									</span>
-									<p className="text-card-foreground text-[14px]">{machine?.efficiency}<span className="text-card-foreground text-[12px]">%</span></p>
+								<div className="flex flex-col items-end gap-0 justify-end w-full">
+									<p className="text-card-foreground text-[15px] font-medium uppercase">
+										<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.currentProduction}</span>
+										/
+										<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.targetProduction}</span>
+										<span className="text-card-foreground text-[10px]"> units</span>
+									</p>
+									<Progress value={((machine?.currentProduction || 0) / (machine?.targetProduction || 1)) * 100} />
 								</div>
 							</div>
 						</CardContent>
@@ -577,9 +347,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<TabsContent value="material">
 							<MaterialTab />
 						</TabsContent>
-						<TabsContent value="management">
-							<ManagementTab />
-						</TabsContent>
 					</Tabs>
 				</DialogContent>
 			</Dialog>
@@ -601,7 +368,6 @@ export default function Component() {
 		setStatusFilter,
 		setCurrentPage,
 		setItemsPerPage,
-		setSearchQuery,
 		searchQuery,
 		setSocketStatus,
 	} = liveRunStore();
@@ -653,7 +419,7 @@ export default function Component() {
 						type="text"
 						value={searchQuery}
 						placeholder="search live run"
-						onChange={(e) => setSearchQuery(e.target.value)}
+						disabled
 						className="border rounded placeholder:text-xs placeholder:text-card-foreground/50 w-[300px] placeholder:italic"
 					/>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -684,9 +450,9 @@ export default function Component() {
 
 	const filteredMachines = useMemo(() => {
 		return machineData?.filter(machine =>
-			(machine?.machine?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				machine?.component?.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
-			(statusFilter === 'all' || machine?.status.toLowerCase() === statusFilter)
+			(machine?.machine?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+				machine?.component?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())) &&
+			(statusFilter === 'all' || machine?.status?.toLowerCase() === statusFilter)
 		);
 	}, [machineData, searchQuery, statusFilter]);
 
@@ -735,6 +501,7 @@ export default function Component() {
 		)
 	}
 
+
 	if (isLoading || isEmpty(machineData)) {
 		return (
 			<div className="w-full h-screen">
@@ -771,3 +538,4 @@ const MachineCardsLoader = () => {
 		</div>
 	);
 };
+

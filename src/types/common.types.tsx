@@ -26,6 +26,7 @@ export interface Mould {
 }
 
 export interface Machine {
+    uid: string;
     name: string;
     machineNumber: string;
     macAddress: string;
