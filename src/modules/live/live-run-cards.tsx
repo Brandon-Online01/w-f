@@ -12,6 +12,7 @@ import {
 	ChartSpline,
 	Weight,
 	Info,
+	PauseOctagonIcon,
 } from 'lucide-react'
 import {
 	Card,
@@ -69,6 +70,8 @@ import { liveRunStore } from './state/state'
 import { Progress } from '@/components/ui/progress'
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
+	const screenSize = { width: window.innerWidth, height: window.innerHeight }
+
 	const DialogSectionHeader = () => {
 		return (
 			<div className="flex flex-col gap-1">
@@ -108,7 +111,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							height={50}
 							priority
 							quality={100}
-							className="rounded" />
+							className="rounded object-cover h-[20vh]" />
 					</div>
 				</div>
 				<div className="grid grid-cols-3 gap-4 text-center">
@@ -328,26 +331,46 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<CardContent className="p-2 space-y-2 h-full">
 							<div className={`aspect-video w-full rounded overflow-hidden ${machine?.status === 'Active' ? 'bg-green-500/80' : machine?.status === 'Idle' ? 'bg-yellow-500' : 'bg-red-500'}`}>
 								<div className="flex items-center justify-center rounded flex-col w-full h-full">
-									<Image
-										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
-										alt={machine?.component?.name}
-										width={50}
-										height={50}
-										priority
-										quality={100}
-										className="rounded object-cover" />
+									{
+										machine?.status === 'Active' ?
+											<Image
+												src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
+												alt={machine?.component?.name}
+												width={screenSize.width > 768 ? 50 : 20}
+												height={screenSize.width > 768 ? 50 : 20}
+												priority
+												quality={100}
+												className="rounded object-cover" />
+											:
+											machine?.status === 'Idle' ?
+												<div className="flex items-center justify-center flex-col">
+													<PauseOctagonIcon className="stroke-white" strokeWidth={1.5} size={40} />
+													<p className="text-white text-[10px] uppercase">Laying Idle</p>
+												</div>
+												:
+												<Image
+													src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
+													alt={machine?.component?.name}
+													width={screenSize.width > 768 ? 50 : 20}
+													height={screenSize.width > 768 ? 50 : 20}
+													priority
+													quality={100}
+													className="rounded object-cover" />
+									}
 								</div>
 							</div>
 							<div className="flex items-center justify-between w-full gap-2 flex-col">
 								<div className="flex items-center justify-between w-full gap-2">
 									<div className="flex flex-col">
-										<span className="text-card-foreground text-[18px] font-medium uppercase">{machine?.machine?.name} {machine?.machine?.machineNumber}</span>
+										<span className="text-card-foreground text-[18px] font-medium uppercase flex items-center gap-1">
+											{machine?.machine?.name} {machine?.machine?.machineNumber}
+										</span>
 										<span className="text-card-foreground text-[11px] -mt-1 flex-col flex">
 											{machine?.eventTimeStamp ? formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true }) : ''}
 										</span>
 									</div>
-									<div className="flex flex-col">
-										<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.component?.name?.slice(0, 20)}</span>
+									<div className="flex flex-col items-end justify-end">
+										<span className="text-card-foreground text-[12px] text-right sm:text-[15px] font-medium uppercase">{machine?.component?.name?.slice(0, 10)}</span>
 									</div>
 								</div>
 								<div className="flex items-center gap-2 justify-between gap-2 w-full">
@@ -568,7 +591,7 @@ export default function Component() {
 	return (
 		<div className="w-full">
 			<SectionHeader />
-			<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
+			<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
 				{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
 			</div>
 			<TablePagination />
