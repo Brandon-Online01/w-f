@@ -96,7 +96,7 @@ export default function LiveRunHighlights() {
                     <Card className="flex flex-col w-full">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
-                                <p className="text-sm text-card-foreground -mt-3">Current Shift</p>
+                                <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1 pb-0 items-center justify-center">
@@ -134,7 +134,7 @@ export default function LiveRunHighlights() {
                     <Card className="flex flex-col w-full">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
-                                <p className="text-sm text-card-foreground -mt-3">Current Shift</p>
+                                <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1 pb-0 items-center justify-center">
@@ -168,7 +168,7 @@ export default function LiveRunHighlights() {
                     <Card className="flex flex-col w-full">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
-                                <p className="text-sm text-card-foreground -mt-3">Current Shift</p>
+                                <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1 pb-0 items-center justify-center">
@@ -202,7 +202,7 @@ export default function LiveRunHighlights() {
                     <Card className="flex flex-col w-full">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
-                                <p className="text-sm text-card-foreground -mt-3">Current Shift</p>
+                                <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1 pb-0 items-center justify-center">

@@ -20,6 +20,7 @@ import {
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger
@@ -90,6 +91,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 				<TabsTrigger value="overview">Overview</TabsTrigger>
 				{machine?.insertHistory?.length > 0 && <TabsTrigger value="performance">Performance</TabsTrigger>}
 				<TabsTrigger value="material">Material</TabsTrigger>
+				<TabsTrigger value="management">Manage</TabsTrigger>
 			</>
 		)
 	}
@@ -197,7 +199,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 									<>
 										<Cell
 											key={`cell-${index}`}
-											fill={'hsl(var(--chart-1))'}
+											fill={parseFloat(entry?.cycleTime) > machine?.component?.targetTime ? 'hsl(var(--chart-3))' : 'hsl(var(--success))'}
 										/>
 										<LabelList
 											dataKey="cycleTime"
@@ -243,12 +245,14 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							tick={{ fontSize: 8 }}
 						/>
 						<Tooltip cursor={false} />
-						<ReferenceLine y={machine?.totalMaterialsUsed * 0.9} stroke="red" strokeDasharray="3 3" label={{ value: 'Target Material Usage', position: 'insideTopRight' }} />
 						<Bar
 							radius={5}
 							dataKey="value">
 							{[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }].map((entry, index) => (
-								<Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+								<Cell
+									key={`cell-${index}`}
+									fill={chartColors[index % chartColors.length]}
+								/>
 							))}
 						</Bar>
 					</BarChart>
@@ -264,6 +268,51 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					</AlertDescription>
 				</Alert>
 			</div>
+		)
+	}
+
+	const ManagementTab = () => {
+		return (
+			<div className='flex items-center justify-between gap-2 h-full'>
+				<DialogTrigger asChild>
+				</DialogTrigger>
+				<Dialog>
+					<DialogTrigger asChild>
+						<div className="flex items-center gap-0 border rounded bg-card p-2 h-32 w-1/2 justify-center flex-col cursor-pointer">
+							<span className="text-card-foreground text-[10px] uppercase">tap to</span>
+							<p className="text-card-foreground text-[15px] uppercase">Save Notes</p>
+						</div>
+					</DialogTrigger>
+					<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
+						<DialogHeader>
+							<DialogTitle>
+								<p className="text-card-foreground text-[15px] uppercase">Save Notes</p>
+							</DialogTitle>
+						</DialogHeader>
+						<DialogDescription>
+							<p className="text-card-foreground text-[15px] uppercase">Save Notes</p>
+						</DialogDescription>
+					</DialogContent>
+				</Dialog>
+				<Dialog>
+					<DialogTrigger asChild>
+						<div className="flex items-center gap-0 border rounded bg-card p-2 h-32 w-1/2 justify-center flex-col cursor-pointer">
+							<span className="text-card-foreground text-[10px] uppercase">tap to</span>
+							<p className="text-card-foreground text-[15px] uppercase">Update Live Run</p>
+						</div>
+					</DialogTrigger>
+					<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
+						<DialogHeader>
+							<DialogTitle>
+								<p className="text-card-foreground text-[15px] uppercase">Update Live Run</p>
+							</DialogTitle>
+						</DialogHeader>
+						<DialogDescription>
+							<p className="text-card-foreground text-[15px] uppercase">Update Live Run</p>
+						</DialogDescription>
+					</DialogContent>
+				</Dialog>
+			</div >
 		)
 	}
 
@@ -347,6 +396,9 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<TabsContent value="material">
 							<MaterialTab />
 						</TabsContent>
+						<TabsContent value="management">
+							<ManagementTab />
+						</TabsContent>
 					</Tabs>
 				</DialogContent>
 			</Dialog>
@@ -413,14 +465,14 @@ export default function Component() {
 
 	const SectionHeader = () => {
 		return (
-			<div className="mb-4 flex justify-between items-center">
-				<div className="flex items-center gap-2">
+			<div className="mb-4 flex justify-between items-center flex-wrap md:flex-nowrap">
+				<div className="flex items-center gap-2 w-full lg:w-1/2">
 					<Input
 						type="text"
 						value={searchQuery}
 						placeholder="search live run"
 						disabled
-						className="border rounded placeholder:text-xs placeholder:text-card-foreground/50 w-[300px] placeholder:italic"
+						className="border rounded placeholder:text-xs placeholder:text-card-foreground/50 w-3/4 md:w-[300px] placeholder:italic"
 					/>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className="w-[180px]">
@@ -434,16 +486,18 @@ export default function Component() {
 						</SelectContent>
 					</Select>
 				</div>
-				<Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
-					<SelectTrigger className="w-[180px]">
-						<SelectValue placeholder="Items per page" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="16">16 per page</SelectItem>
-						<SelectItem value="20">20 per page</SelectItem>
-						<SelectItem value="40">40 per page</SelectItem>
-					</SelectContent>
-				</Select>
+				<div className="w-full xl:w-1/2 mt-1 lg:mt-0 flex items-center justify-end">
+					<Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
+						<SelectTrigger className="w-full sm:w-[180px]">
+							<SelectValue placeholder="Items per page" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="16">16 per page</SelectItem>
+							<SelectItem value="20">20 per page</SelectItem>
+							<SelectItem value="40">40 per page</SelectItem>
+						</SelectContent>
+					</Select>
+				</div>
 			</div>
 		)
 	}
