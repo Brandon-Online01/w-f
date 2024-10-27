@@ -159,6 +159,9 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<AlertDescription>
 							<ul className="list-disc list-inside">
 								<li>Average Cycle Time: {machine?.averageCycleTime}s</li>
+								<li>First Report Type: {machine?.machineFirstReportType}</li>
+								<li>First Report Time: {machine?.machineFirstReportTime?.slice(15, 25)}</li>
+								<li>Production Start Time: {machine?.productionStartTime?.qd_cycleCompletedTimestamp?.slice(15, 25)}</li>
 							</ul>
 						</AlertDescription>
 					</Alert>
@@ -357,7 +360,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 													:
 													<HeartHandshake className="stroke-warning" size={20} strokeWidth={1.5} />
 											}
-											<span className="text-card-foreground text-[11px] uppercase">{machine?.machineFirstReport?.slice(15, 25)}</span>
+											<span className="text-card-foreground text-[11px] uppercase">{machine?.machineFirstReportTime?.slice(15, 25)}</span>
 										</p>
 										<p className="text-card-foreground text-[15px] font-medium uppercase">
 											<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.currentProduction}</span>
@@ -542,7 +545,6 @@ export default function Component() {
 			</motion.div>
 		)
 	}
-
 
 	if (isLoading || isEmpty(machineData)) {
 		return (
