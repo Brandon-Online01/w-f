@@ -1,7 +1,6 @@
 'use client'
 
 import { create } from 'zustand'
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,7 +8,6 @@ import axios from "axios"
 import toast from 'react-hot-toast';
 import { useMutation } from '@tanstack/react-query'
 import { useForm, SubmitHandler } from "react-hook-form"
-import signInCover from "../../assets/covers/signincover.jpg"
 import { Loader2 } from 'lucide-react'
 import { useSessionStore } from '@/session/session.provider'
 
@@ -108,27 +106,16 @@ export default function Page() {
     };
 
     return (
-        <div className="w-full flex items-center justify-between h-full overflow-hidden bg-signInCover bg-cover bg-no-repeat">
-            <div className="hidden bg-muted lg:block md:w-1/2 xl:w-2/3 h-full">
-                <Image
-                    src={signInCover}
-                    alt="Image"
-                    width="1920"
-                    height="1080"
-                    priority
-                    quality={100}
-                    className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                />
-            </div>
-            <div className="flex items-center justify-center p-6 md:p-12 w-11/12 rounded-lg lg:rounded-none md:w-2/3 mx-auto xl:w-1/3 lg:h-full bg-card">
-                <div className="w-full flex flex-col justify-start gap-4 border p-3 rounded">
-                    <div className="flex flex-col items-center justify-center gap-0 text-center">
+        <div className="w-full flex items-center justify-center lg:justify-end h-full overflow-hidden bg-signInCover bg-cover bg-no-repeat">
+            <div className="flex items-center justify-center p-3 md:p-8 w-11/12 rounded lg:rounded-none md:w-8/12 lg:w-4/12 lg:h-full bg-card">
+                <div className="w-full flex flex-col justify-start gap-4 p-3 lg:p-0">
+                    <div className="flex flex-col items-center justify-center gap-0 text-center w-full">
                         <h1 className="text-3xl font-normal">Warese-Sense</h1>
                         <p className="text-balance text-muted-foreground -mt-1 text-xs">
                             Enter your email below to sign in to your account
                         </p>
                     </div>
-                    <div className="grid gap-4">
+                    <div className="grid gap-4 w-full">
                         <div className="flex items-start gap-1 flex-col">
                             <Label htmlFor="email">Username</Label>
                             <Input
@@ -160,7 +147,7 @@ export default function Page() {
                             </div>
                             {errors.password && <span className="text-red-500 text-xs mt-1">{errors.password.message}</span>}
                         </div>
-                        <Button type="submit" className="w-full" onClick={handleSubmit(onSubmit)} disabled={isLoading}>
+                        <Button type="submit" className="w-10/12 mx-auto" onClick={handleSubmit(onSubmit)} disabled={isLoading}>
                             {isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : 'SIGN IN'}
                         </Button>
                     </div>

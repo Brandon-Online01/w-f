@@ -118,7 +118,7 @@ export function DeviceStatistics({ data }: DeviceStatisticsProps) {
                     <div className="flex items-center gap-1 justify-center">
                         <p className="flex items-center gap-1">
                             <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1))" }}></span>
-                            <span className="text-card-foreground text-[16px] uppercase">{registeredMachines}</span>
+                            <span className="text-card-foreground text-[16px] uppercase">{(registeredMachines || 0) - (machinesNotInUse || 0)}</span>
                         </p>
                         <span className="text-card-foreground text-[10px] uppercase">In Use</span>
                     </div>

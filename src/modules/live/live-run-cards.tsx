@@ -109,7 +109,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							height={50}
 							priority
 							quality={100}
-							className="rounded object-cover" />
+							className="rounded object-cover w-auto h-auto" />
 					</div>
 				</div>
 				<div className="grid grid-cols-3 gap-4 text-center">
@@ -299,7 +299,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 												height={screenSize.width > 768 ? 50 : 20}
 												priority
 												quality={100}
-												className="rounded object-cover" />
+												className="rounded object-cover w-auto h-auto" />
 											:
 											machine?.status === 'Idle' ?
 												<div className="flex items-center justify-center flex-col">
@@ -314,7 +314,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 													height={screenSize.width > 768 ? 50 : 20}
 													priority
 													quality={100}
-													className="rounded object-cover" />
+													className="rounded object-cover w-auto h-auto" />
 									}
 								</div>
 							</div>
@@ -359,7 +359,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						</CardContent>
 					</Card>
 				</DialogTrigger>
-				<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
+				<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")} aria-describedby="machine-details">
 					<DialogHeader>
 						<DialogTitle>
 							<DialogSectionHeader />
@@ -412,26 +412,22 @@ export default function Component() {
 			});
 
 			socket.on('connect', () => {
-				console.log('connected to live stream');
-				setSocketStatus('Connected to live stream'); // Update socket status
+				setSocketStatus('Connected to live stream');
 			});
 
 			socket.on('live-run', (data) => {
-				console.log('streaming live');
 				setMachineData(data?.data);
 				setIsLoading(false);
 			});
 
 			socket.on('disconnect', () => {
 				setIsLoading(false);
-				setSocketStatus('Live stream disconnected'); // Update socket status
-				console.log('Live stream disconnected');
+				setSocketStatus('Live stream disconnected');
 			});
 
 			socket.on('error', () => {
 				setIsLoading(false);
-				setSocketStatus('Live stream ended'); // Update socket status
-				console.log('Live stream ended');
+				setSocketStatus('Live stream ended');
 			});
 
 			return () => {
