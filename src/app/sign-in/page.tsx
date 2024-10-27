@@ -120,10 +120,10 @@ export default function Page() {
                     className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                 />
             </div>
-            <div className="flex items-center justify-center py-12 w-2/3 md:w-1/2 mx-auto xl:w-1/3 lg:h-full bg-card">
-                <div className="w-10/12 flex flex-col justify-start gap-4 border p-3">
+            <div className="flex items-center justify-center p-6 md:p-12 w-11/12 rounded-lg lg:rounded-none md:w-2/3 mx-auto xl:w-1/3 lg:h-full bg-card">
+                <div className="w-full flex flex-col justify-start gap-4 border p-3 rounded">
                     <div className="flex flex-col items-center justify-center gap-0 text-center">
-                        <h1 className="text-3xl font-bold">Warese Sense</h1>
+                        <h1 className="text-3xl font-normal">Warese-Sense</h1>
                         <p className="text-balance text-muted-foreground -mt-1 text-xs">
                             Enter your email below to sign in to your account
                         </p>
