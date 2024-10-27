@@ -139,15 +139,18 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					</div>
 				</div>
 				<div className="flex flex-col sm:flex-row gap-4 mt-4">
-					<Alert variant={machine?.cycleTimeVariancePercentage === 'Low' ? "default" : "destructive"} className="flex-1">
-						<AlertTriangle className="h-4 w-4" />
-						<AlertTitle className="uppercase">Cycle Time Status</AlertTitle>
-						<AlertDescription>
-							<p className="text-xs uppercase">{machine?.cycleTimeVariancePercentage === 'Low'
-								? "Cycle times are within normal range."
-								: "Cycle times are showing high variance. Machine may need inspection."}</p>
-						</AlertDescription>
-					</Alert>
+					{
+						String(machine?.cycleTimeVariance) > '0.00' &&
+						<Alert variant={machine?.cycleTimeVariancePercentage === 'Low' ? "default" : "destructive"} className="flex-1">
+							<AlertTriangle className="h-4 w-4" />
+							<AlertTitle className="uppercase">Cycle Time Status</AlertTitle>
+							<AlertDescription>
+								<p className="text-xs uppercase">{machine?.cycleTimeVariancePercentage === 'Low'
+									? "Cycle times are within normal range."
+									: "Cycle times are showing high variance. Machine may need inspection."}</p>
+							</AlertDescription>
+						</Alert>
+					}
 					<Alert className="flex-1">
 						<BarChartIcon className="h-4 w-4" />
 						<AlertTitle className="uppercase">Additional Metrics</AlertTitle>
@@ -234,30 +237,33 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 	const MaterialTab = () => {
 		return (
 			<div className="space-y-4 flex flex-col justify-start gap-3">
-				<ResponsiveContainer width="100%" height={300}>
-					<BarChart
-						barGap={5}
-						barSize={screenSize.width > 768 ? 50 : 30}
-						margin={{ top: 10, right: 10, left: 10 }}
-						data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
-						<XAxis dataKey="name" />
-						<YAxis
-							label={{ value: 'weight (kg)', angle: -90, position: 'insideLeft' }}
-							tick={{ fontSize: 8 }}
-						/>
-						<Tooltip cursor={false} />
-						<Bar
-							radius={5}
-							dataKey="value">
-							{[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }].map((entry, index) => (
-								<Cell
-									key={`cell-${index}`}
-									fill={chartColors[index % chartColors.length]}
-								/>
-							))}
-						</Bar>
-					</BarChart>
-				</ResponsiveContainer>
+				{
+					machine?.totalMaterialsUsed > 0 &&
+					<ResponsiveContainer width="100%" height={300}>
+						<BarChart
+							barGap={5}
+							barSize={screenSize.width > 768 ? 50 : 30}
+							margin={{ top: 10, right: 10, left: 10 }}
+							data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
+							<XAxis dataKey="name" />
+							<YAxis
+								label={{ value: 'weight (kg)', angle: -90, position: 'insideLeft' }}
+								tick={{ fontSize: 8 }}
+							/>
+							<Tooltip cursor={false} />
+							<Bar
+								radius={5}
+								dataKey="value">
+								{[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }].map((entry, index) => (
+									<Cell
+										key={`cell-${index}`}
+										fill={chartColors[index % chartColors.length]}
+									/>
+								))}
+							</Bar>
+						</BarChart>
+					</ResponsiveContainer>
+				}
 				<Alert>
 					<Weight className="h-4 w-4" />
 					<AlertTitle className="uppercase">Material Usage</AlertTitle>
