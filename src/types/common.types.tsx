@@ -85,8 +85,9 @@ export interface MachineLiveRun {
     component: Component;
     mould: Mould;
     firmwareVersion: string | null;
+    productionStartTime: ProductionInsert;
+    machineFirstReportTime: string;
     machineFirstReportType: string;
-    machineFirstReport: string;
 }
 
 
@@ -100,4 +101,11 @@ export interface CreateUserPayload {
     photoURL: string;
     phoneNumber: string;
     status: string;
+}
+
+export type ProductionInsert = {
+    qd_cycleTime: string;
+    qd_cycleCompletedTimestamp: string;
+    macAddress: string;
+    row_num: string;
 }
