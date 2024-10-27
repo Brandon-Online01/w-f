@@ -15,7 +15,7 @@ const config: Config = {
 	theme: {
     	extend: {
     		backgroundImage: {
-    			signInCover: 'url("../assets/covers/signincover.jpg")'
+    			signInCover: 'url("../assets/covers/signincover.webp")'
     		},
     		colors: {
     			background: 'hsl(var(--background))',

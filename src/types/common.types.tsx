@@ -85,6 +85,8 @@ export interface MachineLiveRun {
     component: Component;
     mould: Mould;
     firmwareVersion: string | null;
+    machineFirstReportType: string;
+    machineFirstReport: string;
 }
 
 

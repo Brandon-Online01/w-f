@@ -491,7 +491,7 @@ export default function UserManagementDashboard() {
                             <Plus className="mr-2 h-4 w-4" /> Create User
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[90vw] max-h-[85vh] overflow-y-auto bg-card">
+                    <DialogContent className="sm:max-w-[90vw] max-h-[85vh] overflow-y-auto bg-card" aria-describedby="create-user-details">
                         <DialogHeader>
                             <DialogTitle>Create New User</DialogTitle>
                             <DialogDescription>Fill in the details to create a new user.</DialogDescription>
@@ -602,7 +602,7 @@ export default function UserManagementDashboard() {
             )}
 
             <Dialog open={isEditUserModalOpen} onOpenChange={setIsEditUserModalOpen}>
-                <DialogContent className="sm:max-w-[90vw] max-h-[85vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-[90vw] max-h-[85vh] overflow-y-auto bg-card" aria-describedby="edit-user-details">
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
                         <DialogDescription>Update user details.</DialogDescription>
@@ -612,7 +612,7 @@ export default function UserManagementDashboard() {
             </Dialog>
 
             <Dialog open={isViewUserModalOpen} onOpenChange={setIsViewUserModalOpen}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px] bg-card" aria-describedby="view-user-details">
                     <DialogHeader>
                         <DialogTitle>User Details</DialogTitle>
                     </DialogHeader>
