@@ -86,3 +86,16 @@ export interface MachineLiveRun {
     mould: Mould;
     firmwareVersion: string | null;
 }
+
+
+export interface CreateUserPayload {
+    name: string;
+    lastName: string;
+    email: string;
+    username: string;
+    password: string;
+    role: string;
+    photoURL: string;
+    phoneNumber: string;
+    status: string;
+}

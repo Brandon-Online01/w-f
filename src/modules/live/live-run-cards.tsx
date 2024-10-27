@@ -12,6 +12,7 @@ import {
 	ChartSpline,
 	Weight,
 	Info,
+	PauseOctagonIcon,
 } from 'lucide-react'
 import {
 	Card,
@@ -68,6 +69,8 @@ import { liveRunStore } from './state/state'
 import { Progress } from '@/components/ui/progress'
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
+	const screenSize = { width: window.innerWidth, height: window.innerHeight }
+
 	const DialogSectionHeader = () => {
 		return (
 			<div className="flex flex-col gap-1">
@@ -106,7 +109,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							height={50}
 							priority
 							quality={100}
-							className="rounded" />
+							className="rounded object-cover" />
 					</div>
 				</div>
 				<div className="grid grid-cols-3 gap-4 text-center">
@@ -136,15 +139,18 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					</div>
 				</div>
 				<div className="flex flex-col sm:flex-row gap-4 mt-4">
-					<Alert variant={machine?.cycleTimeVariancePercentage === 'Low' ? "default" : "destructive"} className="flex-1">
-						<AlertTriangle className="h-4 w-4" />
-						<AlertTitle className="uppercase">Cycle Time Status</AlertTitle>
-						<AlertDescription>
-							<p className="text-xs uppercase">{machine?.cycleTimeVariancePercentage === 'Low'
-								? "Cycle times are within normal range."
-								: "Cycle times are showing high variance. Machine may need inspection."}</p>
-						</AlertDescription>
-					</Alert>
+					{
+						String(machine?.cycleTimeVariance) > '0.00' &&
+						<Alert variant={machine?.cycleTimeVariancePercentage === 'Low' ? "default" : "destructive"} className="flex-1">
+							<AlertTriangle className="h-4 w-4" />
+							<AlertTitle className="uppercase">Cycle Time Status</AlertTitle>
+							<AlertDescription>
+								<p className="text-xs uppercase">{machine?.cycleTimeVariancePercentage === 'Low'
+									? "Cycle times are within normal range."
+									: "Cycle times are showing high variance. Machine may need inspection."}</p>
+							</AlertDescription>
+						</Alert>
+					}
 					<Alert className="flex-1">
 						<BarChartIcon className="h-4 w-4" />
 						<AlertTitle className="uppercase">Additional Metrics</AlertTitle>
@@ -161,13 +167,13 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	const PerformanceTab = () => {
 		return (
-			<div className="space-y-4 flex flex-col justify-start gap-3">
+			<div className="space-y-4 flex flex-col justify-start gap-3 w-full">
 				<div className='w-full flex flex-col gap-2 justify-start'>
 					<h4 className="text-sm uppercase mb-2 text-card-foreground text-center">Last 10 Cycle Times</h4>
 					<ResponsiveContainer width="100%" height={300}>
 						<BarChart
-							barGap={5}
-							barSize={30}
+							barGap={screenSize?.width > 768 ? 5 : 0}
+							barSize={screenSize?.width > 768 ? 35 : 16}
 							margin={{ top: 30, bottom: 30 }}
 							accessibilityLayer
 							data={machine?.insertHistory}>
@@ -197,7 +203,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 									<>
 										<Cell
 											key={`cell-${index}`}
-											fill={'hsl(var(--chart-1))'}
+											fill={parseFloat(entry?.cycleTime) > machine?.component?.targetTime ? 'hsl(var(--chart-3))' : 'hsl(var(--success))'}
 										/>
 										<LabelList
 											dataKey="cycleTime"
@@ -231,28 +237,33 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 	const MaterialTab = () => {
 		return (
 			<div className="space-y-4 flex flex-col justify-start gap-3">
-				<ResponsiveContainer width="100%" height={300}>
-					<BarChart
-						barGap={5}
-						barSize={50}
-						margin={{ top: 10, right: 10, left: 10 }}
-						data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
-						<XAxis dataKey="name" />
-						<YAxis
-							label={{ value: 'weight (kg)', angle: -90, position: 'insideLeft' }}
-							tick={{ fontSize: 8 }}
-						/>
-						<Tooltip cursor={false} />
-						<ReferenceLine y={machine?.totalMaterialsUsed * 0.9} stroke="red" strokeDasharray="3 3" label={{ value: 'Target Material Usage', position: 'insideTopRight' }} />
-						<Bar
-							radius={5}
-							dataKey="value">
-							{[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }].map((entry, index) => (
-								<Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
-							))}
-						</Bar>
-					</BarChart>
-				</ResponsiveContainer>
+				{
+					machine?.totalMaterialsUsed > 0 &&
+					<ResponsiveContainer width="100%" height={300}>
+						<BarChart
+							barGap={5}
+							barSize={screenSize.width > 768 ? 50 : 30}
+							margin={{ top: 10, right: 10, left: 10 }}
+							data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
+							<XAxis dataKey="name" />
+							<YAxis
+								label={{ value: 'weight (kg)', angle: -90, position: 'insideLeft' }}
+								tick={{ fontSize: 8 }}
+							/>
+							<Tooltip cursor={false} />
+							<Bar
+								radius={5}
+								dataKey="value">
+								{[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }].map((entry, index) => (
+									<Cell
+										key={`cell-${index}`}
+										fill={chartColors[index % chartColors.length]}
+									/>
+								))}
+							</Bar>
+						</BarChart>
+					</ResponsiveContainer>
+				}
 				<Alert>
 					<Weight className="h-4 w-4" />
 					<AlertTitle className="uppercase">Material Usage</AlertTitle>
@@ -279,26 +290,46 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<CardContent className="p-2 space-y-2 h-full">
 							<div className={`aspect-video w-full rounded overflow-hidden ${machine?.status === 'Active' ? 'bg-green-500/80' : machine?.status === 'Idle' ? 'bg-yellow-500' : 'bg-red-500'}`}>
 								<div className="flex items-center justify-center rounded flex-col w-full h-full">
-									<Image
-										src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
-										alt={machine?.component?.name}
-										width={50}
-										height={50}
-										priority
-										quality={100}
-										className="rounded object-cover" />
+									{
+										machine?.status === 'Active' ?
+											<Image
+												src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
+												alt={machine?.component?.name}
+												width={screenSize.width > 768 ? 50 : 20}
+												height={screenSize.width > 768 ? 50 : 20}
+												priority
+												quality={100}
+												className="rounded object-cover" />
+											:
+											machine?.status === 'Idle' ?
+												<div className="flex items-center justify-center flex-col">
+													<PauseOctagonIcon className="stroke-white" strokeWidth={1.5} size={40} />
+													<p className="text-white text-[10px] uppercase">Laying Idle</p>
+												</div>
+												:
+												<Image
+													src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${machine?.component?.photoURL}`}
+													alt={machine?.component?.name}
+													width={screenSize.width > 768 ? 50 : 20}
+													height={screenSize.width > 768 ? 50 : 20}
+													priority
+													quality={100}
+													className="rounded object-cover" />
+									}
 								</div>
 							</div>
 							<div className="flex items-center justify-between w-full gap-2 flex-col">
 								<div className="flex items-center justify-between w-full gap-2">
 									<div className="flex flex-col">
-										<span className="text-card-foreground text-[18px] font-medium uppercase">{machine?.machine?.name} {machine?.machine?.machineNumber}</span>
+										<span className="text-card-foreground text-[18px] font-medium uppercase flex items-center gap-1">
+											{machine?.machine?.name} {machine?.machine?.machineNumber}
+										</span>
 										<span className="text-card-foreground text-[11px] -mt-1 flex-col flex">
 											{machine?.eventTimeStamp ? formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true }) : ''}
 										</span>
 									</div>
-									<div className="flex flex-col">
-										<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.component?.name?.slice(0, 20)}</span>
+									<div className="flex flex-col items-end justify-end">
+										<span className="text-card-foreground text-[12px] text-right sm:text-[15px] font-medium uppercase">{machine?.component?.name?.slice(0, 10)}</span>
 									</div>
 								</div>
 								<div className="flex items-center gap-2 justify-between gap-2 w-full">
@@ -334,17 +365,17 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							<DialogSectionHeader />
 						</DialogTitle>
 					</DialogHeader>
-					<Tabs defaultValue="overview" className="w-full">
+					<Tabs defaultValue="overview" className="w-full overflow-hidden">
 						<TabsList>
 							<TabListHeaders />
 						</TabsList>
-						<TabsContent value="overview">
+						<TabsContent value="overview" className="w-full">
 							<OverViewTab />
 						</TabsContent>
-						<TabsContent value="performance">
+						<TabsContent value="performance" className="w-full">
 							<PerformanceTab />
 						</TabsContent>
-						<TabsContent value="material">
+						<TabsContent value="material" className="w-full">
 							<MaterialTab />
 						</TabsContent>
 					</Tabs>
@@ -413,14 +444,14 @@ export default function Component() {
 
 	const SectionHeader = () => {
 		return (
-			<div className="mb-4 flex justify-between items-center">
-				<div className="flex items-center gap-2">
+			<div className="mb-4 flex justify-between items-center flex-wrap md:flex-nowrap">
+				<div className="flex items-center gap-2 w-full lg:w-1/2">
 					<Input
 						type="text"
 						value={searchQuery}
 						placeholder="search live run"
 						disabled
-						className="border rounded placeholder:text-xs placeholder:text-card-foreground/50 w-[300px] placeholder:italic"
+						className="border rounded placeholder:text-xs placeholder:text-card-foreground/50 w-3/4 md:w-[300px] placeholder:italic"
 					/>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className="w-[180px]">
@@ -434,16 +465,18 @@ export default function Component() {
 						</SelectContent>
 					</Select>
 				</div>
-				<Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
-					<SelectTrigger className="w-[180px]">
-						<SelectValue placeholder="Items per page" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="16">16 per page</SelectItem>
-						<SelectItem value="20">20 per page</SelectItem>
-						<SelectItem value="40">40 per page</SelectItem>
-					</SelectContent>
-				</Select>
+				<div className="w-full xl:w-1/2 mt-1 lg:mt-0 flex items-center justify-end">
+					<Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
+						<SelectTrigger className="w-full sm:w-[180px]">
+							<SelectValue placeholder="Items per page" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="16">16 per page</SelectItem>
+							<SelectItem value="20">20 per page</SelectItem>
+							<SelectItem value="40">40 per page</SelectItem>
+						</SelectContent>
+					</Select>
+				</div>
 			</div>
 		)
 	}
@@ -514,7 +547,7 @@ export default function Component() {
 	return (
 		<div className="w-full">
 			<SectionHeader />
-			<div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
+			<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
 				{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
 			</div>
 			<TablePagination />
