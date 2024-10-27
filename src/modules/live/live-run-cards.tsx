@@ -21,7 +21,6 @@ import {
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger
@@ -94,7 +93,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 				<TabsTrigger value="overview">Overview</TabsTrigger>
 				{machine?.insertHistory?.length > 0 && <TabsTrigger value="performance">Performance</TabsTrigger>}
 				<TabsTrigger value="material">Material</TabsTrigger>
-				<TabsTrigger value="management">Manage</TabsTrigger>
 			</>
 		)
 	}
@@ -111,7 +109,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							height={50}
 							priority
 							quality={100}
-							className="rounded object-cover h-[20vh]" />
+							className="rounded object-cover" />
 					</div>
 				</div>
 				<div className="grid grid-cols-3 gap-4 text-center">
@@ -166,13 +164,13 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	const PerformanceTab = () => {
 		return (
-			<div className="space-y-4 flex flex-col justify-start gap-3">
+			<div className="space-y-4 flex flex-col justify-start gap-3 w-full">
 				<div className='w-full flex flex-col gap-2 justify-start'>
 					<h4 className="text-sm uppercase mb-2 text-card-foreground text-center">Last 10 Cycle Times</h4>
 					<ResponsiveContainer width="100%" height={300}>
 						<BarChart
-							barGap={5}
-							barSize={30}
+							barGap={screenSize?.width > 768 ? 5 : 0}
+							barSize={screenSize?.width > 768 ? 35 : 16}
 							margin={{ top: 30, bottom: 30 }}
 							accessibilityLayer
 							data={machine?.insertHistory}>
@@ -239,7 +237,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 				<ResponsiveContainer width="100%" height={300}>
 					<BarChart
 						barGap={5}
-						barSize={50}
+						barSize={screenSize.width > 768 ? 50 : 30}
 						margin={{ top: 10, right: 10, left: 10 }}
 						data={[{ name: 'Virgin Material', value: machine?.virginMaterial }, { name: 'Master Batch', value: machine?.masterBatchMaterial }]}>
 						<XAxis dataKey="name" />
@@ -271,51 +269,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					</AlertDescription>
 				</Alert>
 			</div>
-		)
-	}
-
-	const ManagementTab = () => {
-		return (
-			<div className='flex items-center justify-between gap-2 h-full'>
-				<DialogTrigger asChild>
-				</DialogTrigger>
-				<Dialog>
-					<DialogTrigger asChild>
-						<div className="flex items-center gap-0 border rounded bg-card p-2 h-32 w-1/2 justify-center flex-col cursor-pointer">
-							<span className="text-card-foreground text-[10px] uppercase">tap to</span>
-							<p className="text-card-foreground text-[15px] uppercase">Save Notes</p>
-						</div>
-					</DialogTrigger>
-					<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
-						<DialogHeader>
-							<DialogTitle>
-								<p className="text-card-foreground text-[15px] uppercase">Save Notes</p>
-							</DialogTitle>
-						</DialogHeader>
-						<DialogDescription>
-							<p className="text-card-foreground text-[15px] uppercase">Save Notes</p>
-						</DialogDescription>
-					</DialogContent>
-				</Dialog>
-				<Dialog>
-					<DialogTrigger asChild>
-						<div className="flex items-center gap-0 border rounded bg-card p-2 h-32 w-1/2 justify-center flex-col cursor-pointer">
-							<span className="text-card-foreground text-[10px] uppercase">tap to</span>
-							<p className="text-card-foreground text-[15px] uppercase">Update Live Run</p>
-						</div>
-					</DialogTrigger>
-					<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
-						<DialogHeader>
-							<DialogTitle>
-								<p className="text-card-foreground text-[15px] uppercase">Update Live Run</p>
-							</DialogTitle>
-						</DialogHeader>
-						<DialogDescription>
-							<p className="text-card-foreground text-[15px] uppercase">Update Live Run</p>
-						</DialogDescription>
-					</DialogContent>
-				</Dialog>
-			</div >
 		)
 	}
 
@@ -406,21 +359,18 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							<DialogSectionHeader />
 						</DialogTitle>
 					</DialogHeader>
-					<Tabs defaultValue="overview" className="w-full">
+					<Tabs defaultValue="overview" className="w-full overflow-hidden">
 						<TabsList>
 							<TabListHeaders />
 						</TabsList>
-						<TabsContent value="overview">
+						<TabsContent value="overview" className="w-full">
 							<OverViewTab />
 						</TabsContent>
-						<TabsContent value="performance">
+						<TabsContent value="performance" className="w-full">
 							<PerformanceTab />
 						</TabsContent>
-						<TabsContent value="material">
+						<TabsContent value="material" className="w-full">
 							<MaterialTab />
-						</TabsContent>
-						<TabsContent value="management">
-							<ManagementTab />
 						</TabsContent>
 					</Tabs>
 				</DialogContent>

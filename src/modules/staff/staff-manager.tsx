@@ -1,6 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import {
+    useState,
+    useEffect,
+    useCallback
+} from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import {
     Search,
@@ -74,6 +78,12 @@ type UserFormData = {
     status: string;
 }
 
+type UserFormProps = {
+    user: UserFormData;
+    isEdit: boolean;
+    onSubmit?: (userData: Partial<UserFormData>) => void;
+}
+
 const mockUsers = Array(20).fill(null).map((_, index) => ({
     uid: index + 1,
     name: `User ${index + 1}`,
@@ -88,7 +98,7 @@ const mockUsers = Array(20).fill(null).map((_, index) => ({
 }))
 
 export default function UserManagementDashboard() {
-    const [users, setUsers] = useState(mockUsers)
+    const [users] = useState(mockUsers)
     const [searchTerm, setSearchTerm] = useState('')
     const [roleFilter, setRoleFilter] = useState('All')
     const [statusFilter, setStatusFilter] = useState('All')
@@ -96,7 +106,7 @@ export default function UserManagementDashboard() {
     const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false)
     const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false)
     const [isViewUserModalOpen, setIsViewUserModalOpen] = useState(false)
-    const [editingUser, setEditingUser] = useState(null)
+    const [editingUser, setEditingUser] = useState<UserFormData | null>(null)
     const [viewingUser, setViewingUser] = useState<UserFormData | null>(null)
     const [isLoading, setIsLoading] = useState(false)
     const [filteredUsers, setFilteredUsers] = useState(users)
@@ -119,34 +129,20 @@ export default function UserManagementDashboard() {
 
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
 
-    const handleCreateUser = (userData: UserFormData) => {
-        const payload = {
-            name: userData.name,
-            lastName: userData.lastName,
-            email: userData.email,
-            username: userData.username,
-            password: userData.password,
-            role: userData.role,
-            photoURL: userData.photoURL,
-            phoneNumber: userData.phoneNumber,
-            status: userData.status,
-        }
-
-        console.log(payload, '-  as new user')
-    }
-
     const handleEditUser = (userData: Partial<UserFormData>) => {
-        if (!editingUser) return; // Ensure editingUser is defined
+        if (!editingUser) return;
+
+        setIsLoading(true)
 
         const updatedUser = users.map(user => user?.uid === (editingUser as UserFormData)?.uid ? { ...user, ...userData } : user);
 
         console.log(updatedUser, '-  as updated user');
     }
 
-    const handleDeleteUser = (userId: number) => 
+    const handleDeleteUser = (userId: number) =>
         console.log(userId, '-  as deleted user')
 
-    const UserForm = ({ user, onSubmit, isEdit }: { user: UserFormData, onSubmit: (userData: UserFormData) => void, isEdit: boolean }) => {
+    const UserForm = ({ user, isEdit }: UserFormProps) => {
         const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<UserFormData>({
             defaultValues: user || {
                 name: '',
@@ -164,19 +160,25 @@ export default function UserManagementDashboard() {
         const photoURL = watch('photoURL')
 
         const onSubmitForm = (data: UserFormData) => {
-            onSubmit(data); // Use the onSubmit prop here
             if (isEdit) {
-                const changedFields = Object.keys(data).reduce((acc, key) => {
+                const changedFields = Object?.keys(data)?.reduce((acc, key) => {
                     if (data[key as keyof UserFormData] !== user[key as keyof UserFormData]) {
-                        // Ensure the value is correctly typed before assignment
                         acc[key as keyof UserFormData] = data[key as keyof UserFormData] as string | undefined;
                     }
                     return acc;
                 }, {} as Partial<UserFormData>)
 
-                console.log(changedFields, '- as changed fields for user -- ', user.uid)
+                const { photoURL, ...restOfUserData } = data
+
+                if (photoURL && !photoURL?.toLocaleLowerCase()?.includes('.png')) {
+                    console.log('upload image first, then append to - ', restOfUserData)
+                } else {
+                    console.log(changedFields, '- as changed fields for user no need to update image-- ', user.uid)
+                }
             } else {
-                console.log(data, '-  as new user')
+                const { photoURL, ...restOfUserData } = data
+
+                console.log(photoURL, '- upload image first', restOfUserData, '- as new user',)
             }
         }
 
@@ -329,7 +331,7 @@ export default function UserManagementDashboard() {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Active">Active</SelectItem>
-                                        <SelectItem value="Inactive">In AƒEdctive</SelectItem>
+                                        <SelectItem value="Inactive">In Active</SelectItem>
                                     </SelectContent>
                                 </Select>
                             )}
@@ -498,7 +500,7 @@ export default function UserManagementDashboard() {
                             <DialogTitle>Create New User</DialogTitle>
                             <DialogDescription>Fill in the details to create a new user.</DialogDescription>
                         </DialogHeader>
-                        <UserForm 
+                        <UserForm
                             user={{
                                 name: '',
                                 lastName: '',
@@ -510,7 +512,6 @@ export default function UserManagementDashboard() {
                                 phoneNumber: '',
                                 status: 'Active'
                             }}
-                            onSubmit={handleCreateUser}
                             isEdit={false}
                         />
                     </DialogContent>
@@ -605,7 +606,7 @@ export default function UserManagementDashboard() {
             )}
 
             <Dialog open={isEditUserModalOpen} onOpenChange={setIsEditUserModalOpen}>
-                <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-[90vw] max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
                         <DialogDescription>Update user details.</DialogDescription>
