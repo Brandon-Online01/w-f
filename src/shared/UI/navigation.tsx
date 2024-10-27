@@ -35,7 +35,7 @@ export const MobileNavigation = () => {
     const signOut = useSessionStore(state => state.signOut)
 
     return (
-        <div className="flex w-full xl:hidden items-center justify-between">
+        <div className="flex w-full xl:hidden items-center justify-between py-6">
             <Image src={logoIcon} alt="logo" width={30} height={30} className="rounded-full" priority quality={100} />
             <Dialog>
                 <DialogTrigger>
