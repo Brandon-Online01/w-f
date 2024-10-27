@@ -13,6 +13,8 @@ import {
 	Weight,
 	Info,
 	PauseOctagonIcon,
+	ComponentIcon,
+	HeartHandshake,
 } from 'lucide-react'
 import {
 	Card,
@@ -109,7 +111,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							height={50}
 							priority
 							quality={100}
-							className="rounded object-cover" />
+							className="rounded object-cover w-auto h-auto" />
 					</div>
 				</div>
 				<div className="grid grid-cols-3 gap-4 text-center">
@@ -299,7 +301,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 												height={screenSize.width > 768 ? 50 : 20}
 												priority
 												quality={100}
-												className="rounded object-cover" />
+												className="rounded object-cover w-auto h-auto" />
 											:
 											machine?.status === 'Idle' ?
 												<div className="flex items-center justify-center flex-col">
@@ -314,22 +316,22 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 													height={screenSize.width > 768 ? 50 : 20}
 													priority
 													quality={100}
-													className="rounded object-cover" />
+													className="rounded object-cover w-auto h-auto" />
 									}
 								</div>
 							</div>
 							<div className="flex items-center justify-between w-full gap-2 flex-col">
 								<div className="flex items-center justify-between w-full gap-2">
 									<div className="flex flex-col">
-										<span className="text-card-foreground text-[18px] font-medium uppercase flex items-center gap-1">
+										<span className="text-card-foreground text-[12px] md:text-[18px] font-medium uppercase flex items-center gap-1">
 											{machine?.machine?.name} {machine?.machine?.machineNumber}
 										</span>
-										<span className="text-card-foreground text-[11px] -mt-1 flex-col flex">
+										<span className="text-card-foreground text-[10px] md:text-[12px] -mt-1 flex-col flex">
 											{machine?.eventTimeStamp ? formatDistanceToNow(new Date(machine.eventTimeStamp), { addSuffix: true }) : ''}
 										</span>
 									</div>
 									<div className="flex flex-col items-end justify-end">
-										<span className="text-card-foreground text-[12px] text-right sm:text-[15px] font-medium uppercase">{machine?.component?.name?.slice(0, 10)}</span>
+										<span className="text-card-foreground text-[10px] text-right md:text-[12px] font-medium uppercase">{machine?.component?.name?.slice(0, 10)}</span>
 									</div>
 								</div>
 								<div className="flex items-center gap-2 justify-between gap-2 w-full">
@@ -346,20 +348,31 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 										<span className="text-card-foreground text-[10px] uppercase">{machine?.signalQuality}</span>
 									</div>
 								</div>
-								<div className="flex flex-col items-end gap-0 justify-end w-full">
-									<p className="text-card-foreground text-[15px] font-medium uppercase">
-										<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.currentProduction}</span>
-										/
-										<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.targetProduction}</span>
-										<span className="text-card-foreground text-[10px]"> units</span>
-									</p>
+								<div className="flex flex-col items-end gap-2 mt-4 justify-end w-full">
+									<div className="flex items-center justify-between w-full">
+										<p className="text-card-foreground text-[10px] uppercase flex items-center gap-1">
+											{
+												machine?.machineFirstReportType === 'Data' ?
+													<ComponentIcon className="stroke-success" size={20} strokeWidth={1.5} />
+													:
+													<HeartHandshake className="stroke-warning" size={20} strokeWidth={1.5} />
+											}
+											<span className="text-card-foreground text-[11px] uppercase">{machine?.machineFirstReport?.slice(15, 25)}</span>
+										</p>
+										<p className="text-card-foreground text-[15px] font-medium uppercase">
+											<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.currentProduction}</span>
+											/
+											<span className="text-card-foreground text-[15px] font-medium uppercase">{machine?.targetProduction}</span>
+											<span className="text-card-foreground text-[10px]"> units</span>
+										</p>
+									</div>
 									<Progress value={((machine?.currentProduction || 0) / (machine?.targetProduction || 1)) * 100} />
 								</div>
 							</div>
 						</CardContent>
 					</Card>
 				</DialogTrigger>
-				<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")}>
+				<DialogContent className={cn("sm:max-w-[700px]", "rounded bg-card")} aria-describedby="machine-details">
 					<DialogHeader>
 						<DialogTitle>
 							<DialogSectionHeader />
@@ -412,26 +425,22 @@ export default function Component() {
 			});
 
 			socket.on('connect', () => {
-				console.log('connected to live stream');
-				setSocketStatus('Connected to live stream'); // Update socket status
+				setSocketStatus('Connected to live stream');
 			});
 
 			socket.on('live-run', (data) => {
-				console.log('streaming live');
 				setMachineData(data?.data);
 				setIsLoading(false);
 			});
 
 			socket.on('disconnect', () => {
 				setIsLoading(false);
-				setSocketStatus('Live stream disconnected'); // Update socket status
-				console.log('Live stream disconnected');
+				setSocketStatus('Live stream disconnected');
 			});
 
 			socket.on('error', () => {
 				setIsLoading(false);
-				setSocketStatus('Live stream ended'); // Update socket status
-				console.log('Live stream ended');
+				setSocketStatus('Live stream ended');
 			});
 
 			return () => {
