@@ -16,6 +16,7 @@ import {
 	ComponentIcon,
 	HeartHandshake,
 	Settings,
+	Search,
 } from 'lucide-react'
 import {
 	Card,
@@ -69,6 +70,7 @@ import { formatDistanceToNow } from 'date-fns';
 import React, { useMemo } from 'react';
 import { liveRunStore } from './state/state'
 import { Progress } from '@/components/ui/progress'
+import { Input } from '@/components/ui/input'
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
 	const screenSize = { width: window.innerWidth, height: window.innerHeight }
@@ -427,10 +429,10 @@ export default function Component() {
 		setStatusFilter,
 		setCurrentPage,
 		setItemsPerPage,
-		searchQuery,
 		setSocketStatus,
+		setSearchQuery,
+		searchQuery,
 	} = liveRunStore();
-
 
 	useEffect(() => {
 		const fetchLiveRunData = () => {
@@ -471,6 +473,18 @@ export default function Component() {
 		return (
 			<div className="mb-4 flex justify-between items-center flex-wrap md:flex-nowrap">
 				<div className="flex items-center gap-2 w-full lg:w-1/2">
+					<div className="relative flex-grow w-full">
+						<Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" strokeWidth={1.5} size={18} />
+						<Input
+							type="text"
+							placeholder="search staff..."
+							className="pl-8 w-full"
+							value={searchQuery}
+							onChange={(e) =>
+								setSearchQuery(e.target.value)}
+								disabled
+						/>
+					</div>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className="w-[180px]">
 							<SelectValue placeholder="Filter by status" />

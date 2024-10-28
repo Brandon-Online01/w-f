@@ -112,15 +112,15 @@ export const DesktopNavigation = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: (index + 4) * 0.1 }}>
-                        {item.href ? (
-                            <Link href={item.href} aria-label={item.ariaLabel}>
+                        {item?.href ? (
+                            <Link href={item?.href} aria-label={item?.ariaLabel}>
                                 <item.Icon
-                                    className={`${pathname === item.href ? 'stroke-primary' : 'stroke-card-foreground'}`}
+                                    className={`${pathname === item?.href ? 'stroke-primary' : 'stroke-card-foreground'}`}
                                     size={18}
                                     strokeWidth={1}
                                 />
                             </Link>
-                        ) : item.component ? (
+                        ) : item?.component ? (
                             <item.component />
                         ) : (
                             <div onClick={item.onClick}>
