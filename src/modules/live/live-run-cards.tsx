@@ -65,7 +65,6 @@ import { isEmpty } from 'lodash'
 import { MachineLiveRun } from '../../types/common.types'
 import { chartColors } from '../../tools/data'
 import { signalIcon } from './helpers/signal-icons'
-import { Input } from '@/components/ui/input'
 import { formatDistanceToNow } from 'date-fns';
 import React, { useMemo } from 'react';
 import { liveRunStore } from './state/state'
@@ -432,6 +431,7 @@ export default function Component() {
 		setSocketStatus,
 	} = liveRunStore();
 
+
 	useEffect(() => {
 		const fetchLiveRunData = () => {
 			setIsLoading(true);
@@ -471,13 +471,6 @@ export default function Component() {
 		return (
 			<div className="mb-4 flex justify-between items-center flex-wrap md:flex-nowrap">
 				<div className="flex items-center gap-2 w-full lg:w-1/2">
-					<Input
-						type="text"
-						value={searchQuery}
-						placeholder="search live run"
-						disabled
-						className="border rounded placeholder:text-xs placeholder:text-card-foreground/50 w-3/4 md:w-[300px] placeholder:italic"
-					/>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
 						<SelectTrigger className="w-[180px]">
 							<SelectValue placeholder="Filter by status" />

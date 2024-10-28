@@ -402,9 +402,9 @@ export default function UserManagementDashboard() {
     )
 
     return (
-        <div className="w-full">
-            <div className="flex flex-col lg:flex-row gap-4 mb-6">
-                <div className="relative flex-grow">
+        <div className="w-full flex flex-col justify-start items-center gap-2">
+            <div className="flex flex-col lg:flex-row gap-2 w-full">
+                <div className="relative flex-grow w-full">
                     <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <Input
                         type="text"
@@ -513,8 +513,7 @@ export default function UserManagementDashboard() {
                     </DialogContent>
                 </Dialog>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 w-full">
                 {currentUsers.map(user => (
                     <Card key={user.uid} className="relative">
                         <CardContent className="pt-4 px-4 pb-2">
@@ -576,9 +575,8 @@ export default function UserManagementDashboard() {
                     </Card>
                 ))}
             </div>
-
             {filteredUsers.length > usersPerPage && (
-                <div className="flex justify-center items-center space-x-2 mt-6">
+                <div className="flex justify-center items-center space-x-2">
                     <Button
                         variant="outline"
                         size="sm"
