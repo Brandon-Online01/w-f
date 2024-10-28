@@ -15,6 +15,7 @@ import {
 	PauseOctagonIcon,
 	ComponentIcon,
 	HeartHandshake,
+	Settings,
 } from 'lucide-react'
 import {
 	Card,
@@ -159,9 +160,21 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<AlertDescription>
 							<ul className="list-disc list-inside">
 								<li>Average Cycle Time: {machine?.averageCycleTime}s</li>
-								<li>First Report Type: {machine?.machineFirstReportType}</li>
-								<li>First Report Time: {machine?.machineFirstReportTime?.slice(15, 25)}</li>
-								<li>Production Start Time: {machine?.productionStartTime?.qd_cycleCompletedTimestamp?.slice(15, 25)}</li>
+							</ul>
+						</AlertDescription>
+					</Alert>
+				</div>
+				<div className="flex flex-col sm:flex-row gap-4 mt-4">
+					<Alert className="flex-1">
+						<Settings className="h-4 w-4" />
+						<AlertTitle className="uppercase">Machine Run Times</AlertTitle>
+						<AlertDescription>
+							<ul className="list-disc list-inside">
+								<li>
+									{machine?.machineFirstReportType === 'Status' ?
+										`The machine's first report was a health check at ${machine?.machineFirstReportTime?.slice(15, 25)}.` :
+										`The machine's first report was the start of production at ${machine?.machineFirstReportTime?.slice(15, 25)}.`}
+								</li>
 							</ul>
 						</AlertDescription>
 					</Alert>
@@ -309,7 +322,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 											machine?.status === 'Idle' ?
 												<div className="flex items-center justify-center flex-col">
 													<PauseOctagonIcon className="stroke-white" strokeWidth={1.5} size={40} />
-													<p className="text-white text-[10px] uppercase">Laying Idle</p>
+													<p className="text-white text-[10px] uppercase">{machine?.status}</p>
 												</div>
 												:
 												<Image
@@ -470,10 +483,30 @@ export default function Component() {
 							<SelectValue placeholder="Filter by status" />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="all">All</SelectItem>
-							<SelectItem value="idle">Idling</SelectItem>
-							<SelectItem value="active">Running</SelectItem>
-							<SelectItem value="stopped">Stopped</SelectItem>
+							<SelectItem value="all">
+								<div className="flex items-center gap-2 w-full cursor-pointer">
+									<ComponentIcon className="stroke-card-foreground" size={18} strokeWidth={1.5} />
+									<span className="">All</span>
+								</div>
+							</SelectItem>
+							<SelectItem value="idle">
+								<div className="flex items-center gap-2 w-full cursor-pointer">
+									<ComponentIcon className="stroke-warning" size={18} strokeWidth={1.5} />
+									<span className="">Idling</span>
+								</div>
+							</SelectItem>
+							<SelectItem value="active">
+								<div className="flex items-center gap-2 w-full cursor-pointer">
+									<ComponentIcon className="stroke-success" size={18} strokeWidth={1.5} />
+									<span className="">Running</span>
+								</div>
+							</SelectItem>
+							<SelectItem value="stopped">
+								<div className="flex items-center gap-2 w-full cursor-pointer">
+									<ComponentIcon className="stroke-destructive" size={18} strokeWidth={1.5} />
+									<span className="">Stopped</span>
+								</div>
+							</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
