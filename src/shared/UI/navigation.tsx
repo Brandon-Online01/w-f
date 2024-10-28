@@ -107,17 +107,17 @@ export const DesktopNavigation = () => {
                     { onClick: signOut, Icon: () => <Image src={signOutIcon} alt="logo" width={25} height={25} className="rounded-full" /> },
                 ].map((item, index) => (
                     <motion.li
+                        className="flex items-center justify-center cursor-pointer"
                         key={index}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5, delay: (index + 4) * 0.1 }}
-                        className="flex items-center justify-center cursor-pointer">
+                        transition={{ duration: 0.5, delay: (index + 4) * 0.1 }}>
                         {item.href ? (
                             <Link href={item.href} aria-label={item.ariaLabel}>
                                 <item.Icon
-                                    strokeWidth={1}
-                                    size={18}
                                     className={`${pathname === item.href ? 'stroke-primary' : 'stroke-card-foreground'}`}
+                                    size={18}
+                                    strokeWidth={1}
                                 />
                             </Link>
                         ) : item.component ? (

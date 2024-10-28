@@ -60,38 +60,10 @@ import {
     AvatarImage
 } from "@/components/ui/avatar"
 import Image from 'next/image'
-
-type UserFormData = {
-    uid?: string | number;
-    name: string;
-    lastName: string;
-    email: string;
-    username: string;
-    password: string;
-    role: string;
-    photoURL: string;
-    phoneNumber: string;
-    status: string;
-}
-
-type UserFormProps = {
-    user: UserFormData;
-    isEdit: boolean;
-    onSubmit?: (userData: Partial<UserFormData>) => void;
-}
-
-const mockUsers = Array(20).fill(null).map((_, index) => ({
-    uid: index + 1,
-    name: `User ${index + 1}`,
-    lastName: `LastName ${index + 1}`,
-    email: `user${index + 1}@example.com`,
-    username: `user${index + 1}`,
-    password: 'securePassword123',
-    role: ['Admin', 'Manager', 'Operator', 'Developer', 'Support'][Math.floor(Math.random() * 5)],
-    photoURL: `/placeholder.svg?height=100&width=100`,
-    phoneNumber: `+1234567${index.toString().padStart(3, '0')}`,
-    status: ['Active', 'Inactive'][Math.floor(Math.random() * 2)],
-}))
+import { UserFormData, UserFormProps } from '@/types/user';
+import { mockUsers } from '@/data/user'
+import { useQuery } from '@tanstack/react-query'
+import { allUsers } from './helpers/user'
 
 export default function UserManagementDashboard() {
     const [users] = useState(mockUsers)
@@ -107,6 +79,16 @@ export default function UserManagementDashboard() {
     const [isLoading, setIsLoading] = useState(false)
     const [filteredUsers, setFilteredUsers] = useState(users)
     const usersPerPage = 10
+
+    const { data: userList, isLoading: loadingUsers, isError } = useQuery({
+        queryKey: ['allUsers'],
+        queryFn: allUsers,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+    });
+
+    console.log(userList?.data, loadingUsers, isError, '- as all users')
 
     useEffect(() => {
         const filtered = users.filter(user =>
@@ -125,18 +107,17 @@ export default function UserManagementDashboard() {
 
     const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
 
-    const handleEditUser = (userData: Partial<UserFormData>) => {
+    const handleEditUser = async (userData: Partial<UserFormData>) => {
         if (!editingUser) return;
 
         setIsLoading(true)
 
-        const updatedUser = users.map(user => user?.uid === (editingUser as UserFormData)?.uid ? { ...user, ...userData } : user);
+        const updatedUser = users?.map((user: { uid: string | number | undefined }) => user?.uid === (editingUser as UserFormData)?.uid ? { ...user, ...userData } : user);
 
         console.log(updatedUser, '-  as updated user');
     }
 
-    const handleDeleteUser = (userId: number) =>
-        console.log(userId, '-  as deleted user')
+    const handleDeleteUser = (userId: number) => console.log(userId, '-  as deleted user')
 
     const UserForm = ({ user, isEdit }: UserFormProps) => {
         const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<UserFormData>({
@@ -167,10 +148,10 @@ export default function UserManagementDashboard() {
                 const { photoURL, ...restOfUserData } = data
 
                 if (photoURL && !photoURL?.toLocaleLowerCase()?.includes('.png')) {
-                    console.log('upload image first, then append to - ', restOfUserData)
-                } else {
-                    console.log(changedFields, '- as changed fields for user no need to update image-- ', user.uid)
+                    console.log('upload image first, then append to rest of user data- ', restOfUserData)
                 }
+
+                console.log(changedFields, '- as changed fields for user no need to update image-- ', user.uid)
             } else {
                 const { photoURL, ...restOfUserData } = data
 
@@ -401,9 +382,9 @@ export default function UserManagementDashboard() {
         </div>
     )
 
-    return (
-        <div className="w-full flex flex-col justify-start items-center gap-2">
-            <div className="flex flex-col lg:flex-row gap-2 w-full">
+    const SectionHeader = () => {
+        return (
+            <>
                 <div className="relative flex-grow w-full">
                     <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <Input
@@ -415,105 +396,88 @@ export default function UserManagementDashboard() {
                             setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 sm:w-auto w-full">
-                    <Select value={roleFilter} onValueChange={setRoleFilter}>
-                        <SelectTrigger className="w-full sm:w-[140px]">
-                            <SelectValue placeholder="Filter by role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="All">
-                                <span className="flex items-center gap-2">
-                                    <GraduationCap className="h-4 w-4" />
-                                    All
-                                </span>
-                            </SelectItem>
-                            <SelectItem value="Admin">
-                                <span className="flex items-center gap-2">
-                                    <FolderDot className="h-4 w-4" />
-                                    Admin
-                                </span>
-                            </SelectItem>
-                            <SelectItem value="Manager">
-                                <span className="flex items-center gap-2">
-                                    <FolderKanban className="h-4 w-4" />
-                                    Manager
-                                </span>
-                            </SelectItem>
-                            <SelectItem value="Operator">
-                                <span className="flex items-center gap-2">
-                                    <HardHat className="h-4 w-4" />
-                                    Operator
-                                </span>
-                            </SelectItem>
-                            <SelectItem value="Developer">
-                                <span className="flex items-center gap-2">
-                                    <SquareTerminal className="h-4 w-4" />
-                                    Developer
-                                </span>
-                            </SelectItem>
-                            <SelectItem value="Support">
-                                <span className="flex items-center gap-2">
-                                    <Headset className="h-4 w-4" />
-                                    Support
-                                </span>
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-full sm:w-[140px]">
-                            <SelectValue placeholder="Filter by status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="All">
-                                <span className="flex items-center gap-2">
-                                    <Users className="h-4 w-4" />
-                                    All
-                                </span>
-                            </SelectItem>
-                            <SelectItem value="Active">
-                                <span className="flex items-center gap-2">
-                                    <UserCheck className="h-4 w-4 text-green-500" />
-                                    Active
-                                </span>
-                            </SelectItem>
-                            <SelectItem value="Inactive">
-                                <span className="flex items-center gap-2">
-                                    <UserX className="h-4 w-4 text-red-500" />
-                                    Inactive
-                                </span>
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <Dialog open={isCreateUserModalOpen} onOpenChange={setIsCreateUserModalOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="w-full sm:w-auto">
-                            <Plus className="mr-2 h-4 w-4" /> Create User
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[90vw] max-h-[85vh] overflow-y-auto bg-card" aria-describedby="create-user-details">
-                        <DialogHeader>
-                            <DialogTitle>Create New User</DialogTitle>
-                            <DialogDescription>Fill in the details to create a new user.</DialogDescription>
-                        </DialogHeader>
-                        <UserForm
-                            user={{
-                                name: '',
-                                lastName: '',
-                                email: '',
-                                username: '',
-                                password: '',
-                                role: 'Operator',
-                                photoURL: '',
-                                phoneNumber: '',
-                                status: 'Active'
-                            }}
-                            isEdit={false}
-                        />
-                    </DialogContent>
-                </Dialog>
+            </>
+        )
+    }
+
+    const SectionFilters = () => {
+        return (
+            <div className="flex flex-col sm:flex-row gap-4 sm:w-auto w-full">
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                    <SelectTrigger className="w-full sm:w-[140px]">
+                        <SelectValue placeholder="Filter by role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="All">
+                            <span className="flex items-center gap-2">
+                                <GraduationCap className="h-4 w-4" />
+                                All
+                            </span>
+                        </SelectItem>
+                        <SelectItem value="Admin">
+                            <span className="flex items-center gap-2">
+                                <FolderDot className="h-4 w-4" />
+                                Admin
+                            </span>
+                        </SelectItem>
+                        <SelectItem value="Manager">
+                            <span className="flex items-center gap-2">
+                                <FolderKanban className="h-4 w-4" />
+                                Manager
+                            </span>
+                        </SelectItem>
+                        <SelectItem value="Operator">
+                            <span className="flex items-center gap-2">
+                                <HardHat className="h-4 w-4" />
+                                Operator
+                            </span>
+                        </SelectItem>
+                        <SelectItem value="Developer">
+                            <span className="flex items-center gap-2">
+                                <SquareTerminal className="h-4 w-4" />
+                                Developer
+                            </span>
+                        </SelectItem>
+                        <SelectItem value="Support">
+                            <span className="flex items-center gap-2">
+                                <Headset className="h-4 w-4" />
+                                Support
+                            </span>
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full sm:w-[140px]">
+                        <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="All">
+                            <span className="flex items-center gap-2">
+                                <Users className="h-4 w-4" />
+                                All
+                            </span>
+                        </SelectItem>
+                        <SelectItem value="Active">
+                            <span className="flex items-center gap-2">
+                                <UserCheck className="h-4 w-4 text-green-500" />
+                                Active
+                            </span>
+                        </SelectItem>
+                        <SelectItem value="Inactive">
+                            <span className="flex items-center gap-2">
+                                <UserX className="h-4 w-4 text-red-500" />
+                                Inactive
+                            </span>
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 w-full">
+        )
+    }
+
+    const UserCard = () => {
+        return (
+            <>
                 {currentUsers.map(user => (
                     <Card key={user.uid} className="relative">
                         <CardContent className="pt-4 px-4 pb-2">
@@ -574,31 +538,73 @@ export default function UserManagementDashboard() {
                         </CardContent>
                     </Card>
                 ))}
-            </div>
-            {filteredUsers.length > usersPerPage && (
-                <div className="flex justify-center items-center space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1 || isLoading}
-                    >
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <span className="text-sm">
-                        {currentPage} of {totalPages}
-                    </span>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages || isLoading}
-                    >
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
-                </div>
-            )}
+            </>
+        )
+    }
 
+    const Pagination = () => {
+        return (
+            <>
+                {filteredUsers?.length > usersPerPage && (
+                    <div className="flex justify-center items-center space-x-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={currentPage === 1 || isLoading}
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}>
+                            <ChevronLeft className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                        </Button>
+                        <span className="text-sm">{currentPage} of {totalPages}</span>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={currentPage === totalPages || isLoading}
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}>
+                            <ChevronRight className="stroke-card-foreground" strokeWidth={1.5} size={16} />
+                        </Button>
+                    </div>
+                )}
+            </>
+        )
+    }
+
+    return (
+        <div className="w-full flex flex-col justify-start items-center gap-2">
+            <div className="flex flex-col lg:flex-row gap-2 w-full">
+                <SectionHeader />
+                <SectionFilters />
+                <Dialog open={isCreateUserModalOpen} onOpenChange={setIsCreateUserModalOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="w-full sm:w-auto">
+                            <Plus className="mr-2 h-4 w-4" /> Create User
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[90vw] max-h-[85vh] overflow-y-auto bg-card" aria-describedby="create-user-details">
+                        <DialogHeader>
+                            <DialogTitle>Create New User</DialogTitle>
+                            <DialogDescription>Fill in the details to create a new user.</DialogDescription>
+                        </DialogHeader>
+                        <UserForm
+                            user={{
+                                name: '',
+                                lastName: '',
+                                email: '',
+                                username: '',
+                                password: '',
+                                role: 'Operator',
+                                photoURL: '',
+                                phoneNumber: '',
+                                status: 'Active'
+                            }}
+                            isEdit={false}
+                        />
+                    </DialogContent>
+                </Dialog>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 w-full">
+                <UserCard />
+            </div>
+            <Pagination />
             <Dialog open={isEditUserModalOpen} onOpenChange={setIsEditUserModalOpen}>
                 <DialogContent className="sm:max-w-[90vw] max-h-[85vh] overflow-y-auto bg-card" aria-describedby="edit-user-details">
                     <DialogHeader>
@@ -608,7 +614,6 @@ export default function UserManagementDashboard() {
                     {editingUser && <UserForm user={editingUser} onSubmit={handleEditUser} isEdit={true} />}
                 </DialogContent>
             </Dialog>
-
             <Dialog open={isViewUserModalOpen} onOpenChange={setIsViewUserModalOpen}>
                 <DialogContent className="sm:max-w-[500px] bg-card" aria-describedby="view-user-details">
                     <DialogHeader>
