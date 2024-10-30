@@ -18,3 +18,21 @@ export const updateUser = async (updatedUser: CreateUserPayload, referenceID: st
         console.error(error)
     }
 }
+
+export const allUsers = async () => {
+    try {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`)
+        return data;
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export const deleteUser = async (userId: string | number) => {
+    try {
+        const { data } = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`)
+        return data;
+    } catch (error) {
+        console.error(error)
+    }
+}
