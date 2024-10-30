@@ -109,3 +109,4 @@ export type ProductionInsert = {
     macAddress: string;
     row_num: string;
 }
+
