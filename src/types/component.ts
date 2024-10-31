@@ -1,4 +1,5 @@
 export interface Component {
+    uid?: string;
     name: string;
     targetTime: number;
     photoURL: string;

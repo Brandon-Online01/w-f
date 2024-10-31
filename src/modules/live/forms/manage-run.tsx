@@ -30,80 +30,50 @@ import {
     DialogDescription,
     DialogTrigger
 } from "@/components/ui/dialog"
+import {
+    componentList,
+    userList,
+    mouldList,
+    colors
+} from "../../../data/user"
+import { useEffect } from "react"
 import { updateLiveRuns } from "../helpers/live-run"
-
-const components = [
-    {
-        value: "cpu",
-        label: "CPU",
-    },
-    {
-        value: "gpu",
-        label: "GPU",
-    },
-    {
-        value: "ram",
-        label: "RAM",
-    },
-    {
-        value: "motherboard",
-        label: "Motherboard",
-    },
-    {
-        value: "power_supply",
-        label: "Power Supply",
-    },
-];
-
-const colors = [
-    {
-        value: "red",
-        label: "Red",
-    },
-    {
-        value: "blue",
-        label: "Blue",
-    },
-    {
-        value: "green",
-        label: "Green",
-    },
-    {
-        value: "yellow",
-        label: "Yellow",
-    },
-    {
-        value: "black",
-        label: "Black",
-    },
-];
-
-const moulds = [
-    {
-        value: "small_box",
-        label: "Small Box",
-    },
-    {
-        value: "large_box",
-        label: "Large Box",
-    },
-    {
-        value: "cylinder",
-        label: "Cylinder",
-    },
-    {
-        value: "sphere",
-        label: "Sphere",
-    },
-    {
-        value: "hexagon",
-        label: "Hexagon",
-    },
-];
 
 export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) {
     const { formState: { errors }, control, handleSubmit } = useForm<NoteInputs>();
-    const { setNoteType, noteType, isLoading, setIsLoading, setUpdateComponent, setUpdateColor, setUpdateMould, updateComponent, updateColor, updateMould } = liveRunStore();
+    const {
+        setNoteType,
+        noteType,
+        isLoading,
+        setIsLoading,
+        setUpdateComponent,
+        setUpdateColor,
+        setUpdateMould,
+        updateComponent,
+        updateColor,
+        updateMould,
+        setAllUsers,
+        setAllComponents,
+        setAllMoulds,
+        allUsers,
+        allComponents,
+        allMoulds
+    } = liveRunStore();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const users = await userList();
+            const components = await componentList();
+            const moulds = await mouldList();
+
+
+            setAllUsers(users?.data)
+            setAllComponents(components?.data)
+            setAllMoulds(moulds?.data)
+        };
+
+        fetchData();
+    }, [setAllComponents, setAllMoulds, setAllUsers]);
 
     if (!liveRun) return null
 
@@ -177,23 +147,39 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                                         <Label htmlFor="component">
                                             <p className="text-card-foreground text-[12px] uppercase">Component</p>
                                         </Label>
-                                        <BaseDropDownSelector
-                                            items={components}
-                                            placeholder="Select a component"
-                                            command="Type to search..."
-                                            onChange={(selectedValue) => setUpdateComponent(selectedValue)}
-                                        />
+                                        {
+                                            allComponents ?
+                                                <BaseDropDownSelector
+                                                    items={allComponents?.map((component) => ({
+                                                        value: String(component?.uid),
+                                                        label: component?.name,
+                                                    }))}
+                                                    placeholder="Select a component"
+                                                    command="Type to search..."
+                                                    onChange={(selectedValue) => setUpdateComponent(selectedValue)}
+                                                />
+                                                :
+                                                'Loading'
+                                        }
                                     </div>
                                     <div className="w-full lg:w-1/2">
                                         <Label htmlFor="component">
                                             <p className="text-card-foreground text-[12px] uppercase">Mould</p>
                                         </Label>
-                                        <BaseDropDownSelector
-                                            items={moulds}
-                                            placeholder="Select a mould"
-                                            command="Type to search..."
-                                            onChange={(selectedValue) => setUpdateMould(selectedValue)}
-                                        />
+                                        {
+                                            allMoulds ?
+                                                <BaseDropDownSelector
+                                                    items={allMoulds?.map((mould) => ({
+                                                        value: String(mould?.uid),
+                                                        label: mould?.name,
+                                                    }))}
+                                                    placeholder="Select a mould"
+                                                    command="Type to search..."
+                                                    onChange={(selectedValue) => setUpdateMould(selectedValue)}
+                                                />
+                                                :
+                                                'Loading'
+                                        }
                                     </div>
                                     <div className="w-full lg:w-1/2">
                                         <Label htmlFor="color">
