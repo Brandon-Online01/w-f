@@ -1,4 +1,4 @@
-import { CreateUserPayload } from "@/types/common.types"
+import { CreateUserPayload } from "@/types/user";
 import axios from "axios"
 
 export const createUser = async (newUser: CreateUserPayload) => {

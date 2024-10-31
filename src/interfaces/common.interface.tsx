@@ -1,4 +1,4 @@
-import { Machine } from "../types/common.types";
+import { Machine } from "@/types/machine";
 
 export interface NotesDialogProps {
     machine: Machine;

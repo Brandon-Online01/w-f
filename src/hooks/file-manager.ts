@@ -1,6 +1,6 @@
 'use client'
 
-import { UploadedFile } from "@/types/common.types";
+import { UploadedFile } from "@/types/file";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 

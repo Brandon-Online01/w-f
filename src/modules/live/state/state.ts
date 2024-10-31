@@ -1,5 +1,8 @@
 import { create } from 'zustand';
 import { MachineLiveRun } from "../../../types/common.types";
+import { Component } from '@/types/component';
+import { Mould } from '@/types/mould';
+import { UserFormData } from '@/types/user';
 
 export interface LiveRunStore {
     isLoading: boolean;
@@ -9,6 +12,13 @@ export interface LiveRunStore {
     currentPage: number;
     itemsPerPage: number;
     socketStatus: string;
+    noteType: string,
+    updateComponent: string,
+    updateColor: string,
+    updateMould: string,
+    allUsers: UserFormData[],
+    allComponents: Component[],
+    allMoulds: Mould[],
     setMachineData: (data: MachineLiveRun[]) => void;
     setSearchQuery: (query: string) => void;
     setIsLoading: (state: boolean) => void;
@@ -16,6 +26,13 @@ export interface LiveRunStore {
     setCurrentPage: (page: number) => void;
     setItemsPerPage: (items: number) => void;
     setSocketStatus: (status: string) => void;
+    setNoteType: (type: string) => void;
+    setUpdateComponent: (component: string) => void;
+    setUpdateColor: (color: string) => void;
+    setUpdateMould: (mould: string) => void;
+    setAllUsers: (users: UserFormData[]) => void;
+    setAllComponents: (components: Component[]) => void;
+    setAllMoulds: (moulds: Mould[]) => void;
 }
 
 export const liveRunStore = create<LiveRunStore>((set) => ({
@@ -26,6 +43,13 @@ export const liveRunStore = create<LiveRunStore>((set) => ({
     currentPage: 1,
     itemsPerPage: 20,
     socketStatus: '',
+    noteType: '',
+    updateComponent: '',
+    updateColor: '',
+    updateMould: '',
+    allUsers: [],
+    allComponents: [],
+    allMoulds: [],
     setMachineData: (data: MachineLiveRun[]) => set({ machineData: data }),
     setSearchQuery: (query: string) => set({ searchQuery: query }),
     setIsLoading: (state: boolean) => set({ isLoading: state }),
@@ -33,4 +57,11 @@ export const liveRunStore = create<LiveRunStore>((set) => ({
     setCurrentPage: (page: number) => set({ currentPage: page }),
     setItemsPerPage: (items: number) => set({ itemsPerPage: items }),
     setSocketStatus: (status: string) => set({ socketStatus: status }),
+    setNoteType: (type: string) => set({ noteType: type }),
+    setUpdateComponent: (component: string) => set({ updateComponent: component }),
+    setUpdateColor: (color: string) => set({ updateColor: color }),
+    setUpdateMould: (mould: string) => set({ updateMould: mould }),
+    setAllUsers: (users: UserFormData[]) => set({ allUsers: users }),
+    setAllComponents: (components: Component[]) => set({ allComponents: components }),
+    setAllMoulds: (moulds: Mould[]) => set({ allMoulds: moulds }),
 }))

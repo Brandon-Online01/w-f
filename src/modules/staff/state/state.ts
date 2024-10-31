@@ -1,4 +1,4 @@
-import { UploadedFile } from '@/types/common.types';
+import { UploadedFile } from '@/types/file';
 import { create } from 'zustand'
 
 // Define the state type
