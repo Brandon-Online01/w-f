@@ -4,7 +4,7 @@ import { UpdateLiveRun } from "../../../types/live-run";
 
 export const updateLiveRuns = async (updatePayload: UpdateLiveRun) => {
     try {
-        const { data } = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/live-run/${updatePayload?.machineUid}`, updatePayload)
+        const { data } = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/live-run/current/${updatePayload?.machineNumber}`, updatePayload)
 
         if (data?.message === 'Live Run Updated') {
             toast(`${data?.message}`,
