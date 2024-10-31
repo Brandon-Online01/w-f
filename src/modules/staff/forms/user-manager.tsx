@@ -20,8 +20,8 @@ import {
 import { Label } from "@/components/ui/label"
 import Image from 'next/image'
 import { UserFormData, UserFormProps } from '@/types/user';
-import { UploadedFile } from '@/types/common.types'
 import { useStaffManagerState } from '../state/state'
+import { UploadedFile } from '@/types/file'
 
 export const UserManagerForm = ({ user, isEdit }: UserFormProps) => {
     const { imageFile, setImageFile } = useStaffManagerState()
