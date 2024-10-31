@@ -1,23 +1,109 @@
 'use client'
 
-import { ClipboardPenLine, Loader2, Replace } from "lucide-react"
-import { MachineLiveRun } from "@/types/common.types"
+import { format } from "date-fns"
+import { noteTypes } from "@/tools/data"
+import { NoteInputs, UpdateLiveRun } from "@/types/live-run"
+import { liveRunStore } from "../state/state"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { noteTypes } from "@/tools/data"
+import { saveNote } from "../helpers/notes"
 import { Textarea } from "@/components/ui/textarea"
-import { DropDownSelector } from "@/shared/UI/combo-box"
-import { NoteInputs } from "@/types/live-run"
-import { liveRunStore } from "../state/state"
+import { MachineLiveRun } from "@/types/common.types"
 import { useForm, Controller } from 'react-hook-form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
-import { format } from "date-fns"
-import { saveNote } from "../helpers/save-notes"
+import { BaseDropDownSelector } from "@/shared/UI/combo-box"
+import {
+    ClipboardPenLine,
+    Loader2, Replace
+} from "lucide-react"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogTrigger
+} from "@/components/ui/dialog"
+import { updateLiveRuns } from "../helpers/live-run"
+
+const components = [
+    {
+        value: "cpu",
+        label: "CPU",
+    },
+    {
+        value: "gpu",
+        label: "GPU",
+    },
+    {
+        value: "ram",
+        label: "RAM",
+    },
+    {
+        value: "motherboard",
+        label: "Motherboard",
+    },
+    {
+        value: "power_supply",
+        label: "Power Supply",
+    },
+];
+
+const colors = [
+    {
+        value: "red",
+        label: "Red",
+    },
+    {
+        value: "blue",
+        label: "Blue",
+    },
+    {
+        value: "green",
+        label: "Green",
+    },
+    {
+        value: "yellow",
+        label: "Yellow",
+    },
+    {
+        value: "black",
+        label: "Black",
+    },
+];
+
+const moulds = [
+    {
+        value: "small_box",
+        label: "Small Box",
+    },
+    {
+        value: "large_box",
+        label: "Large Box",
+    },
+    {
+        value: "cylinder",
+        label: "Cylinder",
+    },
+    {
+        value: "sphere",
+        label: "Sphere",
+    },
+    {
+        value: "hexagon",
+        label: "Hexagon",
+    },
+];
 
 export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) {
-    const { setNoteType, noteType, isLoading, setIsLoading } = liveRunStore();
     const { formState: { errors }, control, handleSubmit } = useForm<NoteInputs>();
+    const { setNoteType, noteType, isLoading, setIsLoading, setUpdateComponent, setUpdateColor, setUpdateMould, updateComponent, updateColor, updateMould } = liveRunStore();
 
     if (!liveRun) return null
 
@@ -33,16 +119,34 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
 
     const saveNotes = async (data: NoteInputs) => {
         setIsLoading(true)
+
         const newNote = {
             note: data?.note,
             type: noteType,
             machineUid: Number(machineNumber),
-            creationDate: format(new Date(), "EEE MMM dd yyyy HH:mm:ss 'GMT'xxx '(South Africa Standard Time)'").replace(/GMT([+-]\d{2}):(\d{2})/, 'GMT$1$2'),
+            creationDate: format(new Date(), "EEE MMM dd yyyy HH:mm:ss 'GMT'xxx '(South Africa Standard Time)'")?.replace(/GMT([+-]\d{2}):(\d{2})/, 'GMT$1$2'),
         }
 
         const saved = await saveNote(newNote)
 
         if (saved) {
+            setIsLoading(false)
+        }
+    };
+
+    const saveLiveRun = async () => {
+        setIsLoading(true)
+
+        const updatePayload: UpdateLiveRun = {
+            component: updateComponent,
+            color: updateColor,
+            mould: updateMould,
+            machineNumber: Number(machineNumber),
+        }
+
+        const updated = await updateLiveRuns(updatePayload)
+
+        if (updated) {
             setIsLoading(false)
         }
     };
@@ -66,30 +170,45 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                         <DialogDescription>
                             <div className="mt-2 flex flex-col justify-start gap-2">
                                 <p className='text-center md:text-left'>
-                                    This action cannot be undone. This will update the live run for this machine.
+                                    This will update the live run for this machine.
                                 </p>
                                 <div className="flex items-center justify-between gap-2 flex-wrap lg:flex-nowrap">
                                     <div className="w-full lg:w-1/2">
                                         <Label htmlFor="component">
                                             <p className="text-card-foreground text-[12px] uppercase">Component</p>
                                         </Label>
-                                        <DropDownSelector />
+                                        <BaseDropDownSelector
+                                            items={components}
+                                            placeholder="Select a component"
+                                            command="Type to search..."
+                                            onChange={(selectedValue) => setUpdateComponent(selectedValue)}
+                                        />
                                     </div>
                                     <div className="w-full lg:w-1/2">
                                         <Label htmlFor="component">
                                             <p className="text-card-foreground text-[12px] uppercase">Mould</p>
                                         </Label>
-                                        <DropDownSelector />
+                                        <BaseDropDownSelector
+                                            items={moulds}
+                                            placeholder="Select a mould"
+                                            command="Type to search..."
+                                            onChange={(selectedValue) => setUpdateMould(selectedValue)}
+                                        />
                                     </div>
                                     <div className="w-full lg:w-1/2">
-                                        <Label htmlFor="component">
-                                            <p className="text-card-foreground text-[12px] uppercase">Start Time</p>
+                                        <Label htmlFor="color">
+                                            <p className="text-card-foreground text-[12px] uppercase">Color</p>
                                         </Label>
-                                        <DropDownSelector />
+                                        <BaseDropDownSelector
+                                            items={colors}
+                                            placeholder="Select a color"
+                                            command="Type to search..."
+                                            onChange={(selectedValue) => setUpdateColor(selectedValue)}
+                                        />
                                     </div>
                                 </div>
-                                <Button type="submit" className="w-10/12 mx-auto" >
-                                    Save Changes
+                                <Button type="submit" className="w-10/12 mx-auto" onClick={saveLiveRun}>
+                                    {isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : "Save Changes"}
                                 </Button>
                             </div>
                         </DialogDescription>
