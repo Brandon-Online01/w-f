@@ -55,7 +55,6 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
         setAllUsers,
         setAllComponents,
         setAllMoulds,
-        allUsers,
         allComponents,
         allMoulds
     } = liveRunStore();
