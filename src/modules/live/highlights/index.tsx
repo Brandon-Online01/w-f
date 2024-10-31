@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card"
 import { ChartSpline, CpuIcon, RadioTower } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import ProductionReportCard from './reports';
 
 type HighlightsData = {
     activeReporters: number | null,
@@ -260,17 +261,20 @@ export default function LiveRunHighlights() {
 
     return (
         <div className="flex gap-1 w-full flex-wrap lg:flex-nowrap flex-col md:flex-row md:justify-between p-1 lg:p-0 gap-y-4">
-            <div className="flex flex-col xl:flex-row items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4">
+            <div className="flex flex-col xl:flex-row items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <MachineStatistics data={machineStats} />
             </div>
-            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4">
+            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <ShiftUtilization data={currentShiftMachineUtilization} />
             </div>
-            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4">
+            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <DeviceStatistics data={deviceStats} />
             </div>
-            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4">
+            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <FactoryUtilization data={totalFactoryMachineUtilization} />
+            </div>
+            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+                <ProductionReportCard />
             </div>
         </div>
     )

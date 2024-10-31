@@ -71,6 +71,7 @@ import React, { useMemo } from 'react';
 import { liveRunStore } from './state/state'
 import { Progress } from '@/components/ui/progress'
 import { Input } from '@/components/ui/input'
+import ManagementTab from './forms/manage-run'
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
 	const screenSize = { width: window.innerWidth, height: window.innerHeight }
@@ -131,6 +132,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 				<TabsTrigger value="overview">Overview</TabsTrigger>
 				{insertHistory?.length > 0 && <TabsTrigger value="performance">Performance</TabsTrigger>}
 				<TabsTrigger value="material">Material</TabsTrigger>
+				<TabsTrigger value="management" className='hidden md:block'>Management</TabsTrigger>
 			</>
 		)
 	}
@@ -442,6 +444,9 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<TabsContent value="material" className="w-full">
 							<MaterialTab />
 						</TabsContent>
+						<TabsContent value="management" className="w-full">
+							<ManagementTab liveRun={machine} />
+						</TabsContent>
 					</Tabs>
 				</DialogContent>
 			</Dialog>
@@ -451,7 +456,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 MachineCard.displayName = 'MachineCard';
 
-export default function Component() {
+export default function LiveRunCards() {
 	const {
 		setMachineData,
 		setIsLoading,
