@@ -9,6 +9,7 @@ export interface LiveRunStore {
     currentPage: number;
     itemsPerPage: number;
     socketStatus: string;
+    noteType: string,
     setMachineData: (data: MachineLiveRun[]) => void;
     setSearchQuery: (query: string) => void;
     setIsLoading: (state: boolean) => void;
@@ -16,6 +17,7 @@ export interface LiveRunStore {
     setCurrentPage: (page: number) => void;
     setItemsPerPage: (items: number) => void;
     setSocketStatus: (status: string) => void;
+    setNoteType: (type: string) => void;
 }
 
 export const liveRunStore = create<LiveRunStore>((set) => ({
@@ -26,6 +28,7 @@ export const liveRunStore = create<LiveRunStore>((set) => ({
     currentPage: 1,
     itemsPerPage: 20,
     socketStatus: '',
+    noteType: '',
     setMachineData: (data: MachineLiveRun[]) => set({ machineData: data }),
     setSearchQuery: (query: string) => set({ searchQuery: query }),
     setIsLoading: (state: boolean) => set({ isLoading: state }),
@@ -33,4 +36,5 @@ export const liveRunStore = create<LiveRunStore>((set) => ({
     setCurrentPage: (page: number) => set({ currentPage: page }),
     setItemsPerPage: (items: number) => set({ itemsPerPage: items }),
     setSocketStatus: (status: string) => set({ socketStatus: status }),
+    setNoteType: (type: string) => set({ noteType: type }),
 }))
