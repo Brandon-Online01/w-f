@@ -35,7 +35,7 @@ import {
     userList,
     mouldList,
     colors
-} from "../../../data/user"
+} from "../../../data/data"
 import { useEffect } from "react"
 import { updateLiveRuns } from "../helpers/live-run"
 

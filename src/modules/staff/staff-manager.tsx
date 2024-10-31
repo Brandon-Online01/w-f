@@ -56,7 +56,7 @@ import {
     AvatarImage
 } from "@/components/ui/avatar"
 import { UserFormData } from '@/types/user';
-import { mockUsers } from '@/data/user'
+import { mockUsers } from '@/data/data'
 import { UserManagerForm } from './forms/user-manager'
 
 export default function UserManagementDashboard() {

@@ -40,6 +40,15 @@ export const mouldList = async () => {
     }
 }
 
+export const latestReports = async () => {
+    try {
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/reports`)
+        return data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export const colors = [
     { value: "#FF5733", label: "Cinnabar" },
     { value: "#33FF57", label: "Screamin' Green" },
