@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import logoIcon from '../../assets/logo/waresense.png';
 import signOutIcon from '../../assets/icons/signout.png';
 import {
+    Component,
     LayoutDashboard,
     Settings,
     TrendingUpDown,
@@ -62,6 +63,14 @@ export const MobileNavigation = () => {
                                         </Link>
                                     </li>
                                 </ul>
+                                <ul className="flex w-full flex-col gap-5">
+                                    <li className="flex items-center justify-center cursor-pointer">
+                                        <Link href="/components" className="flex items-center justify-center gap-2" aria-label="Components">
+                                            <Component strokeWidth={1} size={18} className="stroke-card-foreground" />
+                                            <p>Components</p>
+                                        </Link>
+                                    </li>
+                                </ul>
                                 <Button className="w-full" variant="destructive" onClick={signOut}>
                                     <p>Logout</p>
                                 </Button>
@@ -85,6 +94,7 @@ export const DesktopNavigation = () => {
                 {[
                     { href: "/", Icon: TrendingUpDown, ariaLabel: "Dashboard" },
                     { href: "/staff", Icon: Users, ariaLabel: "Staff" },
+                    { href: "/components", Icon: Component, ariaLabel: "Components" },
                 ].map((item, index) => (
                     <motion.li
                         key={item.href}
@@ -102,11 +112,24 @@ export const DesktopNavigation = () => {
                     </motion.li>
                 ))}
             </ul>
-            <ul className="flex w-full flex-col gap-5">
+            <ul className="flex w-full flex-col gap-5 relative">
                 {[
                     { href: "/settings", Icon: Settings, ariaLabel: "Settings" },
                     { component: ThemeModeToggler },
-                    { onClick: signOut, Icon: () => <Image src={signOutIcon} alt="logo" width={25} height={25} className="rounded-full" /> },
+                    { 
+                        onClick: signOut, 
+                        Icon: () => (
+                            <div className="relative group">
+                                <Image src={signOutIcon} alt="sign out" width={25} height={25} className="rounded-full" />
+                                <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-2">
+                                    <ul className="flex flex-col">
+                                        <li className="cursor-pointer p-2 hover:bg-gray-200" onClick={signOut}>Sign Out</li>
+                                        <li className="cursor-pointer p-2 hover:bg-gray-200">Change Warehouse</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        ) 
+                    },
                 ].map((item, index) => (
                     <motion.li
                         className="flex items-center justify-center cursor-pointer"

@@ -1,23 +1,5 @@
-export  type UserFormData = {
-    uid?: number;
-    photoURL?: string;
-    name: string;
-    lastName: string;
-    email: string;
-    username: string;
-    password: string;
-    role: string;
-    phoneNumber: string;
-    status: string;
-}
-
-export type UserFormProps = {
-    user: UserFormData;
-    isEdit: boolean;
-    onSubmit?: (userData: Partial<UserFormData>) => void;
-}
-
-export interface CreateUserPayload {
+export type UserType = {
+    uid: number;
     name: string;
     lastName: string;
     email: string;

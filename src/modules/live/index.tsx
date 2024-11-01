@@ -334,8 +334,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		)
 	}
 
-	console.log(String(currentProduction)?.replace('.00', ''), String(targetProduction)?.replace('.00', '')?.replace(',', ''))
-
 	return (
 		<motion.div
 			className='bg-card rounded'

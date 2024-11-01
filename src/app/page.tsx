@@ -1,7 +1,7 @@
 'use client'
 
+import LiveRunCards from "@/modules/live";
 import LiveRunHighlights from "@/modules/live/highlights";
-import LiveRunCards from "@/modules/live/live-run-cards";
 import { Radio, Rss } from "lucide-react";
 
 export default function Home() {
