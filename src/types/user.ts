@@ -1,12 +1,12 @@
 export  type UserFormData = {
-    uid?: string | number;
+    uid?: number;
+    photoURL?: string;
     name: string;
     lastName: string;
     email: string;
     username: string;
     password: string;
     role: string;
-    photoURL: string;
     phoneNumber: string;
     status: string;
 }

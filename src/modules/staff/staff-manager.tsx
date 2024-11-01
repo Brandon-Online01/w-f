@@ -56,11 +56,11 @@ import {
     AvatarImage
 } from "@/components/ui/avatar"
 import { UserFormData } from '@/types/user';
-import { mockUsers } from '@/data/data'
+import { userList } from '@/data/data'
 import { UserManagerForm } from './forms/user-manager'
 
 export default function UserManagementDashboard() {
-    const [users] = useState(mockUsers)
+    const [users, setUsers] = useState<UserFormData[]>([])
     const [searchTerm, setSearchTerm] = useState('')
     const [roleFilter, setRoleFilter] = useState('All')
     const [statusFilter, setStatusFilter] = useState('All')
@@ -73,6 +73,20 @@ export default function UserManagementDashboard() {
     const [isLoading, setIsLoading] = useState(false)
     const [filteredUsers, setFilteredUsers] = useState(users)
     const usersPerPage = 10
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const users = await userList();
+
+
+            setUsers(users?.data)
+        };
+
+        fetchData();
+    }, [setUsers]);
+
+    console.log(users, '-  as users');
+
 
     useEffect(() => {
         const filtered = users.filter(user =>
@@ -96,7 +110,7 @@ export default function UserManagementDashboard() {
 
         setIsLoading(true)
 
-        const updatedUser = users?.map((user: { uid: string | number | undefined }) => user?.uid === (editingUser as UserFormData)?.uid ? { ...user, ...userData } : user);
+        const updatedUser = users?.map((user: UserFormData) => user.uid === editingUser?.uid ? { ...user, ...userData } : user);
 
         console.log(updatedUser, '-  as updated user');
     }
@@ -108,8 +122,8 @@ export default function UserManagementDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="col-span-full flex justify-center">
                 <Avatar className="w-24 h-24">
-                    <AvatarImage src={user.photoURL} alt={user.name} />
-                    <AvatarFallback>{user.name[0]}{user.lastName[0]}</AvatarFallback>
+                    <AvatarImage src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${user?.photoURL}`} alt={user.name} />
+                    <AvatarFallback>{user?.name[0]}{user?.lastName[0]}</AvatarFallback>
                 </Avatar>
             </div>
             <div>
@@ -117,39 +131,39 @@ export default function UserManagementDashboard() {
                     <User className="h-4 w-4" />
                     Name
                 </Label>
-                <p>{user.name} {user.lastName}</p>
+                <p>{user?.name} {user?.lastName}</p>
             </div>
             <div>
                 <Label className="font-bold flex items-center gap-2">
                     <UserCircle className="h-4 w-4" />
                     Username
                 </Label>
-                <p>{user.username}</p>
+                <p>{user?.username}</p>
             </div>
             <div>
                 <Label className="font-bold flex items-center gap-2">
                     <Mail className="h-4 w-4" />
                     Email
                 </Label>
-                <p>{user.email}</p>
+                <p>{user?.email}</p>
             </div>
             <div>
                 <Label className="font-bold flex items-center gap-2">
                     <Phone className="h-4 w-4" />
                     Phone
                 </Label>
-                <p>{user.phoneNumber}</p>
+                <p>{user?.phoneNumber}</p>
             </div>
             <div>
                 <Label className="font-bold flex items-center gap-2">
                     <GraduationCap className="h-4 w-4" />
                     Role
                 </Label>
-                <p>{user.role}</p>
+                <p>{user?.role}</p>
             </div>
             <div>
                 <Label className="font-bold flex items-center gap-2">
-                    {user.status === 'Active' ? (
+                    {user?.status === 'Active' ? (
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                     ) : (
                         <XCircle className="h-4 w-4 text-red-500" />
@@ -258,7 +272,7 @@ export default function UserManagementDashboard() {
         return (
             <>
                 {currentUsers.map(user => (
-                    <Card key={user.uid} className="relative">
+                    <Card key={user?.uid} className="relative">
                         <CardContent className="pt-4 px-4 pb-2">
                             <div className="absolute top-2 right-2">
                                 <DropdownMenu>
@@ -282,7 +296,7 @@ export default function UserManagementDashboard() {
                                             <GraduationCap className="mr-2 h-4 w-4" />
                                             Edit user
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => handleDeleteUser(user.uid)}>
+                                        <DropdownMenuItem onSelect={() => handleDeleteUser(user?.uid)}>
                                             <Trash2 className="mr-2 h-4 w-4" />
                                             Delete user
                                         </DropdownMenuItem>
@@ -290,8 +304,8 @@ export default function UserManagementDashboard() {
                                 </DropdownMenu>
                             </div>
                             <div className="flex flex-col items-center">
-                                <Avatar className="w-16 h-16 mb-2">
-                                    <AvatarImage src={user.photoURL} alt={user.name} />
+                                <Avatar className="w-16 h-16 mb-2 border">
+                                    <AvatarImage src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${user?.photoURL}`} alt={user.name} />
                                     <AvatarFallback>{user.name[0]}{user.lastName[0]}</AvatarFallback>
                                 </Avatar>
                                 <h2 className="text-sm font-semibold text-center">{user.name} {user.lastName}</h2>

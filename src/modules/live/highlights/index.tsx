@@ -16,9 +16,11 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card"
-import { ChartSpline, CpuIcon, RadioTower } from 'lucide-react';
+import { ArrowDownToLine, ChartSpline, CpuIcon, FileText, RadioTower } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProductionReportCard from './reports';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 
 type HighlightsData = {
     activeReporters: number | null,
@@ -92,8 +94,8 @@ export default function LiveRunHighlights() {
     if (isLoading || isEmpty(highlightsData)) {
         return (
             <div className="flex gap-1 w-full flex-wrap lg:flex-nowrap flex-col md:flex-row md:justify-between p-1 lg:p-0 gap-y-4">
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4">
-                    <Card className="flex flex-col w-full">
+                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                    <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
                                 <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
@@ -130,8 +132,8 @@ export default function LiveRunHighlights() {
                         </CardFooter>
                     </Card>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4">
-                    <Card className="flex flex-col w-full">
+                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                    <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
                                 <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
@@ -164,8 +166,8 @@ export default function LiveRunHighlights() {
                         </CardFooter>
                     </Card>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4">
-                    <Card className="flex flex-col w-full">
+                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                    <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
                                 <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
@@ -198,8 +200,8 @@ export default function LiveRunHighlights() {
                         </CardFooter>
                     </Card>
                 </div>
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4">
-                    <Card className="flex flex-col w-full">
+                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                    <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
                                 <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
@@ -230,6 +232,38 @@ export default function LiveRunHighlights() {
                                 Usage of machines in the factory
                             </div>
                         </CardFooter>
+                    </Card>
+                </div>
+                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                    <Card className="flex flex-col w-full h-[380px]">
+                        <CardHeader className="items-center pb-0">
+                            <CardDescription>
+                                <p className="text-sm text-card-foreground -mt-3 uppercase">Production Reports</p>
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ScrollArea className="pr-4">
+                                {Array.from({ length: 5 }).map((_, index) => (
+                                    <div key={index} className="flex items-center justify-between py-4 border-b last:border-b-0">
+                                        <div className="flex items-center space-x-4">
+                                            <FileText className="stroke-card-foreground" strokeWidth={1} size={22} />
+                                            <div className="flex flex-col gap-1">
+                                                <Skeleton className="w-3/4 h-4 rounded-full bg-red-500" />
+                                                <Skeleton className="w-1/2 h-4 rounded-full bg-red-500" />
+                                            </div>
+                                        </div>
+                                        <Button
+                                            className="h-8 w-8"
+                                            variant="ghost"
+                                            size="icon"
+                                            disabled>
+                                            <ArrowDownToLine className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                            <span className="sr-only">Download report</span>
+                                        </Button>
+                                    </div>
+                                ))}
+                            </ScrollArea>
+                        </CardContent>
                     </Card>
                 </div>
             </div>

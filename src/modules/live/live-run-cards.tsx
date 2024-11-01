@@ -100,6 +100,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	const {
 		name: componentName,
+		code: componentCode,
 		photoURL,
 		targetTime,
 	} = componentInProduction
@@ -333,6 +334,8 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		)
 	}
 
+	console.log(String(currentProduction)?.replace('.00', ''), String(targetProduction)?.replace('.00', '')?.replace(',', ''))
+
 	return (
 		<motion.div
 			className='bg-card rounded'
@@ -375,17 +378,19 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							</div>
 							<div className="flex items-center justify-between w-full gap-2 flex-col">
 								<div className="flex items-center justify-between w-full gap-2">
-									<div className="flex flex-col">
-										<span className="text-card-foreground text-[12px] md:text-[18px] font-medium uppercase flex items-center gap-1">
+									<div className="flex flex-col w-1/2">
+										<span className="text-card-foreground text-[11px] md:text-[18px] font-medium uppercase flex items-center gap-1">
 											{machineName} {machineNumber}
 										</span>
+									</div>
+									<div className="w-1/2 flex items-end justify-end">
+										<span className="text-card-foreground text-[10px] text-right md:text-[12px] font-medium uppercase">{componentCode}</span>
+									</div>
+								</div>
+								<div className="flex items-start justify-start -mt-2 w-full gap-2">
 										<span className="text-card-foreground text-[10px] md:text-[12px] -mt-1 flex-col flex">
 											{eventTimeStamp ? formatDistanceToNow(new Date(eventTimeStamp), { addSuffix: true }) : ''}
 										</span>
-									</div>
-									<div className="flex flex-col items-end justify-end">
-										<span className="text-card-foreground text-[10px] text-right md:text-[12px] font-medium uppercase">{componentName?.slice(0, 10)}</span>
-									</div>
 								</div>
 								<div className="flex items-center gap-2 justify-between gap-2 w-full">
 									<div className="flex items-center gap-0 flex-col">
@@ -412,14 +417,14 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 											}
 											<span className="text-card-foreground text-[11px] uppercase">{machineFirstReportTime?.slice(15, 25)}</span>
 										</p>
-										<p className="text-card-foreground text-[15px] font-medium uppercase">
-											<span className="text-card-foreground text-[15px] font-medium uppercase">{currentProduction}</span>
+										<p className="text-card-foreground text-[10px] md:text-[15px] font-medium uppercase">
+											<span className="text-card-foreground text-[10px] md:text-[15px] font-medium uppercase">{currentProduction}</span>
 											/
-											<span className="text-card-foreground text-[15px] font-medium uppercase">{targetProduction}</span>
-											<span className="text-card-foreground text-[10px]"> units</span>
+											<span className="text-card-foreground text-[10px] md:text-[15px] font-medium uppercase">{targetProduction}</span>
+											<span className="text-card-foreground text-[8px] md:text-[12px]"> units</span>
 										</p>
 									</div>
-									<Progress value={((currentProduction || 0) / (targetProduction || 1)) * 100} />
+									<Progress value={((Number(String(currentProduction)?.replace('.00', '')) || 0) / (Number(String(targetProduction)?.replace('.00', '')?.replace(',', '')) || 1) * 100)} />
 								</div>
 							</div>
 						</CardContent>
