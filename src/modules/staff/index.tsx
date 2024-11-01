@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -54,6 +54,7 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useStaffStore } from './state/state'
 
 // Sample user data
 const initialUsers = [
@@ -69,7 +70,7 @@ const initialUsers = [
         "phoneNumber": "0739590288",
         "status": "Active" as const
     }
-]       
+]
 
 // Validation schema
 const userSchema = z.object({
@@ -86,17 +87,34 @@ const userSchema = z.object({
 type UserFormData = z.infer<typeof userSchema>
 
 export default function StaffManagement() {
-    const [users, setUsers] = useState<Array<UserFormData & { uid: number, password: string }>>(initialUsers)
-    const [searchTerm, setSearchTerm] = useState('')
-    const [statusFilter, setStatusFilter] = useState('All')
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(8) // Update 1: Initial itemsPerPage is now 8
-    const [isCreateUserOpen, setIsCreateUserOpen] = useState(false)
-    const [isEditUserOpen, setIsEditUserOpen] = useState(false)
-    const [isViewUserOpen, setIsViewUserOpen] = useState(false)
-    const [editingUser, setEditingUser] = useState<(UserFormData & { uid: number, password: string }) | null>(null)
-    const [viewingUser, setViewingUser] = useState<(UserFormData & { uid: number, password: string }) | null>(null)
+    const {
+        users,
+        searchTerm,
+        statusFilter,
+        currentPage,
+        itemsPerPage,
+        isCreateUserOpen,
+        isEditUserOpen,
+        isViewUserOpen,
+        editingUser,
+        viewingUser,
+        setUsers,
+        setSearchTerm,
+        setStatusFilter,
+        setCurrentPage,
+        setItemsPerPage,
+        setIsCreateUserOpen,
+        setIsEditUserOpen,
+        setIsViewUserOpen,
+        setEditingUser,
+        setViewingUser,
+    } = useStaffStore();
     const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+    // Initialize users
+    useEffect(() => {
+        setUsers(initialUsers);
+    }, [setUsers]);
 
     const filteredUsers = users.filter(user =>
         (user.name.toLowerCase() + ' ' + user.lastName.toLowerCase()).includes(searchTerm.toLowerCase()) &&
@@ -312,7 +330,7 @@ export default function StaffManagement() {
                     <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                         disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
@@ -320,7 +338,7 @@ export default function StaffManagement() {
                     <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
+                        onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
                         disabled={currentPage === pageCount}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -331,6 +349,7 @@ export default function StaffManagement() {
 
     const UserForm = ({ user = null, onSubmit }: { user?: UserFormData | null; onSubmit: (data: UserFormData) => void }) => {
         const [imagePreview, setImagePreview] = useState(user?.photoURL || '/placeholder.svg?height=100&width=100')
+
         const { register, handleSubmit, formState: { errors } } = useForm<UserFormData>({
             resolver: zodResolver(userSchema),
             defaultValues: user || {},
