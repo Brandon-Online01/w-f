@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import {
-    Search, 
+    Search,
     ChevronLeft,
     ChevronRight,
     MoreVertical,
@@ -17,6 +17,7 @@ import {
     Grid,
     Palette,
     Activity,
+    Component,
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -75,7 +76,7 @@ const initialComponents = [
         "palletQty": 10,
         "testMachine": "Test Machine A",
         "masterBatch": 2,
-        "status": "Active",
+        "status": "Active" as const,
         "createdAt": "2023-01-01T00:00:00Z",
         "updatedAt": "2023-01-02T00:00:00Z"
     },
@@ -439,6 +440,86 @@ export default function ComponentManager() {
         )
     }
 
+    const ComponentCard = ({ component }: { component: ComponentFormData }) => {
+        return (
+            <Card key={component.code} className="overflow-hidden">
+                <CardContent className="p-0">
+                    <div className="flex flex-col items-center">
+                        <div className="w-full h-32 flex items-center justify-center bg-gray-100">
+                            <Avatar className="h-24 w-24">
+                                <AvatarImage src={component.photoURL} alt={component.name} />
+                                <AvatarFallback>{component.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                        </div>
+                        <div className="p-4 w-full">
+                            <div className="flex items-center mb-2">
+                                <Component className="mr-2" strokeWidth={1.5} size={18} />
+                                <h3 className="font-semibold text-card-foreground">{component.name}</h3>
+                            </div>
+                            <div className="flex items-center mb-2">
+                                <Clock className="h-4 w-4 mr-2 text-card-foreground" />
+                                <p className="text-sm text-card-foreground">Cycle Time: {component.cycleTime}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <Activity className="h-4 w-4 mr-2 text-card-foreground" />
+                                    <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${component.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                        }`}>
+                                        {component.status}
+                                    </span>
+                                </div>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                            <MoreVertical className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => handleEditClick(component)}>
+                                            <Edit className="mr-2 h-4 w-4" />
+                                            Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => {
+                                            const typedComponent: ComponentFormData = {
+                                                name: component.name,
+                                                description: component.description,
+                                                weight: component.weight,
+                                                volume: component.volume,
+                                                code: component.code,
+                                                color: component.color,
+                                                cycleTime: component.cycleTime,
+                                                targetTime: component.targetTime,
+                                                coolingTime: component.coolingTime,
+                                                chargingTime: component.chargingTime,
+                                                cavity: component.cavity,
+                                                configuration: component.configuration,
+                                                configQTY: component.configQTY,
+                                                palletQty: component.palletQty,
+                                                testMachine: component.testMachine,
+                                                masterBatch: component.masterBatch,
+                                                status: component.status as "Active" | "Inactive",
+                                                photoURL: component.photoURL
+                                            };
+                                            setViewingComponent(typedComponent);
+                                            setIsViewComponentOpen(true);
+                                        }}>
+                                            <Eye className="mr-2 h-4 w-4" />
+                                            View
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => handleDeleteComponent(Number(component?.code))}>
+                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
+
     const PageControls = () => {
         return (
             <div className="flex justify-between items-center">
@@ -510,83 +591,7 @@ export default function ComponentManager() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedComponents.map(component => (
-                    <Card key={component.id} className="overflow-hidden">
-                        <CardContent className="p-0">
-                            <div className="flex flex-col items-center">
-                                <div className="w-full h-32 flex items-center justify-center bg-gray-100">
-                                    <Avatar className="h-24 w-24">
-                                        <AvatarImage src={component.photoURL} alt={component.name} />
-                                        <AvatarFallback>{component.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                </div>
-                                <div className="p-4 w-full">
-                                    <div className="flex items-center mb-2">
-                                        <ComponentIcon className="mr-2" strokeWidth={1.5} size={18} />
-                                        <h3 className="font-semibold text-card-foreground">{component.name}</h3>
-                                    </div>
-                                    <div className="flex items-center mb-2">
-                                        <Clock className="h-4 w-4 mr-2 text-card-foreground" />
-                                        <p className="text-sm text-card-foreground">Cycle Time: {component.cycleTime}</p>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center">
-                                            <Activity className="h-4 w-4 mr-2 text-card-foreground" />
-                                            <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${component.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                                }`}>
-                                                {component.status}
-                                            </span>
-                                        </div>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onSelect={() => handleEditClick(component)}>
-                                                    <Edit className="mr-2 h-4 w-4" />
-                                                    Edit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onSelect={() => {
-                                                    const typedComponent: ComponentFormData = {
-                                                        name: component.name,
-                                                        description: component.description,
-                                                        weight: component.weight,
-                                                        volume: component.volume,
-                                                        code: component.code,
-                                                        color: component.color,
-                                                        cycleTime: component.cycleTime,
-                                                        targetTime: component.targetTime,
-                                                        coolingTime: component.coolingTime,
-                                                        chargingTime: component.chargingTime,
-                                                        cavity: component.cavity,
-                                                        configuration: component.configuration,
-                                                        configQTY: component.configQTY,
-                                                        palletQty: component.palletQty,
-                                                        testMachine: component.testMachine,
-                                                        masterBatch: component.masterBatch,
-                                                        status: component.status as "Active" | "Inactive",
-                                                        photoURL: component.photoURL
-                                                    };
-                                                    setViewingComponent(typedComponent);
-                                                    setIsViewComponentOpen(true);
-                                                }}>
-                                                    <Eye className="mr-2 h-4 w-4" />
-                                                    View
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onSelect={() => handleDeleteComponent(component.id)}>
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
+                {paginatedComponents.map((component, index) => <ComponentCard key={index} component={component} />)}
             </div>
             <PageControls />
             <EditComponentModal />
