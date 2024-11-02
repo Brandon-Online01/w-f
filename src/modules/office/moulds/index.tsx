@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { 
+import {
     Search,
     ChevronLeft,
     ChevronRight,
@@ -43,9 +43,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { 
-    useForm, 
-    SubmitHandler 
+import {
+    useForm,
+    SubmitHandler
 } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -61,7 +61,7 @@ const initialMoulds = [
         "mileage": 1000,
         "servicingMileage": 1500,
         "component": 1,
-        "status": "Active"
+        "status": "Active" as const
     },
     // Add more sample moulds here...
 ]
@@ -92,7 +92,7 @@ interface Mould {
 }
 
 export default function MouldManager() {
-    const [moulds, setMoulds] = useState(initialMoulds)
+    const [moulds] = useState(initialMoulds)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('All')
     const [currentPage, setCurrentPage] = useState(1)
@@ -114,15 +114,7 @@ export default function MouldManager() {
         currentPage * itemsPerPage
     )
 
-    const handleCreateMould: SubmitHandler<MouldFormData> = (data) => {
-        const newMould = {
-            id: moulds.length + 1,
-            ...data,
-            creationDate: new Date().toISOString(),
-        }
-        setMoulds([...moulds, newMould])
-        setIsCreateMouldOpen(false)
-    }
+    const handleCreateMould: SubmitHandler<MouldFormData> = (data) => console.log('create mould with data ', data)
 
     const handleEditMould: SubmitHandler<MouldFormData> = (data) => console.log('edit mould with data ', data)
 
@@ -373,7 +365,10 @@ export default function MouldManager() {
                                                 Edit
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onSelect={() => {
-                                                setViewingMould(mould)
+                                                setViewingMould({
+                                                    ...mould,
+                                                    status: mould.status as "Active" | "Inactive" | "Maintenance"
+                                                })
                                                 setIsViewMouldOpen(true)
                                             }}>
                                                 <Eye className="mr-2 h-4 w-4" />
@@ -434,7 +429,10 @@ export default function MouldManager() {
                     <DialogHeader>
                         <DialogTitle>Edit Mould</DialogTitle>
                     </DialogHeader>
-                    {editingMould && <MouldForm mould={editingMould as unknown as MouldFormData} onSubmit={handleEditMould} />}
+                    {editingMould && <MouldForm 
+                        mould={{...editingMould, status: editingMould.status as "Active" | "Inactive" | "Maintenance"}} 
+                        onSubmit={handleEditMould} 
+                    />}
                 </DialogContent>
             </Dialog>
 

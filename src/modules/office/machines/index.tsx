@@ -1,7 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, ChevronLeft, ChevronRight, MoreVertical, Edit, Eye, Trash2, Server, Activity, Calendar, Hash, Wifi, ServerCrash, ServerOff, ServerCogIcon, ServerCog } from 'lucide-react'
+import {
+    Search,
+    ChevronLeft,
+    ChevronRight,
+    MoreVertical,
+    Edit,
+    Eye,
+    Trash2,
+    Server,
+    Activity,
+    Hash,
+    Wifi,
+    ServerCrash,
+    ServerOff,
+    ServerCog,
+} from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -19,7 +34,7 @@ const initialMachines = [
         "id": 1,
         "name": "Machine A",
         "machineNumber": "MACHINE-001",
-        "macAddress": "00:1B:44:11:3A:B7",  
+        "macAddress": "00:1B:44:11:3A:B7",
         "description": "This is a description of Machine A.",
         "creationDate": "2023-01-01T00:00:00Z",
         "status": "Active" as const
@@ -38,7 +53,7 @@ const machineSchema = z.object({
 type MachineFormData = z.infer<typeof machineSchema>
 
 export default function MachineManager() {
-    const [machines, setMachines] = useState(initialMachines)
+    const [machines] = useState(initialMachines)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('All')
     const [currentPage, setCurrentPage] = useState(1)
@@ -47,7 +62,7 @@ export default function MachineManager() {
     const [isEditMachineOpen, setIsEditMachineOpen] = useState(false)
     const [isViewMachineOpen, setIsViewMachineOpen] = useState(false)
     const [editingMachine, setEditingMachine] = useState<MachineFormData | null>(null)
-    const [viewingMachine, setViewingMachine] = useState(null)
+    const [viewingMachine, setViewingMachine] = useState<MachineFormData | null>(null)
 
     const filteredMachines = machines.filter(machine =>
         machine.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -60,15 +75,7 @@ export default function MachineManager() {
         currentPage * itemsPerPage
     )
 
-    const handleCreateMachine: SubmitHandler<MachineFormData> = (data) => {
-        const newMachine = {
-            id: machines.length + 1,
-            ...data,
-            creationDate: new Date().toISOString(),
-        }
-        setMachines([...machines, newMachine])
-        setIsCreateMachineOpen(false)
-    }
+    const handleCreateMachine: SubmitHandler<MachineFormData> = (data) => console.log('create machine with data ', data)
 
     const handleEditMachine: SubmitHandler<MachineFormData> = (data) => console.log('edit machine with data ', data)
 

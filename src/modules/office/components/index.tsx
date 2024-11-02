@@ -85,7 +85,7 @@ const initialComponents = [
 type ComponentFormData = z.infer<typeof componentSchema>
 
 export default function ComponentManager() {
-    const [components, setComponents] = useState(initialComponents)
+    const [components] = useState(initialComponents)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('All')
     const [currentPage, setCurrentPage] = useState(1)
@@ -352,7 +352,7 @@ export default function ComponentManager() {
         </div>
     )
 
-    const handleEditClick = (component: any) => {
+    const handleEditClick = (component: ComponentFormData) => {
         const editableComponent: ComponentFormData = {
             name: component.name,
             description: component.description,
