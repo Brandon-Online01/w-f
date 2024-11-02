@@ -60,8 +60,7 @@ import * as z from "zod"
 import { newUserSchema, editUserSchema } from '@/schemas/user'
 import { userList } from '@/data/data'
 import { useStaffStore } from '../state/state'
-import { createUser } from '../helpers/staff'
-import { NewUserType } from '@/types/user'  
+import { NewUserType } from '@/types/user'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
@@ -88,7 +87,6 @@ export default function StaffManagement() {
         setIsViewUserOpen,
         setEditingUser,
         setViewingUser,
-        setIsLoading,
     } = useStaffStore();
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -112,28 +110,15 @@ export default function StaffManagement() {
         currentPage * itemsPerPage
     )
 
-    const handleCreateUser: SubmitHandler<NewUserType> = async (data) => {
-        setIsLoading(true)
-        const newUser = {
-            ...data,
-            photoURL: data.photoURL || '/placeholder.svg?height=100&width=100',
-        }
-
-        const userCreationStatus = await createUser(newUser)
-
-        console.log(userCreationStatus ? 'User created successfully' : 'User creation failed')
-
-        setIsLoading(false)
-
-    }
+    const handleCreateUser: SubmitHandler<NewUserType> = async (data) => console.log(data)
 
     const handleEditUser: SubmitHandler<UserFormData> = (data) => {
         const updatedUser = {
             ...editingUser!,
             ...data,
         }
-        setUsers(users.map(user => user.uid === updatedUser.uid ? updatedUser : user))
-        setEditingUser(null)
+
+        console.log(updatedUser, 'as updated user data')
     }
 
     const handleDeleteUser = (uid: number) => console.log(uid, '- delete the user with this uid')
@@ -443,7 +428,7 @@ export default function StaffManagement() {
                         {errors?.status && <p className="text-red-500 text-xs mt-1">{errors?.status?.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-10/12 mx-auto flex">
                     {
                         isLoading ? <Loader2 className="mr-2 animate-spin stroke-white" strokeWidth={1.5} size={18} /> :
                             <>

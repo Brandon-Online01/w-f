@@ -153,7 +153,7 @@ export default function StaffManagement() {
                         <Input
                             type="text"
                             placeholder="Search users..."
-                            className="pl-8"
+                            className="pl-8 text-[16px]"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />

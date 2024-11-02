@@ -33,12 +33,12 @@ export default function Home() {
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <LiveRunHighlights />
-                <div className="w-full h-full bg-card p-2 rounded overflow-y-auto mt-4">
+                <div className="w-full h-full bg-card p-1 rounded overflow-y-auto mt-4">
                     <Tabs defaultValue="staff" className="w-full overflow-hidden h-full">
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>
-                        <TabsContent value="staff" className="w-full">
+                        <TabsContent value="staff" className="w-full bg-background p-1 rounded">
                             <StaffTab />
                         </TabsContent>
                         <TabsContent value="components" className="w-full">

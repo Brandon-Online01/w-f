@@ -6,7 +6,6 @@ export const createUser = async (newUser: NewUserType) => {
     try {
         const url = `${process.env.NEXT_PUBLIC_API_URL}/users`
         const { data } = await axios.post(url, newUser)
-
         if (data?.status === 'Success') {
             toast(`${data?.message}`,
                 {

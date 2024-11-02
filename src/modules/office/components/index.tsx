@@ -1,5 +1,5 @@
 export default function ComponentsManagement() {
     return (
-        <div>Office Components</div>
+        <div className="w-full h-full flex p-2 bg-background">Office Components</div>
     )
 }
