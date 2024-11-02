@@ -49,11 +49,13 @@ import {
 } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { mouldSchema } from '@/schemas/mould'
+import { Mould } from '@/types/mould'
 
 // Sample mould data
 const initialMoulds = [
     {
-        "id": 1,
+        "uid": 1,
         "name": "Mould A",
         "serialNumber": "MOULD-001",
         "creationDate": "2023-01-01T00:00:00Z",
@@ -63,33 +65,9 @@ const initialMoulds = [
         "component": 1,
         "status": "Active" as const
     },
-    // Add more sample moulds here...
 ]
 
-// Validation schema
-const mouldSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    serialNumber: z.string().min(3, "Serial number must be at least 3 characters"),
-    lastRepairDate: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/, "Invalid date format"),
-    mileage: z.number().nonnegative("Mileage must be non-negative"),
-    servicingMileage: z.number().positive("Servicing mileage must be positive"),
-    component: z.number().positive("Component ID must be positive"),
-    status: z.enum(["Active", "Inactive", "Maintenance"], { required_error: "Status is required" }),
-})
-
 type MouldFormData = z.infer<typeof mouldSchema>
-
-interface Mould {
-    id: number;
-    name: string;
-    serialNumber: string;
-    creationDate: string;
-    lastRepairDate: string;
-    mileage: number;
-    servicingMileage: number;
-    component: number;
-    status: "Active" | "Inactive" | "Maintenance";
-}
 
 export default function MouldManager() {
     const [moulds] = useState(initialMoulds)
@@ -256,9 +234,8 @@ export default function MouldManager() {
         </div>
     )
 
-    return (
-        <div className="w-full flex flex-col justify-start gap-2">
-            {/* Header Section */}
+    const PageHeader = () => {
+        return (
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="flex w-full sm:w-auto space-x-2">
                     <div className="relative flex-grow w-64 sm:w-96">
@@ -323,71 +300,79 @@ export default function MouldManager() {
                     </DialogContent>
                 </Dialog>
             </div>
+        )
+    }
 
-            {/* Mould Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedMoulds.map(mould => (
-                    <Card key={mould.id} className="overflow-hidden">
-                        <CardContent className="p-4">
-                            <div className="flex flex-col space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <Stamp className="h-5 w-5 text-card-foreground" />
-                                        <h3 className="font-semibold">{mould.name}</h3>
-                                    </div>
-                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${mould.status === 'Active' ? 'bg-green-100 text-green-800' :
-                                        mould.status === 'Inactive' ? 'bg-red-100  text-red-800' : 'bg-yellow-100 text-yellow-800'
-                                        }`}>
-                                        {mould.status}
-                                    </span>
-                                </div>
-                                <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                                    <Hash className="h-4 w-4" />
-                                    <span>{mould.serialNumber}</span>
-                                </div>
-                                <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                                    <Gauge className="h-4 w-4" />
-                                    <span>Mileage: {mould.mileage}</span>
-                                </div>
-                                <div className="flex justify-end">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <MoreVertical className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onSelect={() => {
-                                                setEditingMould(mould)
-                                                setIsEditMouldOpen(true)
-                                            }}>
-                                                <Edit className="mr-2 h-4 w-4" />
-                                                Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => {
-                                                setViewingMould({
-                                                    ...mould,
-                                                    status: mould.status as "Active" | "Inactive" | "Maintenance"
-                                                })
-                                                setIsViewMouldOpen(true)
-                                            }}>
-                                                <Eye className="mr-2 h-4 w-4" />
-                                                View
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => handleDeleteMould(mould.id)}>
-                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
+    const MouldCard = ({ mould }: { mould: MouldFormData }) => {
+        return (
+            <Card key={mould?.serialNumber} className="overflow-hidden">
+                <CardContent className="p-4">
+                    <div className="flex flex-col space-y-2">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                                <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                <h3 className="font-semibold">{mould.name}</h3>
                             </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${mould.status === 'Active' ? 'bg-green-100 text-green-800' :
+                                mould.status === 'Inactive' ? 'bg-red-100  text-red-800' : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                {mould.status}
+                            </span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                            <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <span>{mould.serialNumber}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                            <Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <span>Mileage: {mould.mileage}</span>
+                        </div>
+                        <div className="flex justify-end">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onSelect={() => {
+                                        setEditingMould({
+                                            ...mould,
+                                            uid: Number(mould.serialNumber),
+                                            creationDate: new Date().toISOString()
+                                        })
+                                        setIsEditMouldOpen(true)
+                                    }}>
+                                        <Edit className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                        Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => {
+                                        setViewingMould({
+                                            ...mould,
+                                            uid: Number(mould?.serialNumber),
+                                            creationDate: new Date().toISOString(),
+                                            status: mould.status as "Active" | "Inactive" | "Maintenance"
+                                        })
+                                        setIsViewMouldOpen(true)
+                                    }}>
+                                        <Eye className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                        View
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => handleDeleteMould(Number(mould?.serialNumber))}>
+                                        <Trash2 className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
-            {/* Pagination Controls */}
+    const PageControls = () => {
+        return (
             <div className="flex justify-between items-center">
                 <Select
                     value={itemsPerPage.toString()}
@@ -422,21 +407,28 @@ export default function MouldManager() {
                     </Button>
                 </div>
             </div>
+        )
+    }
 
-            {/* Edit Mould Modal */}
+    //modals
+    const EditMouldModal = () => {
+        return (
             <Dialog open={isEditMouldOpen} onOpenChange={setIsEditMouldOpen}>
                 <DialogContent className="sm:max-w-[700px]">
                     <DialogHeader>
                         <DialogTitle>Edit Mould</DialogTitle>
                     </DialogHeader>
-                    {editingMould && <MouldForm 
-                        mould={{...editingMould, status: editingMould.status as "Active" | "Inactive" | "Maintenance"}} 
-                        onSubmit={handleEditMould} 
+                    {editingMould && <MouldForm
+                        mould={{ ...editingMould, status: editingMould.status as "Active" | "Inactive" | "Maintenance" }}
+                        onSubmit={handleEditMould}
                     />}
                 </DialogContent>
             </Dialog>
+        )
+    }
 
-            {/* View Mould Modal */}
+    const ViewMouldDetailModal = () => {
+        return (
             <Dialog open={isViewMouldOpen} onOpenChange={setIsViewMouldOpen}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
@@ -445,6 +437,18 @@ export default function MouldManager() {
                     {viewingMould && <ViewMouldModal mould={viewingMould} />}
                 </DialogContent>
             </Dialog>
+        )
+    }
+
+    return (
+        <div className="w-full flex flex-col justify-start gap-2">
+            <PageHeader />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {paginatedMoulds.map((mould, index) => <MouldCard mould={mould} key={index} />)}
+            </div>
+            <PageControls />
+            <EditMouldModal />
+            <ViewMouldDetailModal />
         </div>
     )
 }

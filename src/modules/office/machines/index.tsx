@@ -81,12 +81,12 @@ export default function MachineManager() {
 
     const handleDeleteMachine = (referenceID: number) => console.log('delete machine with reference ID ', referenceID)
 
-    const MachineForm = ({ 
-        machine = null, 
-        onSubmit 
-    }: { 
-        machine?: MachineFormData | null, 
-        onSubmit: SubmitHandler<MachineFormData> 
+    const MachineForm = ({
+        machine = null,
+        onSubmit
+    }: {
+        machine?: MachineFormData | null,
+        onSubmit: SubmitHandler<MachineFormData>
     }) => {
         const { register, handleSubmit, formState: { errors } } = useForm<MachineFormData>({
             resolver: zodResolver(machineSchema),
@@ -174,9 +174,8 @@ export default function MachineManager() {
         </div>
     )
 
-    return (
-        <div className="w-full flex flex-col justify-start gap-2">
-            {/* Header Section */}
+    const PageHeader = () => {
+        return (
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="flex w-full sm:w-auto space-x-2">
                     <div className="relative flex-grow w-64 sm:w-96">
@@ -235,67 +234,69 @@ export default function MachineManager() {
                     </DialogContent>
                 </Dialog>
             </div>
+        )
+    }
 
-            {/* Machine Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedMachines.map(machine => (
-                    <Card key={machine.id} className="overflow-hidden">
-                        <CardContent className="p-4">
-                            <div className="flex flex-col space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <Server className="h-5 w-5 text-card-foreground" />
-                                        <h3 className="font-semibold">{machine.name}</h3>
-                                    </div>
-                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${machine.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                        }`}>
-                                        {machine.status}
-                                    </span>
-                                </div>
-                                <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                                    <Hash className="h-4 w-4" />
-                                    <span>{machine.machineNumber}</span>
-                                </div>
-                                <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                                    <Wifi className="h-4 w-4" />
-                                    <span>{machine.macAddress}</span>
-                                </div>
-                                <div className="flex justify-end">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                                <MoreVertical className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onSelect={() => {
-                                                setEditingMachine(machine)
-                                                setIsEditMachineOpen(true)
-                                            }}>
-                                                <Edit className="mr-2 h-4 w-4" />
-                                                Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => {
-                                                setViewingMachine(machine)
-                                                setIsViewMachineOpen(true)
-                                            }}>
-                                                <Eye className="mr-2 h-4 w-4" />
-                                                View
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => handleDeleteMachine(machine.id)}>
-                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
+    const MachineCard = ({ machine }: { machine: MachineFormData }) => {
+        return (
+            <Card key={machine.machineNumber} className="overflow-hidden">
+                <CardContent className="p-4">
+                    <div className="flex flex-col space-y-2">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                                <Server className="h-5 w-5 text-card-foreground" />
+                                <h3 className="font-semibold">{machine.name}</h3>
                             </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${machine.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }`}>
+                                {machine.status}
+                            </span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                            <Hash className="h-4 w-4" />
+                            <span>{machine.machineNumber}</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                            <Wifi className="h-4 w-4" />
+                            <span>{machine.macAddress}</span>
+                        </div>
+                        <div className="flex justify-end">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onSelect={() => {
+                                        setEditingMachine(machine)
+                                        setIsEditMachineOpen(true)
+                                    }}>
+                                        <Edit className="mr-2 h-4 w-4" />
+                                        Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => {
+                                        setViewingMachine(machine)
+                                        setIsViewMachineOpen(true)
+                                    }}>
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        View
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.macAddress))}>
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
-            {/* Pagination Controls */}
+    const PageControls = () => {
+        return (
             <div className="flex justify-between items-center">
                 <Select
                     value={itemsPerPage.toString()}
@@ -330,8 +331,12 @@ export default function MachineManager() {
                     </Button>
                 </div>
             </div>
+        )
+    }
 
-            {/* Edit Machine Modal */}
+    //modals
+    const EditMachineModal = () => {
+        return (
             <Dialog open={isEditMachineOpen} onOpenChange={setIsEditMachineOpen}>
                 <DialogContent className="sm:max-w-[700px]">
                     <DialogHeader>
@@ -340,8 +345,11 @@ export default function MachineManager() {
                     {editingMachine && <MachineForm machine={editingMachine} onSubmit={handleEditMachine} />}
                 </DialogContent>
             </Dialog>
+        )
+    }
 
-            {/* View Machine Modal */}
+    const ViewMachineDetailModal = () => {
+        return (
             <Dialog open={isViewMachineOpen} onOpenChange={setIsViewMachineOpen}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
@@ -350,6 +358,18 @@ export default function MachineManager() {
                     {viewingMachine && <ViewMachineModal machine={viewingMachine} />}
                 </DialogContent>
             </Dialog>
+        )
+    }
+
+    return (
+        <div className="w-full flex flex-col justify-start gap-2">
+            <PageHeader />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {paginatedMachines?.map(machine => <MachineCard machine={machine} key={machine?.machineNumber} />)}
+            </div>
+            <PageControls />
+            <EditMachineModal />
+            <ViewMachineDetailModal />
         </div>
     )
 }
