@@ -17,6 +17,9 @@ import {
 	HeartHandshake,
 	Settings,
 	Search,
+	Kanban,
+	ChartLine,
+	FolderKanban,
 } from 'lucide-react'
 import {
 	Card,
@@ -130,10 +133,30 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 	const TabListHeaders = () => {
 		return (
 			<>
-				<TabsTrigger value="overview">Overview</TabsTrigger>
-				{insertHistory?.length > 0 && <TabsTrigger value="performance">Performance</TabsTrigger>}
-				<TabsTrigger value="material">Material</TabsTrigger>
-				<TabsTrigger value="management" className='hidden md:block'>Management</TabsTrigger>
+				<TabsTrigger value="overview">
+					<span className="flex items-center gap-2">
+						<Kanban className="stroke-card-foreground" strokeWidth={1} size={18} />
+						Overview
+					</span>
+				</TabsTrigger>
+				{insertHistory?.length > 0 && <TabsTrigger value="performance">
+					<span className="flex items-center gap-2">
+						<ChartLine className="stroke-card-foreground" strokeWidth={1} size={18} />
+						Performance
+					</span>
+				</TabsTrigger>}
+				<TabsTrigger value="material">
+					<span className="flex items-center gap-2">
+						<Weight className="stroke-card-foreground" strokeWidth={1} size={18} />
+						Material
+					</span>
+				</TabsTrigger>
+				<TabsTrigger value="management" className='hidden md:block'>
+					<span className="flex items-center gap-2">
+						<FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
+						Management
+					</span>
+				</TabsTrigger>
 			</>
 		)
 	}
@@ -386,9 +409,9 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 									</div>
 								</div>
 								<div className="flex items-start justify-start -mt-2 w-full gap-2">
-										<span className="text-card-foreground text-[10px] md:text-[12px] -mt-1 flex-col flex">
-											{eventTimeStamp ? formatDistanceToNow(new Date(eventTimeStamp), { addSuffix: true }) : ''}
-										</span>
+									<span className="text-card-foreground text-[10px] md:text-[12px] -mt-1 flex-col flex">
+										{eventTimeStamp ? formatDistanceToNow(new Date(eventTimeStamp), { addSuffix: true }) : ''}
+									</span>
 								</div>
 								<div className="flex items-center gap-2 justify-between gap-2 w-full">
 									<div className="flex items-center gap-0 flex-col">

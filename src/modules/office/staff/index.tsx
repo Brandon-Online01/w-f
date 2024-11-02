@@ -18,7 +18,8 @@ import {
     UserPen,
     UserSearch,
     UserX,
-    Loader2
+    Loader2,
+    PenSquare
 } from 'lucide-react'
 import { Phone, UserCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -112,14 +113,7 @@ export default function StaffManagement() {
 
     const handleCreateUser: SubmitHandler<NewUserType> = async (data) => console.log(data)
 
-    const handleEditUser: SubmitHandler<UserFormData> = (data) => {
-        const updatedUser = {
-            ...editingUser!,
-            ...data,
-        }
-
-        console.log(updatedUser, 'as updated user data')
-    }
+    const handleEditUser: SubmitHandler<UserFormData> = (data) => console.log(data, 'as updated user data')
 
     const handleDeleteUser = (uid: number) => console.log(uid, '- delete the user with this uid')
 
@@ -145,7 +139,7 @@ export default function StaffManagement() {
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
                             type="text"
-                            placeholder="Search users..."
+                            placeholder="search users..."
                             className="pl-8"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -179,8 +173,8 @@ export default function StaffManagement() {
                 </div>
                 <Dialog open={isCreateUserOpen} onOpenChange={setIsCreateUserOpen}>
                     <DialogTrigger asChild>
-                        <div className='w-full flex items-end justify-end'>
-                            <Button className="w-full sm:w-1/4">
+                        <div className='w-full flex items-end justify-end lg:w-64'>
+                            <Button className="w-full ">
                                 <UserPlus className="mr-2 h-4 w-4" /> Create User
                             </Button>
                         </div>
@@ -397,9 +391,24 @@ export default function StaffManagement() {
                                     <SelectValue placeholder="Select a role" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Admin">Admin</SelectItem>
-                                    <SelectItem value="User">User</SelectItem>
-                                    <SelectItem value="Editor">Editor</SelectItem>
+                                    <SelectItem value="Admin">
+                                        <span className="flex items-center gap-2">
+                                            <Shield className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                            Admin
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value="User">
+                                        <span className="flex items-center gap-2">
+                                            <User className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                            User
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value="Editor">
+                                        <span className="flex items-center gap-2">
+                                            <Edit className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                            Editor
+                                        </span>
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -420,8 +429,18 @@ export default function StaffManagement() {
                                     <SelectValue placeholder="Select a status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Active">Active</SelectItem>
-                                    <SelectItem value="Inactive">Inactive</SelectItem>
+                                    <SelectItem value="Active">
+                                        <span className="flex items-center gap-2">
+                                            <Activity className="stroke-success" strokeWidth={1} size={18} />
+                                            Active
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value="Inactive">
+                                        <span className="flex items-center gap-2">
+                                            <Activity className="stroke-destructive" strokeWidth={1} size={18} />
+                                            In Active
+                                        </span>
+                                    </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
