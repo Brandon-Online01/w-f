@@ -48,13 +48,17 @@ export default function Home() {
     }
 
     return (
-        <div className="flex flex-col items-start justify-start gap-2 h-full w-full overflow-y-scroll outline-none">
-            <ScrollArea className="h-full w-full pr-3">
-                <div className="flex flex-row items-center justify-start gap-2 px-1 w-full">
+        <div className="flex flex-col items-start justify-start gap-4 h-full w-full overflow-y-scroll outline-none">
+            <ScrollArea className="h-full w-full pr-3 flex flex-col justify-start gap-3">
+                <div className="flex flex-row items-center justify-start gap-2 px-1 w-full mb-3">
                     <p className="text-lg font-medium uppercase">Factory Assets</p>
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <LiveRunHighlights />
+                <div className="flex flex-row items-center justify-start gap-2 px-1 w-full my-3">
+                    <p className="text-lg font-medium uppercase">Management</p>
+                    <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
+                </div>
                 <div className="w-full h-full bg-card p-1 rounded overflow-y-auto mt-4">
                     <Tabs defaultValue="staff" className="w-full overflow-hidden h-full">
                         <TabsList>

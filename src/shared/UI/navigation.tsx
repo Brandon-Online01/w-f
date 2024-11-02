@@ -5,8 +5,8 @@ import Image from "next/image";
 import { usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import logoIcon from '../../assets/logo/waresense.png';
-import signOutIcon from '../../assets/icons/signout.png';
 import {
+    EllipsisIcon,
     FolderKanban,
     LayoutDashboard,
     Settings,
@@ -103,47 +103,12 @@ export const DesktopNavigation = () => {
                 ))}
             </ul>
             <ul className="flex w-full flex-col gap-5 relative">
-                {[
-                    { href: "/settings", Icon: Settings, ariaLabel: "Settings" },
-                    { component: ThemeModeToggler },
-                    { 
-                        onClick: signOut, 
-                        Icon: () => (
-                            <div className="relative group">
-                                <Image src={signOutIcon} alt="sign out" width={25} height={25} className="rounded-full" />
-                                <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-2">
-                                    <ul className="flex flex-col">
-                                        <li className="cursor-pointer p-2 hover:bg-gray-200" onClick={signOut}>Sign Out</li>
-                                        <li className="cursor-pointer p-2 hover:bg-gray-200">Change Warehouse</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        ) 
-                    },
-                ].map((item, index) => (
-                    <motion.li
-                        className="flex items-center justify-center cursor-pointer"
-                        key={index}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5, delay: (index + 4) * 0.1 }}>
-                        {item?.href ? (
-                            <Link href={item?.href} aria-label={item?.ariaLabel}>
-                                <item.Icon
-                                    className={`${pathname === item?.href ? 'stroke-primary' : 'stroke-card-foreground'}`}
-                                    size={18}
-                                    strokeWidth={1}
-                                />
-                            </Link>
-                        ) : item?.component ? (
-                            <item.component />
-                        ) : (
-                            <div onClick={item.onClick}>
-                                <item.Icon />
-                            </div>
-                        )}
-                    </motion.li>
-                ))}
+                <li className="flex items-center justify-center cursor-pointer">
+                    <ThemeModeToggler />
+                </li>
+                <li className="flex items-center justify-center cursor-pointer">
+                    <EllipsisIcon size={18} strokeWidth={1} className="stroke-card-foreground" />
+                </li>
             </ul>
         </div>
     )
