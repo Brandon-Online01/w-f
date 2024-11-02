@@ -7,8 +7,6 @@ import {
     ChevronRight,
     MoreVertical,
     Edit,
-    Eye,
-    Trash2,
     User,
     Shield,
     Users,
@@ -16,7 +14,10 @@ import {
     Upload,
     Mail,
     Activity,
-    IdCard
+    IdCard,
+    UserPen,
+    UserSearch,
+    UserX
 } from 'lucide-react'
 import { Phone, UserCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -55,36 +56,11 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useStaffStore } from './state/state'
+import { userList } from '@/data/data'
+import { newUserSchema } from '@/schemas/user'
+import userPlaceHolderIcon from '@/assets/svg/user-placeholder.svg'
 
-// Sample user data
-const initialUsers = [
-    {
-        "uid": 1,
-        "name": "Brandon",
-        "lastName": "Nkawu",
-        "email": "brandonnkawu01@gmail.com",
-        "username": "brandon",
-        "password": "$2b$10$aI4LDV9iu5HyytAlxfIM..pkSFes1OLGD8Kh.FHv/uQhNgJfBoF9y",
-        "role": "Admin" as const,
-        "photoURL": "https://storage.googleapis.com/hrs-docs/naartjie.png",
-        "phoneNumber": "0739590288",
-        "status": "Active" as const
-    }
-]
-
-// Validation schema
-const userSchema = z.object({
-    name: z.string().min(2, "First name must be at least 2 characters"),
-    lastName: z.string().min(2, "Last name must be at least 2 characters"),
-    email: z.string().email("Invalid email address"),
-    username: z.string().min(3, "Username must be at least 3 characters"),
-    role: z.enum(["Admin", "User", "Editor"], { required_error: "Role is required" }),
-    phoneNumber: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number"),
-    status: z.enum(["Active", "Inactive"], { required_error: "Status is required" }),
-    photoURL: z.string().optional(),
-})
-
-type UserFormData = z.infer<typeof userSchema>
+type UserFormData = z.infer<typeof newUserSchema>
 
 export default function StaffManagement() {
     const {
@@ -111,9 +87,12 @@ export default function StaffManagement() {
     } = useStaffStore();
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-    // Initialize users
     useEffect(() => {
-        setUsers(initialUsers);
+        const allUsers = async () => {
+            const users = await userList()
+            setUsers(users?.data)
+        }
+        allUsers()
     }, [setUsers]);
 
     const filteredUsers = users.filter(user =>
@@ -132,10 +111,12 @@ export default function StaffManagement() {
         const newUser = {
             uid: users.length + 1,
             ...data,
-            password: '', // In a real application, you'd handle password creation securely
+            password: '',
             photoURL: data.photoURL || '/placeholder.svg?height=100&width=100',
         }
-        setUsers([...users, newUser])
+
+        console.log(newUser)
+
         setIsCreateUserOpen(false)
     }
 
@@ -145,7 +126,6 @@ export default function StaffManagement() {
             ...data,
         }
         setUsers(users.map(user => user.uid === updatedUser.uid ? updatedUser : user))
-        setIsEditUserOpen(false)
         setEditingUser(null)
     }
 
@@ -206,9 +186,11 @@ export default function StaffManagement() {
                 </div>
                 <Dialog open={isCreateUserOpen} onOpenChange={setIsCreateUserOpen}>
                     <DialogTrigger asChild>
-                        <Button className="w-full sm:w-auto">
-                            <UserPlus className="mr-2 h-4 w-4" /> Create User
-                        </Button>
+                        <div className='w-full flex items-end justify-end'>
+                            <Button className="w-full sm:w-1/4">
+                                <UserPlus className="mr-2 h-4 w-4" /> Create User
+                            </Button>
+                        </div>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[700px] bg-card">
                         <DialogHeader>
@@ -225,6 +207,7 @@ export default function StaffManagement() {
         const { name, lastName, email, status, photoURL, uid } = user
 
         const userABBR = `${name.charAt(0)}${lastName.charAt(0)}`
+        const userPhoto = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
 
         return (
             <Card key={uid} className="overflow-hidden">
@@ -232,7 +215,7 @@ export default function StaffManagement() {
                     <div className="flex flex-col items-center">
                         <div className="w-full h-32 flex items-center justify-center bg-gray-100">
                             <Avatar className="h-24 w-24">
-                                <AvatarImage src={photoURL} alt={`${name} ${lastName}`} />
+                                <AvatarImage src={userPhoto} alt={`${name} ${lastName}`} />
                                 <AvatarFallback>{userABBR}</AvatarFallback>
                             </Avatar>
                         </div>
@@ -261,18 +244,18 @@ export default function StaffManagement() {
                                             setEditingUser(user)
                                             setIsEditUserOpen(true)
                                         }}>
-                                            <Edit className="mr-2 h-4 w-4" />
+                                            <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={17} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
                                             setViewingUser(user)
                                             setIsViewUserOpen(true)
                                         }}>
-                                            <Eye className="mr-2 h-4 w-4" />
+                                            <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={17} />
                                             View
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => handleDeleteUser(user.uid)}>
-                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            <UserX className="stroke-red-500 mr-2" strokeWidth={1.5} size={17} />
                                             Delete
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -292,7 +275,7 @@ export default function StaffManagement() {
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
                     </DialogHeader>
-                    {editingUser && <UserForm user={editingUser} onSubmit={handleEditUser} />}
+                    {editingUser && <UserForm user={{ ...editingUser, photoURL: editingUser.photoURL || '/placeholder.svg' }} onSubmit={handleEditUser} />}
                 </DialogContent>
             </Dialog>
         )
@@ -305,7 +288,7 @@ export default function StaffManagement() {
                     <DialogHeader>
                         <DialogTitle>User Details</DialogTitle>
                     </DialogHeader>
-                    {viewingUser && <ViewUserModal user={viewingUser} />}
+                    {viewingUser && <ViewUserModal user={viewingUser as UserFormData & { uid: number, password: string }} />}
                 </DialogContent>
             </Dialog>
         )
@@ -351,9 +334,11 @@ export default function StaffManagement() {
         const [imagePreview, setImagePreview] = useState(user?.photoURL || '/placeholder.svg?height=100&width=100')
 
         const { register, handleSubmit, formState: { errors } } = useForm<UserFormData>({
-            resolver: zodResolver(userSchema),
+            resolver: zodResolver(newUserSchema),
             defaultValues: user || {},
         })
+
+        const currentPhoto = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
 
         return (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-card">
@@ -362,7 +347,7 @@ export default function StaffManagement() {
                         <Label htmlFor="photoURL">User Image</Label>
                         <div className="flex items-center space-x-4">
                             <Avatar className="h-20 w-20">
-                                <AvatarImage src={imagePreview} alt="User avatar" />
+                                <AvatarImage src={currentPhoto} alt="User avatar" />
                                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                             <Input
@@ -405,6 +390,13 @@ export default function StaffManagement() {
                             <Input id="username" {...register("username")} placeholder="johndoe" />
                         </div>
                         {errors?.username && <p className="text-red-500 text-xs mt-1">{errors?.username?.message}</p>}
+                    </div>
+                    <div className="space-y-1">
+                        <div className='flex flex-col justify-start gap-1'>
+                            <Label htmlFor="password">Password</Label>
+                            <Input id="password" {...register("password")} placeholder="********" />
+                        </div>
+                        {errors?.password && <p className="text-red-500 text-xs mt-1">{errors?.password?.message}</p>}
                     </div>
                     <div className="space-y-1">
                         <div className='flex flex-col justify-start gap-1'>
@@ -452,12 +444,13 @@ export default function StaffManagement() {
 
     const ViewUserModal = ({ user }: { user: UserFormData & { uid: number, password: string } }) => {
         const { name, lastName, email, username, role, phoneNumber, status, photoURL } = user
+        const userPhoto = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
 
         return (
             <div className="space-y-6">
                 <div className="flex justify-center">
                     <Avatar className="h-32 w-32">
-                        <AvatarImage src={photoURL} alt={`${name} ${lastName}`} />
+                        <AvatarImage src={userPhoto} alt={`${name} ${lastName}`} />
                         <AvatarFallback>{name.charAt(0)}{lastName.charAt(0)}</AvatarFallback>
                     </Avatar>
                 </div>
@@ -513,7 +506,13 @@ export default function StaffManagement() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedUsers.map((user, index) => <UserCard key={index} user={user} />)}
+                {paginatedUsers.map((user, index) => {
+                    const userWithDefaultPhoto = {
+                        ...user,
+                        photoURL: user.photoURL || userPlaceHolderIcon,
+                    };
+                    return <UserCard key={index} user={userWithDefaultPhoto} />;
+                })}
             </div>
             <PaginationControls />
             <EditModal />

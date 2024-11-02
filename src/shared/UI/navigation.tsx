@@ -7,11 +7,10 @@ import { Button } from "@/components/ui/button";
 import logoIcon from '../../assets/logo/waresense.png';
 import signOutIcon from '../../assets/icons/signout.png';
 import {
-    Component,
+    FolderKanban,
     LayoutDashboard,
     Settings,
     TrendingUpDown,
-    Users,
 } from "lucide-react";
 import {
     Dialog,
@@ -57,17 +56,9 @@ export const MobileNavigation = () => {
                                 </ul>
                                 <ul className="flex w-full flex-col gap-5">
                                     <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/staff" className="flex items-center justify-center gap-2" aria-label="Staff">
-                                            <Users strokeWidth={1} size={18} className="stroke-card-foreground" />
-                                            <p>Staff</p>
-                                        </Link>
-                                    </li>
-                                </ul>
-                                <ul className="flex w-full flex-col gap-5">
-                                    <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/components" className="flex items-center justify-center gap-2" aria-label="Components">
-                                            <Component strokeWidth={1} size={18} className="stroke-card-foreground" />
-                                            <p>Components</p>
+                                        <Link href="/office" className="flex items-center justify-center gap-2" aria-label="Office">
+                                            <FolderKanban strokeWidth={1} size={18} className="stroke-card-foreground" />
+                                            <p>Office</p>
                                         </Link>
                                     </li>
                                 </ul>
@@ -93,8 +84,7 @@ export const DesktopNavigation = () => {
             <ul className="flex w-full flex-col gap-5">
                 {[
                     { href: "/", Icon: TrendingUpDown, ariaLabel: "Dashboard" },
-                    { href: "/staff", Icon: Users, ariaLabel: "Staff" },
-                    { href: "/components", Icon: Component, ariaLabel: "Components" },
+                    { href: "/office", Icon: FolderKanban, ariaLabel: "Office" },
                 ].map((item, index) => (
                     <motion.li
                         key={item.href}

@@ -24,6 +24,8 @@ type StaffState = {
     isViewUserOpen: boolean;
     editingUser: UserFormData | null;
     viewingUser: UserFormData | null;
+    isLoading: boolean;
+    setIsLoading: (isLoading: boolean) => void;
     setUsers: (users: UserFormData[]) => void;
     setSearchTerm: (term: string) => void;
     setStatusFilter: (filter: string) => void;
@@ -47,6 +49,8 @@ export const useStaffStore = create<StaffState>((set) => ({
     isViewUserOpen: false,
     editingUser: null,
     viewingUser: null,
+    isLoading: false,
+    setIsLoading: (isLoading: boolean) => set({ isLoading }),
     setUsers: (users) => set({ users }),
     setSearchTerm: (term) => set({ searchTerm: term }),
     setStatusFilter: (filter) => set({ statusFilter: filter }),
