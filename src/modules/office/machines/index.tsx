@@ -135,44 +135,54 @@ export default function MachineManager() {
         )
     }
 
-    const ViewMachineModal = ({ machine }: { machine: MachineFormData }) => (
-        <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Server className={`${machine?.status === 'Active' ? 'stroke-success' : 'stroke-destructive'}`} size={18} strokeWidth={1.5} />
-                        <Label className="text-sm font-medium text-card-foreground">Name</Label>
+    const ViewMachineModal = ({ machine }: { machine: MachineFormData }) => {
+        const {
+            name,
+            machineNumber,
+            macAddress,
+            description,
+            status
+        } = machine
+
+        return (
+            <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Server className={`${machine?.status === 'Active' ? 'stroke-success' : 'stroke-destructive'}`} size={18} strokeWidth={1.5} />
+                            <Label className="text-sm font-medium text-card-foreground">Name</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{name}</p>
                     </div>
-                    <p className="text-sm font-semibold">{machine.name}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Hash className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">Machine Number</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Hash className="stroke-card-foreground" strokeWidth={1.5} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Machine Number</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{machineNumber}</p>
                     </div>
-                    <p className="text-sm font-semibold">{machine.machineNumber}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Wifi className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">MAC Address</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Wifi className="stroke-card-foreground" strokeWidth={1.5} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">MAC Address</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{macAddress}</p>
                     </div>
-                    <p className="text-sm font-semibold">{machine.macAddress}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Activity className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">Status</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Activity className="stroke-card-foreground" strokeWidth={1.5} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Status</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{status}</p>
                     </div>
-                    <p className="text-sm font-semibold">{machine.status}</p>
-                </div>
-                <div className="flex flex-col space-y-1 col-span-2">
-                    <Label className="text-sm font-medium text-card-foreground">Description</Label>
-                    <p className="text-sm">{machine.description}</p>
+                    <div className="flex flex-col space-y-1 col-span-2">
+                        <Label className="text-sm font-medium text-card-foreground">Description</Label>
+                        <p className="text-sm">{description}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
 
     const PageHeader = () => {
         return (
@@ -238,33 +248,39 @@ export default function MachineManager() {
     }
 
     const MachineCard = ({ machine }: { machine: MachineFormData }) => {
+        const {
+            name,
+            machineNumber,
+            macAddress,
+            status,
+        } = machine
         return (
-            <Card key={machine.machineNumber} className="overflow-hidden">
+            <Card key={machineNumber} className="overflow-hidden">
                 <CardContent className="p-4">
                     <div className="flex flex-col space-y-2">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                                <Server className="h-5 w-5 text-card-foreground" />
-                                <h3 className="font-semibold">{machine.name}</h3>
+                                <Server className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                <h3 className="font-semibold">{name}</h3>
                             </div>
-                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${machine.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                                 }`}>
-                                {machine.status}
+                                {status}
                             </span>
                         </div>
                         <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                            <Hash className="h-4 w-4" />
-                            <span>{machine.machineNumber}</span>
+                            <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <span>{machineNumber}</span>
                         </div>
                         <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                            <Wifi className="h-4 w-4" />
-                            <span>{machine.macAddress}</span>
+                            <Wifi className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <span>{macAddress}</span>
                         </div>
                         <div className="flex justify-end">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="h-8 w-8 p-0">
-                                        <MoreVertical className="h-4 w-4" />
+                                        <MoreVertical className="stroke-card-foreground" strokeWidth={1.5} size={18} />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
@@ -272,18 +288,18 @@ export default function MachineManager() {
                                         setEditingMachine(machine)
                                         setIsEditMachineOpen(true)
                                     }}>
-                                        <Edit className="mr-2 h-4 w-4" />
+                                        <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                         Edit
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onSelect={() => {
                                         setViewingMachine(machine)
                                         setIsViewMachineOpen(true)
                                     }}>
-                                        <Eye className="mr-2 h-4 w-4" />
+                                        <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                         View
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.macAddress))}>
-                                        <Trash2 className="mr-2 h-4 w-4" />
+                                    <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.machineNumber))}>
+                                        <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                         Delete
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>

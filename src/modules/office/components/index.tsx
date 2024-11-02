@@ -283,74 +283,88 @@ export default function ComponentManager() {
         )
     }
 
-    const ViewComponentModal = ({ component }: { component: ComponentFormData }) => (
-        <div className="space-y-6">
-            <div className="flex justify-center">
-                <Avatar className="h-32 w-32">
-                    <AvatarImage src={component.photoURL} alt={component.name} />
-                    <AvatarFallback>{component.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+    const ViewComponentModal = ({ component }: { component: ComponentFormData }) => {
+        const {
+            name,
+            color,
+            cycleTime,
+            targetTime,
+            coolingTime,
+            chargingTime,
+            cavity,
+            status,
+            photoURL
+        } = component
+
+        return (
+            <div className="space-y-6">
+                <div className="flex justify-center">
+                    <Avatar className="h-32 w-32">
+                        <AvatarImage src={photoURL} alt={name} />
+                        <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Package className="h-4 w-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-500">Name</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{name}</p>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-500">Cycle Time</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{cycleTime}</p>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Zap className="h-4 w-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-500">Target Time</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{targetTime}</p>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Thermometer className="h-4 w-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-500">Cooling Time</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{coolingTime}</p>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Battery className="h-4 w-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-500">Charging Time</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{chargingTime}</p>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Grid className="h-4 w-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-500">Cavity</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{cavity}</p>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Palette className="h-4 w-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-500">Color</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{color}</p>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Activity className="h-4 w-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-500">Status</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{status}</p>
+                    </div>
+                </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Package className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Name</Label>
-                    </div>
-                    <p className="text-sm font-semibold">{component.name}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Cycle Time</Label>
-                    </div>
-                    <p className="text-sm font-semibold">{component.cycleTime}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Zap className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Target Time</Label>
-                    </div>
-                    <p className="text-sm font-semibold">{component.targetTime}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Thermometer className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Cooling Time</Label>
-                    </div>
-                    <p className="text-sm font-semibold">{component.coolingTime}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Battery className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Charging Time</Label>
-                    </div>
-                    <p className="text-sm font-semibold">{component.chargingTime}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Grid className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Cavity</Label>
-                    </div>
-                    <p className="text-sm font-semibold">{component.cavity}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Palette className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Color</Label>
-                    </div>
-                    <p className="text-sm font-semibold">{component.color}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Activity className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Status</Label>
-                    </div>
-                    <p className="text-sm font-semibold">{component.status}</p>
-                </div>
-            </div>
-        </div>
-    )
+        )
+    }
 
     const handleEditClick = (component: ComponentFormData) => {
         const editableComponent: ComponentFormData = {
@@ -441,32 +455,51 @@ export default function ComponentManager() {
     }
 
     const ComponentCard = ({ component }: { component: ComponentFormData }) => {
+
+        const {
+            status,
+            photoURL,
+            name,
+            cycleTime,
+            code,
+            description,
+            weight,
+            volume,
+            color,
+            targetTime,
+            coolingTime,
+            chargingTime,
+            cavity,
+            configuration,
+            configQTY,
+            palletQty,
+            testMachine,
+            masterBatch
+        } = component
+
         return (
             <Card key={component.code} className="overflow-hidden">
                 <CardContent className="p-0">
                     <div className="flex flex-col items-center">
                         <div className="w-full h-32 flex items-center justify-center bg-gray-100">
                             <Avatar className="h-24 w-24">
-                                <AvatarImage src={component.photoURL} alt={component.name} />
-                                <AvatarFallback>{component.name.charAt(0)}</AvatarFallback>
+                                <AvatarImage src={photoURL} alt={name} />
+                                <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                             </Avatar>
                         </div>
                         <div className="p-4 w-full">
                             <div className="flex items-center mb-2">
-                                <Component className="mr-2" strokeWidth={1.5} size={18} />
-                                <h3 className="font-semibold text-card-foreground">{component.name}</h3>
+                                <Component className="mr-2" strokeWidth={1} size={18} />
+                                <h3 className="font-semibold text-card-foreground">{name}</h3>
                             </div>
-                            <div className="flex items-center mb-2">
-                                <Clock className="h-4 w-4 mr-2 text-card-foreground" />
-                                <p className="text-sm text-card-foreground">Cycle Time: {component.cycleTime}</p>
+                            <div className="flex items-center mb-2 gap-2">
+                                <Clock className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                <p className="text-sm text-card-foreground">Cycle Time: {cycleTime}</p>
                             </div>
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <Activity className="h-4 w-4 mr-2 text-card-foreground" />
-                                    <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${component.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                        }`}>
-                                        {component.status}
-                                    </span>
+                                <div className="flex items-center justify-start gap-2">
+                                    <Activity className="stroke-card-foreground" strokeWidth={1} size={17} />
+                                    <span className="text-sm text-card-foreground">{status}</span>
                                 </div>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
@@ -476,38 +509,38 @@ export default function ComponentManager() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onSelect={() => handleEditClick(component)}>
-                                            <Edit className="mr-2 h-4 w-4" />
+                                            <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
                                             const typedComponent: ComponentFormData = {
                                                 name: component.name,
-                                                description: component.description,
-                                                weight: component.weight,
-                                                volume: component.volume,
-                                                code: component.code,
-                                                color: component.color,
-                                                cycleTime: component.cycleTime,
-                                                targetTime: component.targetTime,
-                                                coolingTime: component.coolingTime,
-                                                chargingTime: component.chargingTime,
-                                                cavity: component.cavity,
-                                                configuration: component.configuration,
-                                                configQTY: component.configQTY,
-                                                palletQty: component.palletQty,
-                                                testMachine: component.testMachine,
-                                                masterBatch: component.masterBatch,
-                                                status: component.status as "Active" | "Inactive",
-                                                photoURL: component.photoURL
+                                                description: description,
+                                                weight: weight,
+                                                volume: volume,
+                                                code: code,
+                                                color: color,
+                                                cycleTime: cycleTime,
+                                                targetTime: targetTime,
+                                                coolingTime: coolingTime,
+                                                chargingTime: chargingTime,
+                                                cavity: cavity,
+                                                configuration: configuration,
+                                                configQTY: configQTY,
+                                                palletQty: palletQty,
+                                                testMachine: testMachine,
+                                                masterBatch: masterBatch,
+                                                status: status as "Active" | "Inactive",
+                                                photoURL: photoURL
                                             };
                                             setViewingComponent(typedComponent);
                                             setIsViewComponentOpen(true);
                                         }}>
-                                            <Eye className="mr-2 h-4 w-4" />
+                                            <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             View
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => handleDeleteComponent(Number(component?.code))}>
-                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Delete
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>

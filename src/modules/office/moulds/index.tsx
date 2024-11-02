@@ -178,61 +178,73 @@ export default function MouldManager() {
         )
     }
 
-    const ViewMouldModal = ({ mould }: { mould: MouldFormData }) => (
-        <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
-                        <Label className="text-sm font-medium text-card-foreground">Name</Label>
+    const ViewMouldModal = ({ mould }: { mould: MouldFormData }) => {
+        const {
+            name,
+            serialNumber,
+            lastRepairDate,
+            mileage,
+            servicingMileage,
+            component,
+            status
+        } = mould
+
+        return (
+            <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Name</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{name}</p>
                     </div>
-                    <p className="text-sm font-semibold">{mould.name}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Hash className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">Serial Number</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Hash className="h-4 w-4 text-card-foreground" />
+                            <Label className="text-sm font-medium text-card-foreground">Serial Number</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{serialNumber}</p>
                     </div>
-                    <p className="text-sm font-semibold">{mould.serialNumber}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Wrench className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">Last Repair Date</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Wrench className="h-4 w-4 text-card-foreground" />
+                            <Label className="text-sm font-medium text-card-foreground">Last Repair Date</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{new Date(lastRepairDate).toLocaleString()}</p>
                     </div>
-                    <p className="text-sm font-semibold">{new Date(mould.lastRepairDate).toLocaleString()}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Gauge className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">Mileage</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Gauge className="h-4 w-4 text-card-foreground" />
+                            <Label className="text-sm font-medium text-card-foreground">Mileage</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{mileage}</p>
                     </div>
-                    <p className="text-sm font-semibold">{mould.mileage}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Gauge className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">Servicing Mileage</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Gauge className="h-4 w-4 text-card-foreground" />
+                            <Label className="text-sm font-medium text-card-foreground">Servicing Mileage</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{servicingMileage}</p>
                     </div>
-                    <p className="text-sm font-semibold">{mould.servicingMileage}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Component className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">Component ID</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Component className="h-4 w-4 text-card-foreground" />
+                            <Label className="text-sm font-medium text-card-foreground">Component ID</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{component}</p>
                     </div>
-                    <p className="text-sm font-semibold">{mould.component}</p>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center gap-1">
-                        <Activity className="h-4 w-4 text-card-foreground" />
-                        <Label className="text-sm font-medium text-card-foreground">Status</Label>
+                    <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-1">
+                            <Activity className="h-4 w-4 text-card-foreground" />
+                            <Label className="text-sm font-medium text-card-foreground">Status</Label>
+                        </div>
+                        <p className="text-sm font-semibold">{status}</p>
                     </div>
-                    <p className="text-sm font-semibold">{mould.status}</p>
                 </div>
             </div>
-        </div>
-    )
+        )
+    }
 
     const PageHeader = () => {
         return (
@@ -304,28 +316,35 @@ export default function MouldManager() {
     }
 
     const MouldCard = ({ mould }: { mould: MouldFormData }) => {
+        const {
+            name,
+            serialNumber,
+            mileage,
+            status
+        } = mould
+
         return (
-            <Card key={mould?.serialNumber} className="overflow-hidden">
+            <Card key={serialNumber} className="overflow-hidden">
                 <CardContent className="p-4">
                     <div className="flex flex-col space-y-2">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                                 <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <h3 className="font-semibold">{mould.name}</h3>
+                                <h3 className="font-semibold">{name}</h3>
                             </div>
-                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${mould.status === 'Active' ? 'bg-green-100 text-green-800' :
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' :
                                 mould.status === 'Inactive' ? 'bg-red-100  text-red-800' : 'bg-yellow-100 text-yellow-800'
                                 }`}>
-                                {mould.status}
+                                {status}
                             </span>
                         </div>
                         <div className="flex items-center space-x-2 text-sm text-card-foreground">
                             <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
-                            <span>{mould.serialNumber}</span>
+                            <span>{serialNumber}</span>
                         </div>
                         <div className="flex items-center space-x-2 text-sm text-card-foreground">
                             <Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
-                            <span>Mileage: {mould.mileage}</span>
+                            <span>Mileage: {mileage}</span>
                         </div>
                         <div className="flex justify-end">
                             <DropdownMenu>
@@ -338,28 +357,28 @@ export default function MouldManager() {
                                     <DropdownMenuItem onSelect={() => {
                                         setEditingMould({
                                             ...mould,
-                                            uid: Number(mould.serialNumber),
+                                            uid: Number(serialNumber),
                                             creationDate: new Date().toISOString()
                                         })
                                         setIsEditMouldOpen(true)
                                     }}>
-                                        <Edit className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                        <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                         Edit
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onSelect={() => {
                                         setViewingMould({
                                             ...mould,
-                                            uid: Number(mould?.serialNumber),
+                                            uid: Number(serialNumber),
                                             creationDate: new Date().toISOString(),
-                                            status: mould.status as "Active" | "Inactive" | "Maintenance"
+                                            status: status as "Active" | "Inactive" | "Maintenance"
                                         })
                                         setIsViewMouldOpen(true)
                                     }}>
-                                        <Eye className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                        <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                         View
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => handleDeleteMould(Number(mould?.serialNumber))}>
-                                        <Trash2 className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <DropdownMenuItem onSelect={() => handleDeleteMould(Number(serialNumber))}>
+                                        <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                         Delete
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>

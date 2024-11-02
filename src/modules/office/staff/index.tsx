@@ -230,18 +230,18 @@ export default function StaffManagement() {
                                             setEditingUser(user)
                                             setIsEditUserOpen(true)
                                         }}>
-                                            <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={17} />
+                                            <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
                                             setViewingUser(user)
                                             setIsViewUserOpen(true)
                                         }}>
-                                            <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={17} />
+                                            <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
                                             View
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => handleDeleteUser(user.uid)}>
-                                            <UserX className="stroke-red-500 mr-2" strokeWidth={1.5} size={17} />
+                                            <UserX className="stroke-red-500 mr-2" strokeWidth={1} size={17} />
                                             Delete
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
