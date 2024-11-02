@@ -9,7 +9,6 @@ import {
     EllipsisIcon,
     FolderKanban,
     LayoutDashboard,
-    Settings,
     TrendingUpDown,
 } from "lucide-react";
 import {
@@ -77,7 +76,6 @@ export const MobileNavigation = () => {
 
 export const DesktopNavigation = () => {
     const pathname = usePathname()
-    const signOut = useSessionStore(state => state.signOut)
 
     return (
         <div className="xl:flex w-full flex-col justify-between py-4 h-full hidden">

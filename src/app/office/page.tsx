@@ -1,6 +1,6 @@
 'use client'
 
-import LiveRunHighlights from "@/modules/live/highlights";
+
 import { Component, FolderKanban, Users, Stamp, ServerCog } from "lucide-react";
 import {
     Tabs,
@@ -13,6 +13,7 @@ import StaffTab from "@/modules/office/staff";
 import MouldsManagement from "@/modules/office/moulds";
 import ComponentsManagement from "@/modules/office/components";
 import MachinesManagement from "@/modules/office/machines";
+import LiveRunHighlights from "@/modules/office/highlights";
 
 export default function Home() {
 
@@ -59,7 +60,7 @@ export default function Home() {
                     <p className="text-lg font-medium uppercase">Management</p>
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
-                <div className="w-full h-full bg-card p-1 rounded overflow-y-auto mt-4">
+                <div className="w-full h-[98vh] bg-card p-1 rounded overflow-y-auto mt-4">
                     <Tabs defaultValue="staff" className="w-full overflow-hidden h-full">
                         <TabsList>
                             <TabListHeaders />
