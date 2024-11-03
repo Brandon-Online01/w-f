@@ -52,6 +52,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
+import { useSessionStore } from '@/providers/session.provider'
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
@@ -78,18 +79,22 @@ export default function ComponentManager() {
         setIsViewing,
         setIsLoading,
     } = useOfficeStore();
+    const token = useSessionStore(state => state?.token)
+
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         setIsLoading(true)
         const allComponents = async () => {
-            const components = await componentList()
-            setComponents(components?.data)
+            if (token) {
+                const components = await componentList(token)
+                setComponents(components?.data)
+            }
         }
 
         allComponents()
         setIsLoading(false)
-    }, [setComponents, setIsLoading]);
+    }, [setComponents, setIsLoading, token]);
 
     const filteredComponents = components?.filter((component: ComponentFormData) =>
         component?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -497,7 +502,7 @@ export default function ComponentManager() {
                 whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                whileHover={{ scale: 1.02, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
+                whileHover={{ scale: 1.01, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
                 transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
                 <Card key={component.code} className="overflow-hidden bg-card">
                     <CardContent className="p-0">
@@ -647,7 +652,7 @@ export default function ComponentManager() {
 
     if (isLoading || isEmpty(components)) {
         return (
-            <div className="w-full h-screen">
+            <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
                 <ComponentCardsLoader />
             </div>
@@ -657,7 +662,7 @@ export default function ComponentManager() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
                 {paginatedComponents.map((component, index) => <ComponentCard key={index} component={component} index={index} />)}
             </div>
             <PageControls />

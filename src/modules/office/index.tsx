@@ -59,6 +59,7 @@ import { userList } from '@/data/data'
 import { newUserSchema } from '@/schemas/user'
 import userPlaceHolderIcon from '@/assets/svg/user-placeholder.svg'
 import { useOfficeStore } from './state/state'
+import { useSessionStore } from '@/providers/session.provider'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
@@ -84,16 +85,22 @@ export default function StaffManagement() {
         setIsCreating,
         setIsEditing,
         setIsViewing,
+        setIsLoading
     } = useOfficeStore();
+    const token = useSessionStore(state => state?.token)
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     useEffect(() => {
+        setIsLoading(true)
         const allUsers = async () => {
-            const users = await userList()
-            setUsers(users?.data)
+            if (token) {
+                const users = await userList(token)
+                setUsers(users?.data)
+            }
         }
         allUsers()
-    }, [setUsers]);
+        setIsLoading(false)
+    }, [setUsers, setIsLoading, token]);
 
     const filteredUsers = users.filter(user =>
         (user?.name?.toLowerCase() + ' ' + user?.lastName?.toLowerCase()).includes(searchTerm.toLowerCase()) &&
