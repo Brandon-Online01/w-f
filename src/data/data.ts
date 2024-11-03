@@ -50,6 +50,17 @@ export const latestReports = async () => {
     }
 }
 
+export const allFactories = async () => {
+    try {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/factories`
+        const { data } = await axios.get(url)
+        return data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
 export const colors = [
     { value: "#FF5733", label: "Cinnabar" },
     { value: "#33FF57", label: "Screamin' Green" },

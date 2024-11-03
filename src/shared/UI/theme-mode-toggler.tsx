@@ -17,7 +17,7 @@ const ThemeModeTogglerContent = () => {
 
     return (
         <span className="cursor-pointer w-full flex items-center justify-center" onClick={cycleTheme}>
-            {theme === 'light' ? <Sun className="stroke-yellow-500" size={18} /> : <Moon className="stroke-card-foreground" size={18} />}
+            {theme === 'light' ? <Sun className="stroke-yellow-500" size={18} strokeWidth={1} /> : <Moon className="stroke-card-foreground" size={18} strokeWidth={1} />}
         </span>
     )
 }
