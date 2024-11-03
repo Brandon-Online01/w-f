@@ -544,7 +544,7 @@ export default function StaffManagement() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
                 {paginatedUsers?.map((user, index) => {
                     const userWithDefaultPhoto = {
                         ...user,

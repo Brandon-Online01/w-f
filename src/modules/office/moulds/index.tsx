@@ -54,6 +54,7 @@ import { Mould } from '@/types/mould'
 import { mouldList } from '@/data/data'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
+import { isEmpty } from 'lodash'
 
 type MouldFormData = z.infer<typeof mouldSchema>
 
@@ -69,6 +70,8 @@ export default function MouldManager() {
         isCreating,
         isEditing,
         isViewing,
+        isLoading,
+        setIsLoading,
         setMoulds,
         setSearchTerm,
         setStatusFilter,
@@ -80,11 +83,13 @@ export default function MouldManager() {
     } = useOfficeStore();
 
     useEffect(() => {
+        setIsLoading(true)
         const allMoulds = async () => {
             const moulds = await mouldList()
             setMoulds(moulds?.data)
         }
         allMoulds()
+        setIsLoading(false)
     }, [setMoulds]);
 
     const filteredMoulds = moulds?.filter((mould: Mould) =>
@@ -471,6 +476,15 @@ export default function MouldManager() {
         )
     }
 
+    if (isLoading || isEmpty(moulds)) {
+        return (
+            <div className="w-full h-screen">
+                <PageHeader />
+                <MouldCardsLoader />
+            </div>
+        )
+    }
+
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
@@ -483,3 +497,43 @@ export default function MouldManager() {
         </div>
     )
 }
+
+const MouldCardsLoader = () => {
+    return (
+        <div className="w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {Array.from({ length: 8 }).map((_, index) => (
+                    <motion.div
+                        key={index}
+                        className="relative bg-card rounded p-4 h-36 border shadow animate-pulse flex flex-col justify-start gap-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}>
+                        <div className="aspect-video w-full rounded mb-4 h-full flex items-center justify-center absolute top-0 left-0 right-0 bottom-0 bg-background/50" >
+                            <div className="loading">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-5 bg-gray-200 rounded w-1/2" />
+                            <div className="h-5 bg-gray-200 rounded w-2/12" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="h-4 bg-gray-200 rounded w-2/12" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-start">
+                            <div className="h-3 bg-gray-200 rounded w-1/2" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-end">
+                            <div className="h-5 bg-gray-200 rounded w-1/12" />
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+};

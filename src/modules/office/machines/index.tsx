@@ -31,6 +31,7 @@ import { machineList } from '@/data/data'
 import { Machine } from '@/types/machine'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
+import { isEmpty } from 'lodash'
 
 // Validation schema
 const machineSchema = z.object({
@@ -63,14 +64,18 @@ export default function MachineManager() {
         setIsCreating,
         setIsEditing,
         setIsViewing,
+        isLoading,
+        setIsLoading,
     } = useOfficeStore();
 
     useEffect(() => {
+        setIsLoading(true)
         const allMachines = async () => {
             const machines = await machineList()
             setMachines(machines?.data)
         }
         allMachines()
+        setIsLoading(false)
     }, [setMachines]);
 
     const filteredMachines = machines?.filter((machine: Machine) =>
@@ -392,10 +397,19 @@ export default function MachineManager() {
         )
     }
 
+    if (isLoading || isEmpty(machines)) {
+        return (
+            <div className="w-full h-screen">
+                <PageHeader />
+                <MachineCardsLoader />
+            </div>
+        )
+    }
+
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
                 {paginatedMachines?.map((machine: Machine, index: number) => <MachineCard machine={machine} key={index} index={index} />)}
             </div>
             <PageControls />
@@ -404,3 +418,43 @@ export default function MachineManager() {
         </div>
     )
 }
+
+const MachineCardsLoader = () => {
+    return (
+        <div className="w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {Array.from({ length: 8 }).map((_, index) => (
+                    <motion.div
+                        key={index}
+                        className="relative bg-card rounded p-4 h-36 border shadow animate-pulse flex flex-col justify-start gap-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}>
+                        <div className="aspect-video w-full rounded mb-4 h-full flex items-center justify-center absolute top-0 left-0 right-0 bottom-0 bg-background/50" >
+                            <div className="loading">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-5 bg-gray-200 rounded w-1/2" />
+                            <div className="h-5 bg-gray-200 rounded w-2/12" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="h-4 bg-gray-200 rounded w-2/12" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-start">
+                            <div className="h-3 bg-gray-200 rounded w-1/2" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-end">
+                            <div className="h-5 bg-gray-200 rounded w-1/12" />
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+};
