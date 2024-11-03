@@ -1,30 +1,19 @@
 import axios from "axios";
 
-export const mockUsers = Array(20).fill(null).map((_, index) => ({
-    uid: index + 1,
-    name: `User ${index + 1}`,
-    lastName: `LastName ${index + 1}`,
-    email: `user${index + 1}@example.com`,
-    username: `user${index + 1}`,
-    password: 'securePassword123',
-    role: ['Admin', 'Manager', 'Operator', 'Developer', 'Support'][Math.floor(Math.random() * 5)],
-    photoURL: `/placeholder.svg?height=100&width=100`,
-    phoneNumber: `+1234567${index.toString().padStart(3, '0')}`,
-    status: ['Active', 'Inactive'][Math.floor(Math.random() * 2)],
-}))
-
-export const componentList = async () => {
+export const userList = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/components`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/users/`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)
     }
 }
 
-export const userList = async () => {
+export const componentList = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/components`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)
@@ -33,7 +22,18 @@ export const userList = async () => {
 
 export const mouldList = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/moulds`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/moulds`
+        const { data } = await axios.get(url)
+        return data;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const machineList = async () => {
+    try {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/machines`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)
@@ -42,7 +42,8 @@ export const mouldList = async () => {
 
 export const latestReports = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/reports`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/reports`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)

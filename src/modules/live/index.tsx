@@ -3,7 +3,7 @@
 import {
 	useEffect
 } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
 	ChevronLeft,
 	ChevronRight,
@@ -11,12 +11,14 @@ import {
 	AlertTriangle,
 	ChartSpline,
 	Weight,
-	Info,
 	PauseOctagonIcon,
 	ComponentIcon,
 	HeartHandshake,
 	Settings,
 	Search,
+	Kanban,
+	ChartLine,
+	FolderKanban,
 } from 'lucide-react'
 import {
 	Card,
@@ -100,6 +102,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	const {
 		name: componentName,
+		code: componentCode,
 		photoURL,
 		targetTime,
 	} = componentInProduction
@@ -109,6 +112,8 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		machineNumber,
 		macAddress
 	} = machineInUse
+
+	const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
 
 	const DialogSectionHeader = () => {
 		return (
@@ -126,13 +131,65 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		)
 	}
 
+	const tabVariants = {
+		hidden: { opacity: 0, x: -20 },
+		visible: (index: number) => ({
+			opacity: 1,
+			x: 0,
+			transition: {
+				delay: index * 0.1,
+				duration: 0.5,
+			},
+		}),
+	};
+
+	const contentVariants = {
+		hidden: { opacity: 0, y: 20 },
+		visible: {
+			opacity: 1,
+			y: 0,
+			transition: {
+				duration: 0.5
+			}
+		},
+		exit: {
+			opacity: 0,
+			y: -20,
+			transition: {
+				duration: 0.3
+			}
+		}
+	};
+
+
 	const TabListHeaders = () => {
+		const tabItems = [
+			{ value: "overview", icon: Kanban, label: "Overview" },
+			{ value: "performance", icon: ChartLine, label: "Performance" },
+			{ value: "material", icon: Weight, label: "Material" },
+			{ value: "management", icon: FolderKanban, label: "Management" },
+		];
+
 		return (
 			<>
-				<TabsTrigger value="overview">Overview</TabsTrigger>
-				{insertHistory?.length > 0 && <TabsTrigger value="performance">Performance</TabsTrigger>}
-				<TabsTrigger value="material">Material</TabsTrigger>
-				<TabsTrigger value="management" className='hidden md:block'>Management</TabsTrigger>
+				{tabItems.map((item, index) => {
+					const Icon = item.icon;
+					return (
+						<motion.div
+							key={item?.value}
+							custom={index}
+							variants={tabVariants}
+							initial="hidden"
+							animate="visible">
+							<TabsTrigger value={item?.value}>
+								<span className="flex items-center gap-2">
+									<Icon className="stroke-card-foreground" strokeWidth={1} size={18} />
+									{item?.label}
+								</span>
+							</TabsTrigger>
+						</motion.div>
+					);
+				})}
 			</>
 		)
 	}
@@ -143,7 +200,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 				<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden h-48">
 					<div className="flex items-center justify-center border rounded border-[1px] h-full">
 						<Image
-							src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
+							src={fullPhotoURL}
 							alt={componentName}
 							width={50}
 							height={50}
@@ -335,10 +392,12 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	return (
 		<motion.div
-			className='bg-card rounded'
+			className="bg-card rounded shadow-md cursor-pointer"
+			whileTap={{ scale: 0.98 }}
 			initial={{ opacity: 0, y: 50 }}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5, delay: index * 0.1 }}>
+			whileHover={{ scale: 0.99, border: "1px solid hsl(var(--success))" }}
+			transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
 			<Dialog>
 				<DialogTrigger asChild>
 					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")} >
@@ -375,17 +434,19 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							</div>
 							<div className="flex items-center justify-between w-full gap-2 flex-col">
 								<div className="flex items-center justify-between w-full gap-2">
-									<div className="flex flex-col">
-										<span className="text-card-foreground text-[12px] md:text-[18px] font-medium uppercase flex items-center gap-1">
+									<div className="flex flex-col w-1/2">
+										<span className="text-card-foreground text-[11px] md:text-[18px] font-medium uppercase flex items-center gap-1">
 											{machineName} {machineNumber}
 										</span>
-										<span className="text-card-foreground text-[10px] md:text-[12px] -mt-1 flex-col flex">
-											{eventTimeStamp ? formatDistanceToNow(new Date(eventTimeStamp), { addSuffix: true }) : ''}
-										</span>
 									</div>
-									<div className="flex flex-col items-end justify-end">
-										<span className="text-card-foreground text-[10px] text-right md:text-[12px] font-medium uppercase">{componentName?.slice(0, 10)}</span>
+									<div className="w-1/2 flex items-end justify-end">
+										<span className="text-card-foreground text-[10px] text-right md:text-[12px] font-medium uppercase">{componentCode}</span>
 									</div>
+								</div>
+								<div className="flex items-start justify-start -mt-2 w-full gap-2">
+									<span className="text-card-foreground text-[10px] md:text-[12px] -mt-1 flex-col flex">
+										{eventTimeStamp ? formatDistanceToNow(new Date(eventTimeStamp), { addSuffix: true }) : ''}
+									</span>
 								</div>
 								<div className="flex items-center gap-2 justify-between gap-2 w-full">
 									<div className="flex items-center gap-0 flex-col">
@@ -412,14 +473,14 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 											}
 											<span className="text-card-foreground text-[11px] uppercase">{machineFirstReportTime?.slice(15, 25)}</span>
 										</p>
-										<p className="text-card-foreground text-[15px] font-medium uppercase">
-											<span className="text-card-foreground text-[15px] font-medium uppercase">{currentProduction}</span>
+										<p className="text-card-foreground text-[10px] md:text-[15px] font-medium uppercase">
+											<span className="text-card-foreground text-[10px] md:text-[15px] font-medium uppercase">{currentProduction}</span>
 											/
-											<span className="text-card-foreground text-[15px] font-medium uppercase">{targetProduction}</span>
-											<span className="text-card-foreground text-[10px]"> units</span>
+											<span className="text-card-foreground text-[10px] md:text-[15px] font-medium uppercase">{targetProduction}</span>
+											<span className="text-card-foreground text-[8px] md:text-[12px]"> units</span>
 										</p>
 									</div>
-									<Progress value={((currentProduction || 0) / (targetProduction || 1)) * 100} />
+									<Progress value={((Number(String(currentProduction)?.replace('.00', '')) || 0) / (Number(String(targetProduction)?.replace('.00', '')?.replace(',', '')) || 1) * 100)} />
 								</div>
 							</div>
 						</CardContent>
@@ -435,18 +496,48 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<TabsList>
 							<TabListHeaders />
 						</TabsList>
-						<TabsContent value="overview" className="w-full">
-							<OverViewTab />
-						</TabsContent>
-						<TabsContent value="performance" className="w-full">
-							<PerformanceTab />
-						</TabsContent>
-						<TabsContent value="material" className="w-full">
-							<MaterialTab />
-						</TabsContent>
-						<TabsContent value="management" className="w-full">
-							<ManagementTab liveRun={machine} />
-						</TabsContent>
+						<AnimatePresence mode="wait">
+							<motion.div
+								key="overview"
+								variants={contentVariants}
+								initial="hidden"
+								animate="visible"
+								exit="exit">
+								<TabsContent value="overview" className="w-full">
+									<OverViewTab />
+								</TabsContent>
+							</motion.div>
+							<motion.div
+								key="performance"
+								variants={contentVariants}
+								initial="hidden"
+								animate="visible"
+								exit="exit">
+								<TabsContent value="performance" className="w-full">
+									<PerformanceTab />
+								</TabsContent>
+							</motion.div>
+							<motion.div
+								key="material"
+								variants={contentVariants}
+								initial="hidden"
+								animate="visible"
+								exit="exit">
+								<TabsContent value="material" className="w-full">
+									<MaterialTab />
+								</TabsContent>
+							</motion.div>
+							<motion.div
+								key="management"
+								variants={contentVariants}
+								initial="hidden"
+								animate="visible"
+								exit="exit">
+								<TabsContent value="management" className="w-full">
+									<ManagementTab liveRun={machine} />
+								</TabsContent>
+							</motion.div>
+						</AnimatePresence>
 					</Tabs>
 				</DialogContent>
 			</Dialog>
@@ -635,7 +726,7 @@ export default function LiveRunCards() {
 	}
 
 	return (
-		<div className="w-full">
+		<div className="w-full flex flex-col justify-start gap-2">
 			<SectionHeader />
 			<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
 				{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
@@ -649,15 +740,52 @@ const MachineCardsLoader = () => {
 	const { socketStatus } = liveRunStore();
 
 	return (
-		<div className="flex flex-wrap items-center justify-center w-full h-[calc(100vh-100px)]">
-			{Array.from({ length: 1 }).map((_, index) => (
-				<div key={index} className="w-full h-full bg-gray-200 animate-pulse rounded-md m-2 flex items-center justify-center">
-					<p className="text-xs flex items-center">
-						<Info className="mr-2 h-4 w-4" />
-						{socketStatus}
-					</p>
-				</div>
-			))}
+		<div className="w-full">
+			<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1">
+				{Array.from({ length: 16 }).map((_, index) => (
+					<motion.div
+						key={index}
+						className="relative bg-card rounded p-4 h-[380px] border shadow animate-pulse flex flex-col justify-start gap-2"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.3, delay: index * 0.1 }}>
+						<div className="aspect-video w-full bg-gray-200 rounded mb-4 h-48 flex items-center justify-center" >
+							<div className="w-full h-full flex items-center justify-center">
+								<div className="loading">
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+								</div>
+							</div>
+						</div>
+
+						{/* Content placeholders */}
+						<div className="flex items-center gap-2 justify-between">
+							<div className="h-4 bg-gray-200 rounded w-1/2" />
+							<div className="h-4 bg-gray-200 rounded w-1/4" />
+						</div>
+						<div className="space-y-3">
+							<div className="h-4 bg-gray-200 rounded w-2/3" />
+						</div>
+						<div className="flex items-center gap-2 justify-between mt-4">
+							<div className="h-4 bg-gray-200 rounded w-3/12" />
+							<div className="h-4 bg-gray-200 rounded w-1/4" />
+							<div className="h-4 bg-gray-200 rounded w-1/4" />
+						</div>
+						<div className="flex items-center gap-2 justify-between -mt-1">
+							<div className="h-4 bg-gray-200 rounded w-2/12" />
+							<div className="h-4 bg-gray-200 rounded w-2/12" />
+							<div className="h-4 bg-gray-200 rounded w-2/12" />
+						</div>
+						<div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-muted-foreground">
+							<div className={`w-2 h-2 rounded-full ${socketStatus === 'Connected to live stream' ? 'bg-success' : 'bg-destructive'} animate-pulse`} />
+							{socketStatus}
+						</div>
+					</motion.div>
+				))}
+			</div>
 		</div>
 	);
 };

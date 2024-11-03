@@ -61,10 +61,10 @@ export function MachineStatistics({ data }: MachineStatisticsProps) {
     ];
 
     return (
-        <Card className="flex flex-col w-full">
+        <Card className="flex flex-col w-full h-[380px]">
             <CardHeader className="items-center pb-0">
                 <CardDescription>
-                    <p className="text-sm text-card-foreground -mt-3 uppercase">Current Shift</p>
+                    <p className="text-sm text-card-foreground -mt-3 uppercase">Machines</p>
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">

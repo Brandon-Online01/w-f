@@ -53,7 +53,7 @@ export default function ProductionReportCard() {
     }
 
     return (
-        <Card className="w-full h-full">
+        <Card className="w-full h-[380px]">
             <CardHeader className="items-center pb-0">
                 <CardDescription>
                     <p className="text-sm text-card-foreground -mt-3 uppercase">Production Reports</p>
@@ -64,7 +64,7 @@ export default function ProductionReportCard() {
                     {reports.map((report) => (
                         <div key={report?.uid} className="flex items-center justify-between py-4 border-b last:border-b-0">
                             <div className="flex items-center space-x-4">
-                                <FileText className="h-6 w-6 text-card-foreground" />
+                                <FileText className="stroke-card-foreground w-" strokeWidth={1} size={22} />
                                 <div>
                                     <h3 className="text-sm font-medium text-card-foreground">{report?.title}</h3>
                                     <p className="text-sm text-card-foreground">{report?.date?.slice(0, 10)} • {report?.shift}</p>
@@ -76,7 +76,7 @@ export default function ProductionReportCard() {
                                 size="icon"
                                 onClick={() => handleDownload(report?.uid, report?.url)}
                                 disabled={downloadingId === report?.uid}>
-                                {downloadingId === report?.uid ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" /> : <ArrowDownToLine className="h-4 w-4" />}
+                                {downloadingId === report?.uid ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" /> : <ArrowDownToLine className="stroke-card-foreground" strokeWidth={1} size={18} />}
                                 <span className="sr-only">Download report</span>
                             </Button>
                         </div>
