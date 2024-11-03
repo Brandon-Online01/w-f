@@ -76,8 +76,6 @@ export default function MouldManager() {
         allMoulds()
     }, [setMoulds]);
 
-    console.log(moulds)
-
     const filteredMoulds = moulds?.filter((mould: Mould) =>
         mould?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (statusFilter === 'All' || mould?.status === statusFilter)
