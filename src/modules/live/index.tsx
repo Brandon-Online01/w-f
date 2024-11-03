@@ -3,7 +3,7 @@
 import {
 	useEffect
 } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import {
 	ChevronLeft,
 	ChevronRight,
@@ -131,33 +131,65 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		)
 	}
 
+	const tabVariants = {
+		hidden: { opacity: 0, x: -20 },
+		visible: (index: number) => ({
+			opacity: 1,
+			x: 0,
+			transition: {
+				delay: index * 0.1,
+				duration: 0.5,
+			},
+		}),
+	};
+
+	const contentVariants = {
+		hidden: { opacity: 0, y: 20 },
+		visible: {
+			opacity: 1,
+			y: 0,
+			transition: {
+				duration: 0.5
+			}
+		},
+		exit: {
+			opacity: 0,
+			y: -20,
+			transition: {
+				duration: 0.3
+			}
+		}
+	};
+
+
 	const TabListHeaders = () => {
+		const tabItems = [
+			{ value: "overview", icon: Kanban, label: "Overview" },
+			{ value: "performance", icon: ChartLine, label: "Performance" },
+			{ value: "material", icon: Weight, label: "Material" },
+			{ value: "management", icon: FolderKanban, label: "Management" },
+		];
+
 		return (
 			<>
-				<TabsTrigger value="overview">
-					<span className="flex items-center gap-2">
-						<Kanban className="stroke-card-foreground" strokeWidth={1} size={18} />
-						Overview
-					</span>
-				</TabsTrigger>
-				{insertHistory?.length > 0 && <TabsTrigger value="performance">
-					<span className="flex items-center gap-2">
-						<ChartLine className="stroke-card-foreground" strokeWidth={1} size={18} />
-						Performance
-					</span>
-				</TabsTrigger>}
-				<TabsTrigger value="material">
-					<span className="flex items-center gap-2">
-						<Weight className="stroke-card-foreground" strokeWidth={1} size={18} />
-						Material
-					</span>
-				</TabsTrigger>
-				<TabsTrigger value="management" className='hidden md:block'>
-					<span className="flex items-center gap-2">
-						<FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
-						Management
-					</span>
-				</TabsTrigger>
+				{tabItems.map((item, index) => {
+					const Icon = item.icon;
+					return (
+						<motion.div
+							key={item?.value}
+							custom={index}
+							variants={tabVariants}
+							initial="hidden"
+							animate="visible">
+							<TabsTrigger value={item?.value}>
+								<span className="flex items-center gap-2">
+									<Icon className="stroke-card-foreground" strokeWidth={1} size={18} />
+									{item?.label}
+								</span>
+							</TabsTrigger>
+						</motion.div>
+					);
+				})}
 			</>
 		)
 	}
@@ -464,18 +496,48 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<TabsList>
 							<TabListHeaders />
 						</TabsList>
-						<TabsContent value="overview" className="w-full">
-							<OverViewTab />
-						</TabsContent>
-						<TabsContent value="performance" className="w-full">
-							<PerformanceTab />
-						</TabsContent>
-						<TabsContent value="material" className="w-full">
-							<MaterialTab />
-						</TabsContent>
-						<TabsContent value="management" className="w-full">
-							<ManagementTab liveRun={machine} />
-						</TabsContent>
+						<AnimatePresence mode="wait">
+							<motion.div
+								key="overview"
+								variants={contentVariants}
+								initial="hidden"
+								animate="visible"
+								exit="exit">
+								<TabsContent value="overview" className="w-full">
+									<OverViewTab />
+								</TabsContent>
+							</motion.div>
+							<motion.div
+								key="performance"
+								variants={contentVariants}
+								initial="hidden"
+								animate="visible"
+								exit="exit">
+								<TabsContent value="performance" className="w-full">
+									<PerformanceTab />
+								</TabsContent>
+							</motion.div>
+							<motion.div
+								key="material"
+								variants={contentVariants}
+								initial="hidden"
+								animate="visible"
+								exit="exit">
+								<TabsContent value="material" className="w-full">
+									<MaterialTab />
+								</TabsContent>
+							</motion.div>
+							<motion.div
+								key="management"
+								variants={contentVariants}
+								initial="hidden"
+								animate="visible"
+								exit="exit">
+								<TabsContent value="management" className="w-full">
+									<ManagementTab liveRun={machine} />
+								</TabsContent>
+							</motion.div>
+						</AnimatePresence>
 					</Tabs>
 				</DialogContent>
 			</Dialog>
