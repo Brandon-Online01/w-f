@@ -254,10 +254,12 @@ export default function MachineManager() {
         } = machine
         return (
             <motion.div
-                className='bg-card rounded'
+                className="bg-card rounded shadow-md cursor-pointer"
+                whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}>
+                whileHover={{ scale: 1.02, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
+                transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
                 <Card key={machineNumber} className="overflow-hidden">
                     <CardContent className="p-4">
                         <div className="flex flex-col space-y-2">
@@ -333,7 +335,7 @@ export default function MachineManager() {
                 </Select>
                 <div className="flex items-center space-x-2">
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
@@ -342,7 +344,7 @@ export default function MachineManager() {
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
                         disabled={currentPage === pageCount}

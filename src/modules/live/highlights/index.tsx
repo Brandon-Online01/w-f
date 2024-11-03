@@ -8,6 +8,7 @@ import { ShiftUtilization } from './shift-utilization';
 import { FactoryUtilization } from './factory-utilization';
 import { DeviceStatistics } from './iot-devices';
 import { isEmpty } from 'lodash';
+import { motion } from "framer-motion";
 
 import {
     Card,
@@ -16,11 +17,8 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card"
-import { ArrowDownToLine, ChartSpline, CpuIcon, FileText, RadioTower } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { ChartSpline, CpuIcon, RadioTower } from 'lucide-react';
 import ProductionReportCard from './reports';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
 
 type HighlightsData = {
     activeReporters: number | null,
@@ -55,6 +53,31 @@ const liveRunStore = create<LiveRunStore>((set) => ({
     setHighlightsData: (data: HighlightsData) => set({ highlightsData: data }),
     setIsLoading: (state: boolean) => set({ isLoading: state }),
 }))
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.3
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: {
+        opacity: 0,
+        y: 20
+    },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.4
+        }
+    }
+};
 
 export default function LiveRunHighlights() {
     const { highlightsData, setHighlightsData, setIsLoading, isLoading } = liveRunStore();
@@ -93,8 +116,12 @@ export default function LiveRunHighlights() {
 
     if (isLoading || isEmpty(highlightsData)) {
         return (
-            <div className="flex gap-1 w-full flex-wrap lg:flex-nowrap flex-col md:flex-row md:justify-between p-1 lg:p-0 gap-y-4">
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+            <motion.div
+                className="flex gap-1 w-full flex-wrap lg:flex-nowrap flex-col md:flex-row md:justify-between p-1 lg:p-0 gap-y-4"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show">
+                <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
                     <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
@@ -103,8 +130,14 @@ export default function LiveRunHighlights() {
                         </CardHeader>
                         <CardContent className="flex-1 pb-0 items-center justify-center">
                             <div className="flex items-center justify-center w-full h-[250px]">
-                                <div className="w-48 h-48 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <Skeleton className="w-36 h-36 rounded-full bg-card" />
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <div className="loading">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>
@@ -131,8 +164,8 @@ export default function LiveRunHighlights() {
                             </div>
                         </CardFooter>
                     </Card>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                </motion.div>
+                <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
                     <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
@@ -141,8 +174,14 @@ export default function LiveRunHighlights() {
                         </CardHeader>
                         <CardContent className="flex-1 pb-0 items-center justify-center">
                             <div className="flex items-center justify-center w-full h-[250px]">
-                                <div className="w-48 h-48 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <Skeleton className="w-36 h-36 rounded-full bg-card" />
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <div className="loading">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>
@@ -165,8 +204,8 @@ export default function LiveRunHighlights() {
                             </div>
                         </CardFooter>
                     </Card>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                </motion.div>
+                <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
                     <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
@@ -175,8 +214,14 @@ export default function LiveRunHighlights() {
                         </CardHeader>
                         <CardContent className="flex-1 pb-0 items-center justify-center">
                             <div className="flex items-center justify-center w-full h-[250px]">
-                                <div className="w-48 h-48 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <Skeleton className="w-36 h-36 rounded-full bg-card" />
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <div className="loading">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>
@@ -199,8 +244,8 @@ export default function LiveRunHighlights() {
                             </div>
                         </CardFooter>
                     </Card>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                </motion.div>
+                <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
                     <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
@@ -209,8 +254,14 @@ export default function LiveRunHighlights() {
                         </CardHeader>
                         <CardContent className="flex-1 pb-0 items-center justify-center">
                             <div className="flex items-center justify-center w-full h-[250px]">
-                                <div className="w-48 h-48 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <Skeleton className="w-36 h-36 rounded-full bg-card" />
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <div className="loading">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>
@@ -233,40 +284,30 @@ export default function LiveRunHighlights() {
                             </div>
                         </CardFooter>
                     </Card>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
+                </motion.div>
+                <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/4 h-[380px]">
                     <Card className="flex flex-col w-full h-[380px]">
                         <CardHeader className="items-center pb-0">
                             <CardDescription>
                                 <p className="text-sm text-card-foreground -mt-3 uppercase">Production Reports</p>
                             </CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <ScrollArea className="pr-4">
-                                {Array.from({ length: 5 }).map((_, index) => (
-                                    <div key={index} className="flex items-center justify-between py-4 border-b last:border-b-0">
-                                        <div className="flex items-center space-x-4">
-                                            <FileText className="stroke-card-foreground" strokeWidth={1} size={22} />
-                                            <div className="flex flex-col gap-1">
-                                                <Skeleton className="w-3/4 h-4 rounded-full bg-red-500" />
-                                                <Skeleton className="w-1/2 h-4 rounded-full bg-red-500" />
-                                            </div>
-                                        </div>
-                                        <Button
-                                            className="h-8 w-8"
-                                            variant="ghost"
-                                            size="icon"
-                                            disabled>
-                                            <ArrowDownToLine className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                            <span className="sr-only">Download report</span>
-                                        </Button>
+                        <CardContent className="flex-1 pb-0 items-center justify-center">
+                            <div className="flex items-center justify-center w-full h-[250px]">
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <div className="loading">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
                                     </div>
-                                ))}
-                            </ScrollArea>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         )
     }
 
@@ -294,22 +335,27 @@ export default function LiveRunHighlights() {
     }
 
     return (
-        <div className="flex gap-1 w-full flex-wrap lg:flex-nowrap flex-col md:flex-row md:justify-between p-1 lg:p-0 gap-y-4">
-            <div className="flex flex-col xl:flex-row items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+        <motion.div
+            className="flex gap-1 w-full flex-wrap lg:flex-nowrap flex-col md:flex-row md:justify-between p-1 lg:p-0 gap-y-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+        >
+            <motion.div variants={itemVariants} className="flex flex-col xl:flex-row items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <MachineStatistics data={machineStats} />
-            </div>
-            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <ShiftUtilization data={currentShiftMachineUtilization} />
-            </div>
-            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <DeviceStatistics data={deviceStats} />
-            </div>
-            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <FactoryUtilization data={totalFactoryMachineUtilization} />
-            </div>
-            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <ProductionReportCard />
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     )
 }

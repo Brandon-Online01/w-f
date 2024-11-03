@@ -361,10 +361,12 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	return (
 		<motion.div
-			className='bg-card rounded'
+			className="bg-card rounded shadow-md cursor-pointer"
+			whileTap={{ scale: 0.98 }}
 			initial={{ opacity: 0, y: 50 }}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5, delay: index * 0.1 }}>
+			whileHover={{ scale: 0.99, border: "1px solid hsl(var(--success))" }}
+			transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
 			<Dialog>
 				<DialogTrigger asChild>
 					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")} >

@@ -322,10 +322,12 @@ export default function MouldManager() {
 
         return (
             <motion.div
-                className='bg-card rounded'
+                className="bg-card rounded shadow-md cursor-pointer"
+                whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}>
+                whileHover={{ scale: 1.02, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
+                transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
                 <Card key={serialNumber} className="overflow-hidden">
                     <CardContent className="p-4">
                         <div className="flex flex-col space-y-2">
