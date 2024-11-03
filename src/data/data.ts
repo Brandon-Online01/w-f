@@ -2,7 +2,8 @@ import axios from "axios";
 
 export const userList = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/users/`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)
@@ -11,7 +12,8 @@ export const userList = async () => {
 
 export const componentList = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/components`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/components`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)
@@ -20,7 +22,8 @@ export const componentList = async () => {
 
 export const mouldList = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/moulds`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/moulds`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)
@@ -29,7 +32,8 @@ export const mouldList = async () => {
 
 export const machineList = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/machines`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/machines`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)
@@ -38,7 +42,8 @@ export const machineList = async () => {
 
 export const latestReports = async () => {
     try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/reports`)
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/reports`
+        const { data } = await axios.get(url)
         return data;
     } catch (error) {
         console.log(error)

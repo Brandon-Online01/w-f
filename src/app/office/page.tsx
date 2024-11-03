@@ -7,9 +7,7 @@ import {
     Stamp,
     ServerCog,
     Rss,
-    BlendIcon,
-    Scale,
-    Bolt
+    Factory
 } from "lucide-react";
 import {
     Tabs,
@@ -40,14 +38,14 @@ export default function Home() {
 
     const contentVariants = {
         hidden: { opacity: 0, y: 20 },
-        visible: { 
-            opacity: 1, 
+        visible: {
+            opacity: 1,
             y: 0,
             transition: {
                 duration: 0.5
             }
         },
-        exit: { 
+        exit: {
             opacity: 0,
             y: -20,
             transition: {
@@ -58,13 +56,11 @@ export default function Home() {
 
     const TabListHeaders = () => {
         const tabItems = [
+            { value: "factory", icon: Factory, label: "Factory" },
             { value: "staff", icon: Users, label: "Staff" },
             { value: "components", icon: Component, label: "Components" },
-            { value: "moulds", icon: Stamp, label: "Moulds" },
             { value: "machines", icon: ServerCog, label: "Machines" },
-            { value: "materialsControl", icon: Scale, label: "Materials Control" },
-            { value: "materialsMixing", icon: BlendIcon, label: "Materials Mixing" },
-            { value: "toolRoom", icon: Bolt, label: "Tool Room" },
+            { value: "moulds", icon: Stamp, label: "Moulds" },
         ];
 
         return (
@@ -104,7 +100,7 @@ export default function Home() {
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <div className="w-full h-[98vh] bg-card p-1 rounded overflow-y-auto mt-4">
-                    <Tabs defaultValue="staff" className="w-full overflow-hidden h-full">
+                    <Tabs defaultValue="factory" className="w-full overflow-hidden h-full">
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>
@@ -182,6 +178,18 @@ export default function Home() {
                                 <TabsContent value="toolRoom" className="w-full bg-background p-1 rounded">
                                     <div className="w-full h-full flex items-center justify-center">
                                         <p className="text-[10px] font-medium uppercase">Tool Room Coming Soon</p>
+                                    </div>
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="factory"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="factory" className="w-full bg-background p-1 rounded">
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <p className="text-[10px] font-medium uppercase">Factory Management Coming Soon</p>
                                     </div>
                                 </TabsContent>
                             </motion.div>
