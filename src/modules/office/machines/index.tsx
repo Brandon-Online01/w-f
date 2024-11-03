@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -27,19 +27,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-
-// Sample machine data
-const initialMachines = [
-    {
-        "id": 1,
-        "name": "Machine A",
-        "machineNumber": "MACHINE-001",
-        "macAddress": "00:1B:44:11:3A:B7",
-        "description": "This is a description of Machine A.",
-        "creationDate": "2023-01-01T00:00:00Z",
-        "status": "Active" as const
-    },
-]
+import { machineList } from '@/data/data'
+import { Machine } from '@/types/machine'
 
 // Validation schema
 const machineSchema = z.object({
@@ -53,7 +42,7 @@ const machineSchema = z.object({
 type MachineFormData = z.infer<typeof machineSchema>
 
 export default function MachineManager() {
-    const [machines] = useState(initialMachines)
+    const [machines, setMachines] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('All')
     const [currentPage, setCurrentPage] = useState(1)
@@ -64,7 +53,15 @@ export default function MachineManager() {
     const [editingMachine, setEditingMachine] = useState<MachineFormData | null>(null)
     const [viewingMachine, setViewingMachine] = useState<MachineFormData | null>(null)
 
-    const filteredMachines = machines.filter(machine =>
+    useEffect(() => {
+        const allMachines = async () => {
+            const machines = await machineList()
+            setMachines(machines?.data)
+        }
+        allMachines()
+    }, [setMachines]);
+
+    const filteredMachines = machines.filter((machine: Machine) =>
         machine.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (statusFilter === 'All' || machine.status === statusFilter)
     )
@@ -381,7 +378,7 @@ export default function MachineManager() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedMachines?.map(machine => <MachineCard machine={machine} key={machine?.machineNumber} />)}
+                {paginatedMachines?.map((machine: Machine, index: number) => <MachineCard machine={machine} key={index} />)}
             </div>
             <PageControls />
             <EditMachineModal />

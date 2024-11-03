@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -51,26 +51,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { mouldSchema } from '@/schemas/mould'
 import { Mould } from '@/types/mould'
-
-// Sample mould data
-const initialMoulds = [
-    {
-        "uid": 1,
-        "name": "Mould A",
-        "serialNumber": "MOULD-001",
-        "creationDate": "2023-01-01T00:00:00Z",
-        "lastRepairDate": "2023-06-01T00:00:00Z",
-        "mileage": 1000,
-        "servicingMileage": 1500,
-        "component": 1,
-        "status": "Active" as const
-    },
-]
+import { mouldList } from '@/data/data'
 
 type MouldFormData = z.infer<typeof mouldSchema>
 
 export default function MouldManager() {
-    const [moulds] = useState(initialMoulds)
+    const [moulds, setMoulds] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('All')
     const [currentPage, setCurrentPage] = useState(1)
@@ -81,7 +67,17 @@ export default function MouldManager() {
     const [editingMould, setEditingMould] = useState<Mould | null>(null)
     const [viewingMould, setViewingMould] = useState<Mould | null>(null)
 
-    const filteredMoulds = moulds.filter(mould =>
+    useEffect(() => {
+        const allMoulds = async () => {
+            const moulds = await mouldList()
+            setMoulds(moulds?.data)
+        }
+        allMoulds()
+    }, [setMoulds]);
+
+    console.log(moulds)
+
+    const filteredMoulds = moulds.filter((mould: Mould) =>
         mould.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (statusFilter === 'All' || mould.status === statusFilter)
     )
@@ -408,7 +404,7 @@ export default function MouldManager() {
                 </Select>
                 <div className="flex items-center space-x-2">
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
@@ -417,7 +413,7 @@ export default function MouldManager() {
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
                         disabled={currentPage === pageCount}

@@ -1,7 +1,7 @@
 'use client'
 
 
-import { Component, FolderKanban, Users, Stamp, ServerCog, Rss } from "lucide-react";
+import { Component, FolderKanban, Users, Stamp, ServerCog, Rss, Weight, Library } from "lucide-react";
 import {
     Tabs,
     TabsContent,
@@ -41,6 +41,18 @@ export default function Home() {
                     <span className="flex items-center gap-2">
                         <ServerCog className="stroke-card-foreground" strokeWidth={1} size={18} />
                         Machines
+                    </span>
+                </TabsTrigger>
+                <TabsTrigger value="machines">
+                    <span className="flex items-center gap-2">
+                        <Weight className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        Materials
+                    </span>
+                </TabsTrigger>
+                <TabsTrigger value="machines">
+                    <span className="flex items-center gap-2">
+                        <Library className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        Reports
                     </span>
                 </TabsTrigger>
             </>
