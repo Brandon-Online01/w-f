@@ -72,8 +72,7 @@ export default function Home() {
                             custom={index}
                             variants={tabVariants}
                             initial="hidden"
-                            animate="visible"
-                        >
+                            animate="visible">
                             <TabsTrigger value={item.value}>
                                 <span className="flex items-center gap-2">
                                     <Icon className="stroke-card-foreground" strokeWidth={1} size={18} />
