@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -30,6 +30,7 @@ import * as z from "zod"
 import { machineList } from '@/data/data'
 import { Machine } from '@/types/machine'
 import { motion } from 'framer-motion'
+import { useOfficeStore } from '../state/state'
 
 // Validation schema
 const machineSchema = z.object({
@@ -43,16 +44,26 @@ const machineSchema = z.object({
 type MachineFormData = z.infer<typeof machineSchema>
 
 export default function MachineManager() {
-    const [machines, setMachines] = useState([])
-    const [searchTerm, setSearchTerm] = useState('')
-    const [statusFilter, setStatusFilter] = useState('All')
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(8)
-    const [isCreateMachineOpen, setIsCreateMachineOpen] = useState(false)
-    const [isEditMachineOpen, setIsEditMachineOpen] = useState(false)
-    const [isViewMachineOpen, setIsViewMachineOpen] = useState(false)
-    const [editingMachine, setEditingMachine] = useState<MachineFormData | null>(null)
-    const [viewingMachine, setViewingMachine] = useState<MachineFormData | null>(null)
+    const {
+        machineInFocus,
+        setMachineInFocus,
+        machines,
+        searchTerm,
+        statusFilter,
+        currentPage,
+        itemsPerPage,
+        isCreating,
+        isEditing,
+        isViewing,
+        setMachines,
+        setSearchTerm,
+        setStatusFilter,
+        setCurrentPage,
+        setItemsPerPage,
+        setIsCreating,
+        setIsEditing,
+        setIsViewing,
+    } = useOfficeStore();
 
     useEffect(() => {
         const allMachines = async () => {
@@ -225,7 +236,7 @@ export default function MachineManager() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Dialog open={isCreateMachineOpen} onOpenChange={setIsCreateMachineOpen}>
+                <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
@@ -245,7 +256,7 @@ export default function MachineManager() {
         )
     }
 
-    const MachineCard = ({ machine, index }: { machine: MachineFormData, index: number }) => {
+    const MachineCard = ({ machine, index }: { machine: Machine, index: number }) => {
         const {
             name,
             machineNumber,
@@ -290,15 +301,15 @@ export default function MachineManager() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onSelect={() => {
-                                            setEditingMachine(machine)
-                                            setIsEditMachineOpen(true)
+                                            setMachineInFocus(machine)
+                                            setIsEditing(true)
                                         }}>
                                             <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
-                                            setViewingMachine(machine)
-                                            setIsViewMachineOpen(true)
+                                            setMachineInFocus(machine)
+                                            setIsViewing(true)
                                         }}>
                                             <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             View
@@ -337,18 +348,16 @@ export default function MachineManager() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
+                        onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                        disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
-                        disabled={currentPage === pageCount}
-                    >
+                        onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
+                        disabled={currentPage === pageCount}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
@@ -359,12 +368,12 @@ export default function MachineManager() {
     //modals
     const EditMachineModal = () => {
         return (
-            <Dialog open={isEditMachineOpen} onOpenChange={setIsEditMachineOpen}>
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogContent className="sm:max-w-[700px]">
                     <DialogHeader>
                         <DialogTitle>Edit Machine</DialogTitle>
                     </DialogHeader>
-                    {editingMachine && <MachineForm machine={editingMachine} onSubmit={handleEditMachine} />}
+                    {machineInFocus && <MachineForm machine={machineInFocus} onSubmit={handleEditMachine} />}
                 </DialogContent>
             </Dialog>
         )
@@ -372,12 +381,12 @@ export default function MachineManager() {
 
     const ViewMachineDetailModal = () => {
         return (
-            <Dialog open={isViewMachineOpen} onOpenChange={setIsViewMachineOpen}>
+            <Dialog open={isViewing} onOpenChange={setIsViewing}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>Machine Details</DialogTitle>
                     </DialogHeader>
-                    {viewingMachine && <ViewMachineModal machine={viewingMachine} />}
+                    {machineInFocus && <ViewMachineModal machine={machineInFocus} />}
                 </DialogContent>
             </Dialog>
         )

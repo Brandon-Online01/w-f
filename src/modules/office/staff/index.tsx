@@ -59,9 +59,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { newUserSchema, editUserSchema } from '@/schemas/user'
 import { userList } from '@/data/data'
-import { useStaffStore } from '../state/state'
+import { useOfficeStore } from '../state/state'
 import { NewUserType } from '@/types/user'
 import { motion } from 'framer-motion'
+import { isEmpty } from 'lodash'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
@@ -72,9 +73,9 @@ export default function StaffManagement() {
         statusFilter,
         currentPage,
         itemsPerPage,
-        isCreateUserOpen,
-        isEditUserOpen,
-        isViewUserOpen,
+        isCreating,
+        isEditing,
+        isViewing,
         editingUser,
         viewingUser,
         isLoading,
@@ -83,21 +84,25 @@ export default function StaffManagement() {
         setStatusFilter,
         setCurrentPage,
         setItemsPerPage,
-        setIsCreateUserOpen,
-        setIsEditUserOpen,
-        setIsViewUserOpen,
+        setIsCreating,
+        setIsEditing,
+        setIsViewing,
         setEditingUser,
         setViewingUser,
-    } = useStaffStore();
+        setIsLoading,
+    } = useOfficeStore();
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     useEffect(() => {
+        setIsLoading(true)
         const allUsers = async () => {
             const users = await userList()
             setUsers(users?.data)
         }
+
         allUsers()
-    }, [setUsers]);
+        setIsLoading(false)
+    }, [setUsers, setIsLoading]);
 
     const filteredUsers = users?.filter(user =>
         (user?.name?.toLowerCase() + ' ' + user?.lastName.toLowerCase())?.includes(searchTerm.toLowerCase()) &&
@@ -171,7 +176,7 @@ export default function StaffManagement() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Dialog open={isCreateUserOpen} onOpenChange={setIsCreateUserOpen}>
+                <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
@@ -198,13 +203,13 @@ export default function StaffManagement() {
 
         return (
             <motion.div
-                className="bg-card rounded shadow-md cursor-pointer"
+                className="bg-card rounded shadow-md cursor-pointer w-full border"
                 whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.02, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
                 transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
-                <Card key={uid} className="overflow-hidden">
+                <Card key={uid} className="overflow-hidden w-full border">
                     <CardContent className="p-0">
                         <div className="flex flex-col items-center">
                             <div className="w-full h-32 flex items-center justify-center bg-gray-100">
@@ -236,14 +241,14 @@ export default function StaffManagement() {
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem onSelect={() => {
                                                 setEditingUser(user)
-                                                setIsEditUserOpen(true)
+                                                setIsEditing(true)
                                             }}>
                                                 <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
                                                 Edit
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onSelect={() => {
                                                 setViewingUser(user)
-                                                setIsViewUserOpen(true)
+                                                setIsViewing(true)
                                             }}>
                                                 <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
                                                 View
@@ -265,7 +270,7 @@ export default function StaffManagement() {
 
     const EditModal = () => {
         return (
-            <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogContent className="sm:max-w-[700px] bg-card">
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
@@ -278,7 +283,7 @@ export default function StaffManagement() {
 
     const ViewModal = () => {
         return (
-            <Dialog open={isViewUserOpen} onOpenChange={setIsViewUserOpen}>
+            <Dialog open={isViewing} onOpenChange={setIsViewing}>
                 <DialogContent className="sm:max-w-[500px] bg-card">
                     <DialogHeader>
                         <DialogTitle>User Details</DialogTitle>
@@ -455,7 +460,7 @@ export default function StaffManagement() {
                         {errors?.status && <p className="text-red-500 text-xs mt-1">{errors?.status?.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-10/12 mx-auto flex" disabled> 
+                <Button type="submit" className="w-10/12 mx-auto flex" disabled>
                     {
                         isLoading ? <Loader2 className="mr-2 animate-spin stroke-white" strokeWidth={1.5} size={18} /> :
                             <>
@@ -527,14 +532,23 @@ export default function StaffManagement() {
         )
     }
 
+    if (isLoading || isEmpty(users)) {
+        return (
+            <div className="w-full h-screen">
+                <PageHeader />
+                <UserCardsLoader />
+            </div>
+        )
+    }
+
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedUsers.map((user, index) => {
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {paginatedUsers?.map((user, index) => {
                     const userWithDefaultPhoto = {
                         ...user,
-                        photoURL: user.photoURL || userPlaceHolderIcon,
+                        photoURL: user?.photoURL || userPlaceHolderIcon,
                     };
                     return <UserCard key={index} user={userWithDefaultPhoto} index={index} />;
                 })}
@@ -545,3 +559,42 @@ export default function StaffManagement() {
         </div>
     )
 }
+
+const UserCardsLoader = () => {
+    return (
+        <div className="w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {Array.from({ length: 8 }).map((_, index) => (
+                    <motion.div
+                        key={index}
+                        className="relative bg-card rounded p-4 border shadow animate-pulse flex flex-col justify-start gap-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}>
+                        <div className="aspect-video w-full bg-gray-200 rounded mb-4 h-32 flex items-center justify-center" >
+                            <div className="w-full h-full flex items-center justify-center">
+                                <div className="loading">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-5 bg-gray-200 rounded w-1/2" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="h-4 bg-gray-200 rounded w-2/3" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-3 bg-gray-200 rounded w-1/4" />
+                            <div className="h-5 bg-gray-200 rounded w-1/12" />
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+};

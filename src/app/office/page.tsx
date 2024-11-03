@@ -100,7 +100,7 @@ export default function Home() {
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <div className="w-full h-[98vh] bg-card p-1 rounded overflow-y-auto mt-4">
-                    <Tabs defaultValue="factory" className="w-full overflow-hidden h-full">
+                    <Tabs defaultValue="components" className="w-full overflow-hidden h-full">
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>
@@ -143,42 +143,6 @@ export default function Home() {
                                 exit="exit">
                                 <TabsContent value="machines" className="w-full bg-background p-1 rounded">
                                     <MachinesManagement />
-                                </TabsContent>
-                            </motion.div>
-                            <motion.div
-                                key="materialsControl"
-                                variants={contentVariants}
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit">
-                                <TabsContent value="materialsControl" className="w-full bg-background p-1 rounded">
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <p className="text-[10px] font-medium uppercase">Materials Control Coming Soon</p>
-                                    </div>
-                                </TabsContent>
-                            </motion.div>
-                            <motion.div
-                                key="materialsMixing"
-                                variants={contentVariants}
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit">
-                                <TabsContent value="materialsMixing" className="w-full bg-background p-1 rounded">
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <p className="text-[10px] font-medium uppercase">Materials Mixing Coming Soon</p>
-                                    </div>
-                                </TabsContent>
-                            </motion.div>
-                            <motion.div
-                                key="toolRoom"
-                                variants={contentVariants}
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit">
-                                <TabsContent value="toolRoom" className="w-full bg-background p-1 rounded">
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <p className="text-[10px] font-medium uppercase">Tool Room Coming Soon</p>
-                                    </div>
                                 </TabsContent>
                             </motion.div>
                             <motion.div

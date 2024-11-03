@@ -161,7 +161,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		}
 	};
 
-
 	const TabListHeaders = () => {
 		const tabItems = [
 			{ value: "overview", icon: Kanban, label: "Overview" },
