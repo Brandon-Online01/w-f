@@ -62,13 +62,13 @@ export default function MachineManager() {
         allMachines()
     }, [setMachines]);
 
-    const filteredMachines = machines.filter((machine: Machine) =>
-        machine.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || machine.status === statusFilter)
+    const filteredMachines = machines?.filter((machine: Machine) =>
+        machine?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || machine?.status === statusFilter)
     )
 
-    const pageCount = Math.ceil(filteredMachines.length / itemsPerPage)
-    const paginatedMachines = filteredMachines.slice(
+    const pageCount = Math.ceil(filteredMachines?.length / itemsPerPage)
+    const paginatedMachines = filteredMachines?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -128,7 +128,7 @@ export default function MachineManager() {
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-full">{machine ? 'Update Machine' : 'Create Machine'}</Button>
+                <Button type="submit" className="w-full" disabled>{machine ? 'Update Machine' : 'Create Machine'}</Button>
             </form>
         )
     }
