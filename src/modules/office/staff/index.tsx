@@ -61,6 +61,7 @@ import { newUserSchema, editUserSchema } from '@/schemas/user'
 import { userList } from '@/data/data'
 import { useStaffStore } from '../state/state'
 import { NewUserType } from '@/types/user'
+import { motion } from 'framer-motion'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
@@ -189,68 +190,74 @@ export default function StaffManagement() {
         )
     }
 
-    const UserCard = ({ user }: { user: UserFormData & { uid: number, password: string } }) => {
+    const UserCard = ({ user, index }: { user: UserFormData & { uid: number, password: string }, index: number }) => {
         const { name, lastName, email, status, photoURL = userPlaceHolderIcon, uid } = user
 
         const userABBR = `${name.charAt(0)}${lastName.charAt(0)}`
         const userPhoto = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
 
         return (
-            <Card key={uid} className="overflow-hidden">
-                <CardContent className="p-0">
-                    <div className="flex flex-col items-center">
-                        <div className="w-full h-32 flex items-center justify-center bg-gray-100">
-                            <Avatar className="h-24 w-24">
-                                <AvatarImage src={userPhoto} alt={`${name} ${lastName}`} />
-                                <AvatarFallback>{userABBR}</AvatarFallback>
-                            </Avatar>
-                        </div>
-                        <div className="p-4 w-full">
-                            <div className="flex items-center justify-start gap-2">
-                                <IdCard className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <h3 className="font-semibold text-card-foreground">{name} {lastName}</h3>
+            <motion.div
+                className='bg-card rounded'
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}>
+                <Card key={uid} className="overflow-hidden">
+                    <CardContent className="p-0">
+                        <div className="flex flex-col items-center">
+                            <div className="w-full h-32 flex items-center justify-center bg-gray-100">
+                                <Avatar className="h-24 w-24">
+                                    <AvatarImage src={userPhoto} alt={`${name} ${lastName}`} />
+                                    <AvatarFallback>{userABBR}</AvatarFallback>
+                                </Avatar>
                             </div>
-                            <div className="flex items-center justify-start gap-2">
-                                <Mail className="stroke-card-foreground" strokeWidth={1} size={17} />
-                                <p className="text-sm text-card-foreground">{email}</p>
-                            </div>
-                            <div className="flex items-center justify-between">
+                            <div className="p-4 w-full">
                                 <div className="flex items-center justify-start gap-2">
-                                    <Activity className="stroke-card-foreground" strokeWidth={1} size={17} />
-                                    <span className="text-sm text-card-foreground">{status}</span>
+                                    <IdCard className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <h3 className="font-semibold text-card-foreground">{name} {lastName}</h3>
                                 </div>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => {
-                                            setEditingUser(user)
-                                            setIsEditUserOpen(true)
-                                        }}>
-                                            <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => {
-                                            setViewingUser(user)
-                                            setIsViewUserOpen(true)
-                                        }}>
-                                            <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
-                                            View
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => handleDeleteUser(user.uid)}>
-                                            <UserX className="stroke-red-500 mr-2" strokeWidth={1} size={17} />
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div className="flex items-center justify-start gap-2">
+                                    <Mail className="stroke-card-foreground" strokeWidth={1} size={17} />
+                                    <p className="text-sm text-card-foreground">{email}</p>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-start gap-2">
+                                        <Activity className="stroke-card-foreground" strokeWidth={1} size={17} />
+                                        <span className="text-sm text-card-foreground">{status}</span>
+                                    </div>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreVertical className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onSelect={() => {
+                                                setEditingUser(user)
+                                                setIsEditUserOpen(true)
+                                            }}>
+                                                <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => {
+                                                setViewingUser(user)
+                                                setIsViewUserOpen(true)
+                                            }}>
+                                                <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
+                                                View
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => handleDeleteUser(user.uid)}>
+                                                <UserX className="stroke-red-500 mr-2" strokeWidth={1} size={17} />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
         )
     }
 
@@ -527,7 +534,7 @@ export default function StaffManagement() {
                         ...user,
                         photoURL: user.photoURL || userPlaceHolderIcon,
                     };
-                    return <UserCard key={index} user={userWithDefaultPhoto} />;
+                    return <UserCard key={index} user={userWithDefaultPhoto} index={index} />;
                 })}
             </div>
             <PaginationControls />

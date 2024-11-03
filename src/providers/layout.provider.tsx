@@ -7,6 +7,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useSessionStore } from '@/session/session.provider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { motion } from "framer-motion";
 
 const queryClient = new QueryClient();
 
@@ -79,12 +80,38 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
         )
     }
 
+    const pageVariants = {
+        initial: {
+            opacity: 0,
+            y: 20
+        },
+        animate: {
+            opacity: 1,
+            y: 0
+        },
+        transition: {
+            type: "spring",
+            stiffness: 260,
+            damping: 20
+        }
+    };
+
     return (
         <QueryClientProvider client={queryClient}>
             <div className={`w-full h-screen flex flex-col xl:flex-row items-center justify-center xl:gap-2 gap-1 relative ${pathname === '/sign-in' ? '' : 'p-1 xl:p-2'} outline-none`}>
                 {pathname !== '/sign-in' && <div className="border h-10 w-full xl:w-[3%] rounded p-2 flex justify-center h-[5%] xl:h-full ease-in-out duration-300 bg-card"><Navigation /></div>}
                 <div className={`${pathname === '/sign-in' ? 'w-full h-full' : 'w-full xl:w-[97%] p-1 md:p-0 rounded'} xl:h-full h-[95%] ease-in-out duration-300 outline-none`}>
-                    {isLoading ? <PageLoader /> : children}
+                    {isLoading ? (
+                        <PageLoader />
+                    ) : (
+                        <motion.div
+                            initial="initial"
+                            animate="animate"
+                            variants={pageVariants}
+                        >
+                            {children}
+                        </motion.div>
+                    )}
                 </div>
             </div>
             <Toaster position="bottom-center" reverseOrder={false} />

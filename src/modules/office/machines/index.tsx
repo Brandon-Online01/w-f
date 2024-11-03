@@ -29,6 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { machineList } from '@/data/data'
 import { Machine } from '@/types/machine'
+import { motion } from 'framer-motion'
 
 // Validation schema
 const machineSchema = z.object({
@@ -244,7 +245,7 @@ export default function MachineManager() {
         )
     }
 
-    const MachineCard = ({ machine }: { machine: MachineFormData }) => {
+    const MachineCard = ({ machine, index }: { machine: MachineFormData, index: number }) => {
         const {
             name,
             machineNumber,
@@ -252,59 +253,65 @@ export default function MachineManager() {
             status,
         } = machine
         return (
-            <Card key={machineNumber} className="overflow-hidden">
-                <CardContent className="p-4">
-                    <div className="flex flex-col space-y-2">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                                <Server className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <h3 className="font-semibold">{name}</h3>
+            <motion.div
+                className='bg-card rounded'
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}>
+                <Card key={machineNumber} className="overflow-hidden">
+                    <CardContent className="p-4">
+                        <div className="flex flex-col space-y-2">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <Server className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <h3 className="font-semibold">{name}</h3>
+                                </div>
+                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                    }`}>
+                                    {status}
+                                </span>
                             </div>
-                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                }`}>
-                                {status}
-                            </span>
+                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                <span>{machineNumber}</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                <Wifi className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                <span>{macAddress}</span>
+                            </div>
+                            <div className="flex justify-end">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                            <MoreVertical className="stroke-card-foreground" strokeWidth={1.5} size={18} />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => {
+                                            setEditingMachine(machine)
+                                            setIsEditMachineOpen(true)
+                                        }}>
+                                            <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => {
+                                            setViewingMachine(machine)
+                                            setIsViewMachineOpen(true)
+                                        }}>
+                                            <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            View
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.machineNumber))}>
+                                            <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                            <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
-                            <span>{machineNumber}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                            <Wifi className="stroke-card-foreground" strokeWidth={1} size={18} />
-                            <span>{macAddress}</span>
-                        </div>
-                        <div className="flex justify-end">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                        <MoreVertical className="stroke-card-foreground" strokeWidth={1.5} size={18} />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onSelect={() => {
-                                        setEditingMachine(machine)
-                                        setIsEditMachineOpen(true)
-                                    }}>
-                                        <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                        Edit
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => {
-                                        setViewingMachine(machine)
-                                        setIsViewMachineOpen(true)
-                                    }}>
-                                        <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                        View
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.machineNumber))}>
-                                        <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
         )
     }
 
@@ -378,7 +385,7 @@ export default function MachineManager() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedMachines?.map((machine: Machine, index: number) => <MachineCard machine={machine} key={index} />)}
+                {paginatedMachines?.map((machine: Machine, index: number) => <MachineCard machine={machine} key={index} index={index} />)}
             </div>
             <PageControls />
             <EditMachineModal />

@@ -52,6 +52,7 @@ import * as z from "zod"
 import { mouldSchema } from '@/schemas/mould'
 import { Mould } from '@/types/mould'
 import { mouldList } from '@/data/data'
+import { motion } from 'framer-motion'
 
 type MouldFormData = z.infer<typeof mouldSchema>
 
@@ -311,7 +312,7 @@ export default function MouldManager() {
         )
     }
 
-    const MouldCard = ({ mould }: { mould: MouldFormData }) => {
+    const MouldCard = ({ mould, index }: { mould: MouldFormData, index: number }) => {
         const {
             name,
             serialNumber,
@@ -320,69 +321,75 @@ export default function MouldManager() {
         } = mould
 
         return (
-            <Card key={serialNumber} className="overflow-hidden">
-                <CardContent className="p-4">
-                    <div className="flex flex-col space-y-2">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                                <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <h3 className="font-semibold">{name}</h3>
+            <motion.div
+                className='bg-card rounded'
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}>
+                <Card key={serialNumber} className="overflow-hidden">
+                    <CardContent className="p-4">
+                        <div className="flex flex-col space-y-2">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <h3 className="font-semibold">{name}</h3>
+                                </div>
+                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' :
+                                    mould.status === 'Inactive' ? 'bg-red-100  text-red-800' : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                    {status}
+                                </span>
                             </div>
-                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' :
-                                mould.status === 'Inactive' ? 'bg-red-100  text-red-800' : 'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                {status}
-                            </span>
+                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                <span>{serialNumber}</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                <Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                <span>Mileage: {mileage}</span>
+                            </div>
+                            <div className="flex justify-end">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                            <MoreVertical className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => {
+                                            setEditingMould({
+                                                ...mould,
+                                                uid: Number(serialNumber),
+                                                creationDate: new Date().toISOString()
+                                            })
+                                            setIsEditMouldOpen(true)
+                                        }}>
+                                            <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => {
+                                            setViewingMould({
+                                                ...mould,
+                                                uid: Number(serialNumber),
+                                                creationDate: new Date().toISOString(),
+                                                status: status as "Active" | "Inactive" | "Maintenance"
+                                            })
+                                            setIsViewMouldOpen(true)
+                                        }}>
+                                            <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            View
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => handleDeleteMould(Number(serialNumber))}>
+                                            <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                            <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
-                            <span>{serialNumber}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                            <Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
-                            <span>Mileage: {mileage}</span>
-                        </div>
-                        <div className="flex justify-end">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                        <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onSelect={() => {
-                                        setEditingMould({
-                                            ...mould,
-                                            uid: Number(serialNumber),
-                                            creationDate: new Date().toISOString()
-                                        })
-                                        setIsEditMouldOpen(true)
-                                    }}>
-                                        <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                        Edit
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => {
-                                        setViewingMould({
-                                            ...mould,
-                                            uid: Number(serialNumber),
-                                            creationDate: new Date().toISOString(),
-                                            status: status as "Active" | "Inactive" | "Maintenance"
-                                        })
-                                        setIsViewMouldOpen(true)
-                                    }}>
-                                        <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                        View
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => handleDeleteMould(Number(serialNumber))}>
-                                        <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
         )
     }
 
@@ -459,7 +466,7 @@ export default function MouldManager() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedMoulds.map((mould, index) => <MouldCard mould={mould} key={index} />)}
+                {paginatedMoulds.map((mould, index) => <MouldCard mould={mould} key={index} index={index} />)}
             </div>
             <PageControls />
             <EditMouldModal />

@@ -1,7 +1,16 @@
 'use client'
 
-
-import { Component, FolderKanban, Users, Stamp, ServerCog, Rss, Weight, Library } from "lucide-react";
+import {
+    Component,
+    FolderKanban,
+    Users,
+    Stamp,
+    ServerCog,
+    Rss,
+    BlendIcon,
+    Scale,
+    Bolt
+} from "lucide-react";
 import {
     Tabs,
     TabsContent,
@@ -13,51 +22,75 @@ import StaffTab from "@/modules/office/staff";
 import MouldsManagement from "@/modules/office/moulds";
 import ComponentsManagement from "@/modules/office/components";
 import MachinesManagement from "@/modules/office/machines";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
 
+    const tabVariants = {
+        hidden: { opacity: 0, x: -20 },
+        visible: (index: number) => ({
+            opacity: 1,
+            x: 0,
+            transition: {
+                delay: index * 0.1,
+                duration: 0.5,
+            },
+        }),
+    };
+
+    const contentVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.5
+            }
+        },
+        exit: { 
+            opacity: 0,
+            y: -20,
+            transition: {
+                duration: 0.3
+            }
+        }
+    };
+
     const TabListHeaders = () => {
+        const tabItems = [
+            { value: "staff", icon: Users, label: "Staff" },
+            { value: "components", icon: Component, label: "Components" },
+            { value: "moulds", icon: Stamp, label: "Moulds" },
+            { value: "machines", icon: ServerCog, label: "Machines" },
+            { value: "materialsControl", icon: Scale, label: "Materials Control" },
+            { value: "materialsMixing", icon: BlendIcon, label: "Materials Mixing" },
+            { value: "toolRoom", icon: Bolt, label: "Tool Room" },
+        ];
+
         return (
             <>
-                <TabsTrigger value="staff">
-                    <span className="flex items-center gap-2">
-                        <Users className="stroke-card-foreground" strokeWidth={1} size={18} />
-                        Staff
-                    </span>
-                </TabsTrigger>
-                <TabsTrigger value="components">
-                    <span className="flex items-center gap-2">
-                        <Component className="stroke-card-foreground" strokeWidth={1} size={18} />
-                        Components
-                    </span>
-                </TabsTrigger>
-                <TabsTrigger value="moulds">
-                    <span className="flex items-center gap-2">
-                        <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
-                        Moulds
-                    </span>
-                </TabsTrigger>
-                <TabsTrigger value="machines">
-                    <span className="flex items-center gap-2">
-                        <ServerCog className="stroke-card-foreground" strokeWidth={1} size={18} />
-                        Machines
-                    </span>
-                </TabsTrigger>
-                <TabsTrigger value="machines">
-                    <span className="flex items-center gap-2">
-                        <Weight className="stroke-card-foreground" strokeWidth={1} size={18} />
-                        Materials
-                    </span>
-                </TabsTrigger>
-                <TabsTrigger value="machines">
-                    <span className="flex items-center gap-2">
-                        <Library className="stroke-card-foreground" strokeWidth={1} size={18} />
-                        Reports
-                    </span>
-                </TabsTrigger>
+                {tabItems.map((item, index) => {
+                    const Icon = item.icon;
+                    return (
+                        <motion.div
+                            key={item.value}
+                            custom={index}
+                            variants={tabVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
+                            <TabsTrigger value={item.value}>
+                                <span className="flex items-center gap-2">
+                                    <Icon className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    {item.label}
+                                </span>
+                            </TabsTrigger>
+                        </motion.div>
+                    );
+                })}
             </>
-        )
-    }
+        );
+    };
 
     return (
         <div className="flex flex-col items-start justify-start gap-4 h-full w-full overflow-y-scroll outline-none">
@@ -75,18 +108,84 @@ export default function Home() {
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>
-                        <TabsContent value="staff" className="w-full bg-background p-1 rounded">
-                            <StaffTab />
-                        </TabsContent>
-                        <TabsContent value="components" className="w-full bg-background p-1 rounded">
-                            <ComponentsManagement />
-                        </TabsContent>
-                        <TabsContent value="moulds" className="w-full bg-background p-1 rounded">
-                            <MouldsManagement />
-                        </TabsContent>
-                        <TabsContent value="machines" className="w-full bg-background p-1 rounded">
-                            <MachinesManagement />
-                        </TabsContent>
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key="staff"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="staff" className="w-full bg-background p-1 rounded">
+                                    <StaffTab />
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="components"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="components" className="w-full bg-background p-1 rounded">
+                                    <ComponentsManagement />
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="moulds"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="moulds" className="w-full bg-background p-1 rounded">
+                                    <MouldsManagement />
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="machines"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="machines" className="w-full bg-background p-1 rounded">
+                                    <MachinesManagement />
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="materialsControl"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="materialsControl" className="w-full bg-background p-1 rounded">
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <p className="text-[10px] font-medium uppercase">Materials Control Coming Soon</p>
+                                    </div>
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="materialsMixing"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="materialsMixing" className="w-full bg-background p-1 rounded">
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <p className="text-[10px] font-medium uppercase">Materials Mixing Coming Soon</p>
+                                    </div>
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="toolRoom"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="toolRoom" className="w-full bg-background p-1 rounded">
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <p className="text-[10px] font-medium uppercase">Tool Room Coming Soon</p>
+                                    </div>
+                                </TabsContent>
+                            </motion.div>
+                        </AnimatePresence>
                     </Tabs>
                 </div>
             </ScrollArea>

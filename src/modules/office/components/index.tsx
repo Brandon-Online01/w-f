@@ -50,6 +50,7 @@ import { componentSchema } from '@/schemas/component'
 import { componentList } from '@/data/data'
 import { Component as ComponentType } from '@/types/component'
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
@@ -448,7 +449,7 @@ export default function ComponentManager() {
         )
     }
 
-    const ComponentCard = ({ component }: { component: ComponentFormData }) => {
+    const ComponentCard = ({ component, index }: { component: ComponentFormData, index: number }) => {
 
         const {
             status,
@@ -475,84 +476,90 @@ export default function ComponentManager() {
 
 
         return (
-            <Card key={component.code} className="overflow-hidden bg-card">
-                <CardContent className="p-0">
-                    <div className="flex flex-col items-center">
-                        <div className="w-full h-40 flex items-center justify-center bg-gray-100">
-                            <div className="flex items-center justify-center rounded h-full">
-                                <Image
-                                    src={fullPhotoURL}
-                                    alt={name}
-                                    width={50}
-                                    height={50}
-                                    priority
-                                    quality={100}
-                                    className="rounded object-cover w-auto h-auto" />
-                            </div>
-                        </div>
-                        <div className="p-4 w-full">
-                            <div className="flex items-center mb-2">
-                                <Component className="mr-2" strokeWidth={1} size={18} />
-                                <h3 className="font-semibold text-card-foreground">{name}</h3>
-                            </div>
-                            <div className="flex items-center mb-2 gap-2">
-                                <Clock className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <p className="text-sm text-card-foreground">Cycle Time: {cycleTime}</p>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center justify-start gap-2">
-                                    <Activity className="stroke-card-foreground" strokeWidth={1} size={17} />
-                                    <span className="text-sm text-card-foreground">{status}</span>
+            <motion.div
+                className='bg-card rounded'
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}>
+                <Card key={component.code} className="overflow-hidden bg-card">
+                    <CardContent className="p-0">
+                        <div className="flex flex-col items-center">
+                            <div className="w-full h-40 flex items-center justify-center bg-gray-100">
+                                <div className="flex items-center justify-center rounded h-full">
+                                    <Image
+                                        src={fullPhotoURL}
+                                        alt={name}
+                                        width={50}
+                                        height={50}
+                                        priority
+                                        quality={100}
+                                        className="rounded object-cover w-auto h-auto" />
                                 </div>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => handleEditClick(component)}>
-                                            <Component className="stroke-success mr-2" strokeWidth={1} size={18} />
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => {
-                                            const typedComponent: ComponentFormData = {
-                                                name: component.name,
-                                                description: description,
-                                                weight: weight,
-                                                volume: volume,
-                                                code: code,
-                                                color: color,
-                                                cycleTime: cycleTime,
-                                                targetTime: targetTime,
-                                                coolingTime: coolingTime,
-                                                chargingTime: chargingTime,
-                                                cavity: cavity,
-                                                configuration: configuration,
-                                                configQTY: configQTY,
-                                                palletQty: palletQty,
-                                                testMachine: testMachine,
-                                                masterBatch: masterBatch,
-                                                status: status as "Active" | "Inactive",
-                                                photoURL: photoURL
-                                            };
-                                            setViewingComponent(typedComponent);
-                                            setIsViewComponentOpen(true);
-                                        }}>
-                                            <Component className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                            View
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => handleDeleteComponent(Number(component?.code))}>
-                                            <Component className="stroke-destructive mr-2" strokeWidth={1} size={18} />
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                            </div>
+                            <div className="p-4 w-full">
+                                <div className="flex items-center mb-2">
+                                    <Component className="mr-2" strokeWidth={1} size={18} />
+                                    <h3 className="font-semibold text-card-foreground">{name}</h3>
+                                </div>
+                                <div className="flex items-center mb-2 gap-2">
+                                    <Clock className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <p className="text-sm text-card-foreground">Cycle Time: {cycleTime}</p>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-start gap-2">
+                                        <Activity className="stroke-card-foreground" strokeWidth={1} size={17} />
+                                        <span className="text-sm text-card-foreground">{status}</span>
+                                    </div>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreVertical className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onSelect={() => handleEditClick(component)}>
+                                                <Component className="stroke-success mr-2" strokeWidth={1} size={18} />
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => {
+                                                const typedComponent: ComponentFormData = {
+                                                    name: component.name,
+                                                    description: description,
+                                                    weight: weight,
+                                                    volume: volume,
+                                                    code: code,
+                                                    color: color,
+                                                    cycleTime: cycleTime,
+                                                    targetTime: targetTime,
+                                                    coolingTime: coolingTime,
+                                                    chargingTime: chargingTime,
+                                                    cavity: cavity,
+                                                    configuration: configuration,
+                                                    configQTY: configQTY,
+                                                    palletQty: palletQty,
+                                                    testMachine: testMachine,
+                                                    masterBatch: masterBatch,
+                                                    status: status as "Active" | "Inactive",
+                                                    photoURL: photoURL
+                                                };
+                                                setViewingComponent(typedComponent);
+                                                setIsViewComponentOpen(true);
+                                            }}>
+                                                <Component className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                                View
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => handleDeleteComponent(Number(component?.code))}>
+                                                <Component className="stroke-destructive mr-2" strokeWidth={1} size={18} />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
         )
     }
 
@@ -627,7 +634,7 @@ export default function ComponentManager() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedComponents.map((component, index) => <ComponentCard key={index} component={component} />)}
+                {paginatedComponents.map((component, index) => <ComponentCard key={index} component={component} index={index} />)}
             </div>
             <PageControls />
             <EditComponentModal />

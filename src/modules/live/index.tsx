@@ -374,7 +374,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 									{
 										status === 'Active' ?
 											<Image
-												src={fullPhotoURL}
+												src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
 												alt={componentName}
 												width={screenSize.width > 768 ? 50 : 20}
 												height={screenSize.width > 768 ? 50 : 20}
@@ -389,7 +389,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 												</div>
 												:
 												<Image
-													src={fullPhotoURL}
+													src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
 													alt={componentName}
 													width={screenSize.width > 768 ? 50 : 20}
 													height={screenSize.width > 768 ? 50 : 20}
