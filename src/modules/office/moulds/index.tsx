@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -53,20 +53,31 @@ import { mouldSchema } from '@/schemas/mould'
 import { Mould } from '@/types/mould'
 import { mouldList } from '@/data/data'
 import { motion } from 'framer-motion'
+import { useOfficeStore } from '../state/state'
 
 type MouldFormData = z.infer<typeof mouldSchema>
 
 export default function MouldManager() {
-    const [moulds, setMoulds] = useState([])
-    const [searchTerm, setSearchTerm] = useState('')
-    const [statusFilter, setStatusFilter] = useState('All')
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(8)
-    const [isCreateMouldOpen, setIsCreateMouldOpen] = useState(false)
-    const [isEditMouldOpen, setIsEditMouldOpen] = useState(false)
-    const [isViewMouldOpen, setIsViewMouldOpen] = useState(false)
-    const [editingMould, setEditingMould] = useState<Mould | null>(null)
-    const [viewingMould, setViewingMould] = useState<Mould | null>(null)
+    const {
+        mouldInFocus,
+        setMouldInFocus,
+        moulds,
+        searchTerm,
+        statusFilter,
+        currentPage,
+        itemsPerPage,
+        isCreating,
+        isEditing,
+        isViewing,
+        setMoulds,
+        setSearchTerm,
+        setStatusFilter,
+        setCurrentPage,
+        setItemsPerPage,
+        setIsCreating,
+        setIsEditing,
+        setIsViewing,
+    } = useOfficeStore();
 
     useEffect(() => {
         const allMoulds = async () => {
@@ -290,7 +301,7 @@ export default function MouldManager() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Dialog open={isCreateMouldOpen} onOpenChange={setIsCreateMouldOpen}>
+                <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
@@ -310,7 +321,7 @@ export default function MouldManager() {
         )
     }
 
-    const MouldCard = ({ mould, index }: { mould: MouldFormData, index: number }) => {
+    const MouldCard = ({ mould, index }: { mould: Mould, index: number }) => {
         const {
             name,
             serialNumber,
@@ -357,24 +368,24 @@ export default function MouldManager() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onSelect={() => {
-                                            setEditingMould({
+                                            setMouldInFocus({
                                                 ...mould,
                                                 uid: Number(serialNumber),
                                                 creationDate: new Date().toISOString()
                                             })
-                                            setIsEditMouldOpen(true)
+                                            setIsEditing(true)
                                         }}>
                                             <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
-                                            setViewingMould({
+                                            setMouldInFocus({
                                                 ...mould,
                                                 uid: Number(serialNumber),
                                                 creationDate: new Date().toISOString(),
                                                 status: status as "Active" | "Inactive" | "Maintenance"
                                             })
-                                            setIsViewMouldOpen(true)
+                                            setIsViewing(true)
                                         }}>
                                             <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             View
@@ -413,18 +424,16 @@ export default function MouldManager() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
+                        onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                        disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
-                        disabled={currentPage === pageCount}
-                    >
+                        onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
+                        disabled={currentPage === pageCount}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
@@ -435,13 +444,13 @@ export default function MouldManager() {
     //modals
     const EditMouldModal = () => {
         return (
-            <Dialog open={isEditMouldOpen} onOpenChange={setIsEditMouldOpen}>
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogContent className="sm:max-w-[700px]">
                     <DialogHeader>
                         <DialogTitle>Edit Mould</DialogTitle>
                     </DialogHeader>
-                    {editingMould && <MouldForm
-                        mould={{ ...editingMould, status: editingMould.status as "Active" | "Inactive" | "Maintenance" }}
+                    {mouldInFocus && <MouldForm
+                        mould={{ ...mouldInFocus, status: mouldInFocus.status as "Active" | "Inactive" | "Maintenance" }}
                         onSubmit={handleEditMould}
                     />}
                 </DialogContent>
@@ -451,12 +460,12 @@ export default function MouldManager() {
 
     const ViewMouldDetailModal = () => {
         return (
-            <Dialog open={isViewMouldOpen} onOpenChange={setIsViewMouldOpen}>
+            <Dialog open={isViewing} onOpenChange={setIsViewing}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>Mould Details</DialogTitle>
                     </DialogHeader>
-                    {viewingMould && <ViewMouldModal mould={viewingMould} />}
+                    {mouldInFocus && <ViewMouldModal mould={mouldInFocus} />}
                 </DialogContent>
             </Dialog>
         )

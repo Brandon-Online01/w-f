@@ -16,7 +16,8 @@ export interface Component {
     palletQty: number;
     testMachine: string;
     masterBatch: number;
-    status: string;
+    status: 'Active' | 'Inactive';
     createdAt: string;
     updatedAt: string;
+    description: string;
 }

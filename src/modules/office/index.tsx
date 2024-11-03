@@ -55,10 +55,10 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { useStaffStore } from './state/state'
 import { userList } from '@/data/data'
 import { newUserSchema } from '@/schemas/user'
 import userPlaceHolderIcon from '@/assets/svg/user-placeholder.svg'
+import { useOfficeStore } from './state/state'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
@@ -69,22 +69,22 @@ export default function StaffManagement() {
         statusFilter,
         currentPage,
         itemsPerPage,
-        isCreateUserOpen,
-        isEditUserOpen,
-        isViewUserOpen,
         editingUser,
         viewingUser,
+        isCreating,
+        isEditing,
+        isViewing,
         setUsers,
         setSearchTerm,
         setStatusFilter,
         setCurrentPage,
         setItemsPerPage,
-        setIsCreateUserOpen,
-        setIsEditUserOpen,
-        setIsViewUserOpen,
         setEditingUser,
         setViewingUser,
-    } = useStaffStore();
+        setIsCreating,
+        setIsEditing,
+        setIsViewing,
+    } = useOfficeStore();
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     useEffect(() => {
@@ -96,8 +96,8 @@ export default function StaffManagement() {
     }, [setUsers]);
 
     const filteredUsers = users.filter(user =>
-        (user.name.toLowerCase() + ' ' + user.lastName.toLowerCase()).includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || user.role === statusFilter)
+        (user?.name?.toLowerCase() + ' ' + user?.lastName?.toLowerCase()).includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || user?.role === statusFilter)
     )
 
     const pageCount = Math.ceil(filteredUsers.length / itemsPerPage)
@@ -117,7 +117,7 @@ export default function StaffManagement() {
 
         console.log(newUser)
 
-        setIsCreateUserOpen(false)
+        setIsCreating(false)
     }
 
     const handleEditUser: SubmitHandler<UserFormData> = (data) => {
@@ -184,7 +184,7 @@ export default function StaffManagement() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Dialog open={isCreateUserOpen} onOpenChange={setIsCreateUserOpen}>
+                <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end'>
                             <Button className="w-full sm:w-1/4">
@@ -242,14 +242,14 @@ export default function StaffManagement() {
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onSelect={() => {
                                             setEditingUser(user)
-                                            setIsEditUserOpen(true)
+                                            setIsEditing(true)
                                         }}>
                                             <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={17} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
                                             setViewingUser(user)
-                                            setIsViewUserOpen(true)
+                                            setIsViewing(true)
                                         }}>
                                             <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={17} />
                                             View
@@ -270,7 +270,7 @@ export default function StaffManagement() {
 
     const EditModal = () => {
         return (
-            <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogContent className="sm:max-w-[700px] bg-card">
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
@@ -283,7 +283,7 @@ export default function StaffManagement() {
 
     const ViewModal = () => {
         return (
-            <Dialog open={isViewUserOpen} onOpenChange={setIsViewUserOpen}>
+            <Dialog open={isViewing} onOpenChange={setIsViewing}>
                 <DialogContent className="sm:max-w-[500px] bg-card">
                     <DialogHeader>
                         <DialogTitle>User Details</DialogTitle>

@@ -59,7 +59,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { newUserSchema, editUserSchema } from '@/schemas/user'
 import { userList } from '@/data/data'
-import { useStaffStore } from '../state/state'
+import { useOfficeStore } from '../state/state'
 import { NewUserType } from '@/types/user'
 import { motion } from 'framer-motion'
 import { isEmpty } from 'lodash'
@@ -73,9 +73,9 @@ export default function StaffManagement() {
         statusFilter,
         currentPage,
         itemsPerPage,
-        isCreateUserOpen,
-        isEditUserOpen,
-        isViewUserOpen,
+        isCreating,
+        isEditing,
+        isViewing,
         editingUser,
         viewingUser,
         isLoading,
@@ -84,13 +84,13 @@ export default function StaffManagement() {
         setStatusFilter,
         setCurrentPage,
         setItemsPerPage,
-        setIsCreateUserOpen,
-        setIsEditUserOpen,
-        setIsViewUserOpen,
+        setIsCreating,
+        setIsEditing,
+        setIsViewing,
         setEditingUser,
         setViewingUser,
         setIsLoading,
-    } = useStaffStore();
+    } = useOfficeStore();
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     useEffect(() => {
@@ -176,7 +176,7 @@ export default function StaffManagement() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Dialog open={isCreateUserOpen} onOpenChange={setIsCreateUserOpen}>
+                <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
@@ -241,14 +241,14 @@ export default function StaffManagement() {
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem onSelect={() => {
                                                 setEditingUser(user)
-                                                setIsEditUserOpen(true)
+                                                setIsEditing(true)
                                             }}>
                                                 <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
                                                 Edit
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onSelect={() => {
                                                 setViewingUser(user)
-                                                setIsViewUserOpen(true)
+                                                setIsViewing(true)
                                             }}>
                                                 <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
                                                 View
@@ -270,7 +270,7 @@ export default function StaffManagement() {
 
     const EditModal = () => {
         return (
-            <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogContent className="sm:max-w-[700px] bg-card">
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
@@ -283,7 +283,7 @@ export default function StaffManagement() {
 
     const ViewModal = () => {
         return (
-            <Dialog open={isViewUserOpen} onOpenChange={setIsViewUserOpen}>
+            <Dialog open={isViewing} onOpenChange={setIsViewing}>
                 <DialogContent className="sm:max-w-[500px] bg-card">
                     <DialogHeader>
                         <DialogTitle>User Details</DialogTitle>

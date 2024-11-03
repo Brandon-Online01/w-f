@@ -48,41 +48,57 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { componentSchema } from '@/schemas/component'
 import { componentList } from '@/data/data'
-import { Component as ComponentType } from '@/types/component'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useOfficeStore } from '../state/state'
+import { isEmpty } from 'lodash'
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
 export default function ComponentManager() {
-    const [components, setComponents] = useState([])
-    const [searchTerm, setSearchTerm] = useState('')
-    const [statusFilter, setStatusFilter] = useState('All')
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(8)
-    const [isCreateComponentOpen, setIsCreateComponentOpen] = useState(false)
-    const [isEditComponentOpen, setIsEditComponentOpen] = useState(false)
-    const [isViewComponentOpen, setIsViewComponentOpen] = useState(false)
-    const [editingComponent, setEditingComponent] = useState<ComponentFormData | null>(null)
-    const [viewingComponent, setViewingComponent] = useState<ComponentFormData | null>(null)
+    const {
+        components,
+        searchTerm,
+        statusFilter,
+        currentPage,
+        itemsPerPage,
+        isLoading,
+        isCreating,
+        isEditing,
+        isViewing,
+        componentInFocus,
+        setComponentInFocus,
+        setComponents,
+        setSearchTerm,
+        setStatusFilter,
+        setCurrentPage,
+        setItemsPerPage,
+        setIsCreating,
+        setIsEditing,
+        setIsViewing,
+        setIsLoading,
+    } = useOfficeStore();
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
+        setIsLoading(true)
         const allComponents = async () => {
             const components = await componentList()
             setComponents(components?.data)
         }
-        allComponents()
-    }, [setComponents]);
 
-    const filteredComponents = components?.filter((component: ComponentType) =>
+        allComponents()
+        setIsLoading(false)
+    }, [setComponents, setIsLoading]);
+
+    const filteredComponents = components?.filter((component: ComponentFormData) =>
         component?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (statusFilter === 'All' || component?.status === statusFilter)
     )
 
-    const pageCount = Math.ceil(filteredComponents.length / itemsPerPage)
+    const pageCount = Math.ceil(filteredComponents?.length / itemsPerPage)
 
-    const paginatedComponents = filteredComponents.slice(
+    const paginatedComponents = filteredComponents?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -381,8 +397,8 @@ export default function ComponentManager() {
             status: component.status as "Active" | "Inactive",
             photoURL: component.photoURL
         };
-        setEditingComponent(editableComponent);
-        setIsEditComponentOpen(true);
+        setComponentInFocus(editableComponent);
+        setIsEditing(true);
     };
 
     const PageHeader = () => {
@@ -429,7 +445,7 @@ export default function ComponentManager() {
                         </SelectContent>
                     </Select>
                 </div>
-                <Dialog open={isCreateComponentOpen} onOpenChange={setIsCreateComponentOpen}>
+                <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild disabled>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full">
@@ -544,8 +560,8 @@ export default function ComponentManager() {
                                                     status: status as "Active" | "Inactive",
                                                     photoURL: photoURL
                                                 };
-                                                setViewingComponent(typedComponent);
-                                                setIsViewComponentOpen(true);
+                                                setComponentInFocus(typedComponent);
+                                                setIsViewing(true);
                                             }}>
                                                 <Component className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                                 View
@@ -570,8 +586,7 @@ export default function ComponentManager() {
             <div className="flex justify-between items-center">
                 <Select
                     value={itemsPerPage.toString()}
-                    onValueChange={(value) => setItemsPerPage(Number(value))}
-                >
+                    onValueChange={(value) => setItemsPerPage(Number(value))}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Items per page" />
                     </SelectTrigger>
@@ -585,18 +600,16 @@ export default function ComponentManager() {
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
+                        onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                        disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
-                        disabled={currentPage === pageCount}
-                    >
+                        onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
+                        disabled={currentPage === pageCount}>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
@@ -607,12 +620,12 @@ export default function ComponentManager() {
     //modals
     const EditComponentModal = () => {
         return (
-            <Dialog open={isEditComponentOpen} onOpenChange={setIsEditComponentOpen}>
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogContent className="sm:max-w-[700px] bg-card">
                     <DialogHeader>
                         <DialogTitle>Edit Component</DialogTitle>
                     </DialogHeader>
-                    {editingComponent && <ComponentForm component={editingComponent} onSubmit={handleEditComponent} />}
+                    {componentInFocus && <ComponentForm component={componentInFocus} onSubmit={handleEditComponent} />}
                 </DialogContent>
             </Dialog>
         )
@@ -621,21 +634,30 @@ export default function ComponentManager() {
 
     const ViewComponentDetailModal = () => {
         return (
-            <Dialog open={isViewComponentOpen} onOpenChange={setIsViewComponentOpen}>
+            <Dialog open={isViewing} onOpenChange={setIsViewing}>
                 <DialogContent className="sm:max-w-[500px] bg-card">
                     <DialogHeader>
                         <DialogTitle>Component Details</DialogTitle>
                     </DialogHeader>
-                    {viewingComponent && <ViewComponentModal component={viewingComponent} />}
+                    {componentInFocus && <ViewComponentModal component={componentInFocus} />}
                 </DialogContent>
             </Dialog>
+        )
+    }
+
+    if (isLoading || isEmpty(components)) {
+        return (
+            <div className="w-full h-screen">
+                <PageHeader />
+                <ComponentCardsLoader />
+            </div>
         )
     }
 
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
                 {paginatedComponents.map((component, index) => <ComponentCard key={index} component={component} index={index} />)}
             </div>
             <PageControls />
@@ -644,3 +666,42 @@ export default function ComponentManager() {
         </div>
     )
 }
+
+const ComponentCardsLoader = () => {
+    return (
+        <div className="w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {Array.from({ length: 8 }).map((_, index) => (
+                    <motion.div
+                        key={index}
+                        className="relative bg-card rounded p-4 border shadow animate-pulse flex flex-col justify-start gap-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}>
+                        <div className="aspect-video w-full bg-gray-200 rounded mb-4 h-40 flex items-center justify-center" >
+                            <div className="w-full h-full flex items-center justify-center">
+                                <div className="loading">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-5 bg-gray-200 rounded w-1/2" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="h-4 bg-gray-200 rounded w-2/3" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-3 bg-gray-200 rounded w-1/4" />
+                            <div className="h-5 bg-gray-200 rounded w-1/12" />
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+};
