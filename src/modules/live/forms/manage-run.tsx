@@ -38,6 +38,7 @@ import {
 } from "../../../data/data"
 import { useEffect } from "react"
 import { updateLiveRuns } from "../helpers/live-run"
+import { useSessionStore } from "@/providers/session.provider"
 
 export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) {
     const { formState: { errors }, control, handleSubmit } = useForm<NoteInputs>();
@@ -58,21 +59,25 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
         allComponents,
         allMoulds
     } = liveRunStore();
+    const token = useSessionStore(state => state?.token)
 
     useEffect(() => {
+        setIsLoading(true)
         const fetchData = async () => {
-            const users = await userList();
-            const components = await componentList();
-            const moulds = await mouldList();
+            if (token) {
+                const users = await userList(token);
+                const components = await componentList(token);
+                const moulds = await mouldList(token);
 
-
-            setAllUsers(users?.data)
-            setAllComponents(components?.data)
-            setAllMoulds(moulds?.data)
+                setAllUsers(users?.data)
+                setAllComponents(components?.data)
+                setAllMoulds(moulds?.data)
+            }
         };
 
         fetchData();
-    }, [setAllComponents, setAllMoulds, setAllUsers]);
+        setIsLoading(false)
+    }, [setAllComponents, setAllMoulds, setAllUsers, token, setIsLoading]);
 
     if (!liveRun) return null
 

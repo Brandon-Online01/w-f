@@ -1,59 +1,66 @@
 import axios from "axios";
 
-export const userList = async () => {
+export const userList = async (token: string) => {
     try {
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/users/`
-        const { data } = await axios.get(url)
+        const config = { headers: { 'token': token } };
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/users/`;
+
+        const { data } = await axios.get(url, config)
         return data;
     } catch (error) {
         console.log(error)
     }
 }
 
-export const componentList = async () => {
+export const componentList = async (token: string) => {
     try {
+        const config = { headers: { 'token': token } };
         const url = `${process.env.NEXT_PUBLIC_API_URL}/components`
-        const { data } = await axios.get(url)
+        const { data } = await axios.get(url, config)
         return data;
     } catch (error) {
         console.log(error)
     }
 }
 
-export const mouldList = async () => {
+export const mouldList = async (token: string) => {
     try {
+        const config = { headers: { 'token': token } };
         const url = `${process.env.NEXT_PUBLIC_API_URL}/moulds`
-        const { data } = await axios.get(url)
+        const { data } = await axios.get(url, config)
         return data;
     } catch (error) {
         console.log(error)
     }
 }
 
-export const machineList = async () => {
+export const machineList = async (token: string) => {
     try {
+        const config = { headers: { 'token': token } };
         const url = `${process.env.NEXT_PUBLIC_API_URL}/machines`
-        const { data } = await axios.get(url)
+        const { data } = await axios.get(url, config)
         return data;
     } catch (error) {
         console.log(error)
     }
 }
 
-export const latestReports = async () => {
+export const latestReports = async (token: string) => {
     try {
+        const config = { headers: { 'token': token } };
         const url = `${process.env.NEXT_PUBLIC_API_URL}/reports`
-        const { data } = await axios.get(url)
+        const { data } = await axios.get(url, config)
         return data;
     } catch (error) {
         console.log(error)
     }
 }
 
-export const allFactories = async () => {
+export const allFactories = async (token: string) => {
     try {
+        const config = { headers: { 'token': token } };
         const url = `${process.env.NEXT_PUBLIC_API_URL}/factories`
-        const { data } = await axios.get(url)
+        const { data } = await axios.get(url, config)
         return data;
     } catch (error) {
         console.log(error)

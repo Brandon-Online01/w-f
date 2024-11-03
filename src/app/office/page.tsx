@@ -6,7 +6,6 @@ import {
     Users,
     Stamp,
     ServerCog,
-    Rss,
     Factory
 } from "lucide-react";
 import {
@@ -73,8 +72,7 @@ export default function Home() {
                             custom={index}
                             variants={tabVariants}
                             initial="hidden"
-                            animate="visible"
-                        >
+                            animate="visible">
                             <TabsTrigger value={item.value}>
                                 <span className="flex items-center gap-2">
                                     <Icon className="stroke-card-foreground" strokeWidth={1} size={18} />
@@ -92,15 +90,11 @@ export default function Home() {
         <div className="flex flex-col items-start justify-start gap-4 h-full w-full overflow-y-scroll outline-none">
             <ScrollArea className="h-full w-full pr-3 flex flex-col justify-start gap-3">
                 <div className="flex flex-row items-center justify-start gap-2 px-1 w-full mb-3">
-                    <p className="text-lg font-medium uppercase">Highlights</p>
-                    <Rss className="stroke-card-foreground" strokeWidth={1} size={18} />
-                </div>
-                <div className="flex flex-row items-center justify-start gap-2 px-1 w-full my-3">
                     <p className="text-lg font-medium uppercase">Management</p>
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <div className="w-full h-[98vh] bg-card p-1 rounded overflow-y-auto mt-4">
-                    <Tabs defaultValue="components" className="w-full overflow-hidden h-full">
+                    <Tabs defaultValue="staff" className="w-full overflow-hidden h-full">
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>
