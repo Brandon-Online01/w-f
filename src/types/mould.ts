@@ -1,7 +1,11 @@
 export interface Mould {
-    uid?: string;
+    uid: number;
     name: string;
     serialNumber: string;
-    nextServiceDate: string;
-    status: string;
+    creationDate: string;
+    lastRepairDate: string;
+    mileage: number;
+    servicingMileage: number;
+    component: number;
+    status: "Active" | "Inactive" | "Maintenance";
 }

@@ -5,5 +5,5 @@ export interface Machine {
     macAddress: string;
     description: string;
     creationDate: string;
-    status: string;
+    status: 'Active' | 'Inactive';
 }

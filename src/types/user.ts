@@ -1,5 +1,5 @@
-export  type UserFormData = {
-    uid?: string | number;
+export type UserType = {
+    uid: number;
     name: string;
     lastName: string;
     email: string;
@@ -11,13 +11,7 @@ export  type UserFormData = {
     status: string;
 }
 
-export type UserFormProps = {
-    user: UserFormData;
-    isEdit: boolean;
-    onSubmit?: (userData: Partial<UserFormData>) => void;
-}
-
-export interface CreateUserPayload {
+export type NewUserType = {
     name: string;
     lastName: string;
     email: string;
