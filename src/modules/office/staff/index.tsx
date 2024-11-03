@@ -63,6 +63,7 @@ import { useOfficeStore } from '../state/state'
 import { NewUserType } from '@/types/user'
 import { motion } from 'framer-motion'
 import { isEmpty } from 'lodash'
+import { useSessionStore } from '@/providers/session.provider'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
@@ -91,18 +92,21 @@ export default function StaffManagement() {
         setViewingUser,
         setIsLoading,
     } = useOfficeStore();
+    const token = useSessionStore(state => state?.token)
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     useEffect(() => {
         setIsLoading(true)
         const allUsers = async () => {
-            const users = await userList()
-            setUsers(users?.data)
+            if (token) {
+                const users = await userList(token)
+                setUsers(users?.data)
+            }
         }
 
         allUsers()
         setIsLoading(false)
-    }, [setUsers, setIsLoading]);
+    }, [setUsers, setIsLoading, token]);
 
     const filteredUsers = users?.filter(user =>
         (user?.name?.toLowerCase() + ' ' + user?.lastName.toLowerCase())?.includes(searchTerm.toLowerCase()) &&
@@ -111,7 +115,7 @@ export default function StaffManagement() {
 
     const pageCount = Math.ceil(filteredUsers?.length / itemsPerPage)
 
-    const paginatedUsers = filteredUsers.slice(
+    const paginatedUsers = filteredUsers?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -534,7 +538,7 @@ export default function StaffManagement() {
 
     if (isLoading || isEmpty(users)) {
         return (
-            <div className="w-full h-screen">
+            <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
                 <UserCardsLoader />
             </div>

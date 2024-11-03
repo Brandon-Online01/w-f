@@ -52,6 +52,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
+import { useSessionStore } from '@/providers/session.provider'
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
@@ -78,18 +79,22 @@ export default function ComponentManager() {
         setIsViewing,
         setIsLoading,
     } = useOfficeStore();
+    const token = useSessionStore(state => state?.token)
+
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         setIsLoading(true)
         const allComponents = async () => {
-            const components = await componentList()
-            setComponents(components?.data)
+            if (token) {
+                const components = await componentList(token)
+                setComponents(components?.data)
+            }
         }
 
         allComponents()
         setIsLoading(false)
-    }, [setComponents, setIsLoading]);
+    }, [setComponents, setIsLoading, token]);
 
     const filteredComponents = components?.filter((component: ComponentFormData) =>
         component?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -647,7 +652,7 @@ export default function ComponentManager() {
 
     if (isLoading || isEmpty(components)) {
         return (
-            <div className="w-full h-screen">
+            <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
                 <ComponentCardsLoader />
             </div>

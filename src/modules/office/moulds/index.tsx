@@ -55,6 +55,7 @@ import { mouldList } from '@/data/data'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
+import { useSessionStore } from '@/providers/session.provider'
 
 type MouldFormData = z.infer<typeof mouldSchema>
 
@@ -81,16 +82,19 @@ export default function MouldManager() {
         setIsEditing,
         setIsViewing,
     } = useOfficeStore();
+    const token = useSessionStore(state => state?.token)
 
     useEffect(() => {
         setIsLoading(true)
         const allMoulds = async () => {
-            const moulds = await mouldList()
-            setMoulds(moulds?.data)
+            if (token) {
+                const moulds = await mouldList(token)
+                setMoulds(moulds?.data)
+            }
         }
         allMoulds()
         setIsLoading(false)
-    }, [setMoulds]);
+    }, [setMoulds, setIsLoading, token]);
 
     const filteredMoulds = moulds?.filter((mould: Mould) =>
         mould?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -478,7 +482,7 @@ export default function MouldManager() {
 
     if (isLoading || isEmpty(moulds)) {
         return (
-            <div className="w-full h-screen">
+            <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
                 <MouldCardsLoader />
             </div>

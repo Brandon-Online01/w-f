@@ -32,6 +32,7 @@ import { Machine } from '@/types/machine'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
+import { useSessionStore } from '@/providers/session.provider'
 
 // Validation schema
 const machineSchema = z.object({
@@ -67,16 +68,19 @@ export default function MachineManager() {
         isLoading,
         setIsLoading,
     } = useOfficeStore();
+    const token = useSessionStore(state => state?.token)
 
     useEffect(() => {
         setIsLoading(true)
         const allMachines = async () => {
-            const machines = await machineList()
-            setMachines(machines?.data)
+            if (token) {
+                const machines = await machineList(token)
+                setMachines(machines?.data)
+            }
         }
         allMachines()
         setIsLoading(false)
-    }, [setMachines]);
+    }, [setMachines, setIsLoading, token]);
 
     const filteredMachines = machines?.filter((machine: Machine) =>
         machine?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -399,7 +403,7 @@ export default function MachineManager() {
 
     if (isLoading || isEmpty(machines)) {
         return (
-            <div className="w-full h-screen">
+            <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
                 <MachineCardsLoader />
             </div>

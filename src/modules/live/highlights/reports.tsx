@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { latestReports } from '@/data/data'
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ArrowDownToLine, FileText } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
+import { useSessionStore } from '@/providers/session.provider'
+import { create } from 'zustand'
 
 type HighlightReport = {
     uid: number,
@@ -21,27 +23,43 @@ type Report = {
     shift: string
 }
 
+type ReportStore = {
+    reports: Report[],
+    downloadingId: number | null,
+    setReports: (reports: Report[]) => void,
+    setDownloadingId: (id: number | null) => void
+}
+
+const useReportStore = create<ReportStore>((set) => ({
+    reports: [],
+    downloadingId: null,
+    setReports: (reports: Report[]) => set({ reports }),
+    setDownloadingId: (id: number | null) => set({ downloadingId: id })
+}))
+
 export default function ProductionReportCard() {
-    const [downloadingId, setDownloadingId] = useState<number | null>(null)
-    const [reports, setReports] = useState<Report[]>([])
+    const token = useSessionStore(state => state?.token)
+    const { reports, setReports, downloadingId, setDownloadingId } = useReportStore()
 
     useEffect(() => {
         const getReports = async () => {
-            const reports = await latestReports()
+            if (token) {
+                const reports = await latestReports(token)
 
-            const reportsList = reports?.data?.map((report: HighlightReport) => ({
-                uid: report?.uid,
-                title: report?.fileName,
-                date: report?.creationDate,
-                url: report?.reportURL,
-                shift: report?.shift
-            }))
+                const reportsList = reports?.data?.map((report: HighlightReport) => ({
+                    uid: report?.uid,
+                    title: report?.fileName,
+                    date: report?.creationDate,
+                    url: report?.reportURL,
+                    shift: report?.shift
+                }))
 
-            setReports(reportsList)
+                setReports(reportsList)
+            }
         }
 
         getReports()
-    }, [])
+    }, [token, setReports, setDownloadingId])
 
     const handleDownload = (referenceID: number, referenceURL: string) => {
         setDownloadingId(referenceID)
