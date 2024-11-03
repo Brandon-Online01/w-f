@@ -1,14 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
     Search,
     ChevronLeft,
     ChevronRight,
     MoreVertical,
-    Edit,
-    Eye,
-    Trash2,
     Package,
     Clock,
     Zap,
@@ -33,11 +30,6 @@ import {
     CardContent
 } from "@/components/ui/card"
 import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage
-} from "@/components/ui/avatar"
-import {
     Dialog,
     DialogContent,
     DialogHeader,
@@ -55,37 +47,14 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { componentSchema } from '@/schemas/component'
-
-const initialComponents = [
-    {
-        "id": 1,
-        "name": "Component A",
-        "description": "This is a description of Component A.",
-        "photoURL": "/placeholder.svg?height=100&width=100",
-        "weight": 10,
-        "volume": 300,
-        "code": "COMP-A-001",
-        "color": "Red",
-        "cycleTime": 30,
-        "targetTime": 25,
-        "coolingTime": 15,
-        "chargingTime": 10,
-        "cavity": 1,
-        "configuration": "Box",
-        "configQTY": 5,
-        "palletQty": 10,
-        "testMachine": "Test Machine A",
-        "masterBatch": 2,
-        "status": "Active" as const,
-        "createdAt": "2023-01-01T00:00:00Z",
-        "updatedAt": "2023-01-02T00:00:00Z"
-    },
-]
+import { componentList } from '@/data/data'
+import { Component as ComponentType } from '@/types/component'
+import Image from 'next/image'
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
 export default function ComponentManager() {
-    const [components] = useState(initialComponents)
+    const [components, setComponents] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('All')
     const [currentPage, setCurrentPage] = useState(1)
@@ -97,7 +66,15 @@ export default function ComponentManager() {
     const [viewingComponent, setViewingComponent] = useState<ComponentFormData | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    const filteredComponents = components.filter(component =>
+    useEffect(() => {
+        const allComponents = async () => {
+            const components = await componentList()
+            setComponents(components?.data)
+        }
+        allComponents()
+    }, [setComponents]);
+
+    const filteredComponents = components.filter((component: ComponentType) =>
         component.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (statusFilter === 'All' || component.status === statusFilter)
     )
@@ -151,16 +128,24 @@ export default function ComponentManager() {
             defaultValues: component || {},
         })
 
+        const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
+
         return (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-card">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2 col-span-full">
                         <Label htmlFor="photoURL">Component Image</Label>
                         <div className="flex items-center space-x-4">
-                            <Avatar className="h-20 w-20">
-                                <AvatarImage src={imagePreview} alt="Component image" />
-                                <AvatarFallback>{component?.name?.charAt(0) || 'C'}</AvatarFallback>
-                            </Avatar>
+                            <div className="flex items-center justify-center rounded h-40 w-40 border">
+                                <Image
+                                    src={fullPhotoURL}
+                                    alt={'Existing Preview Image'}
+                                    width={40}
+                                    height={40}
+                                    priority
+                                    quality={100}
+                                    className="rounded object-cover w-auto h-auto" />
+                            </div>
                             <Input
                                 id="photoURL"
                                 type="file"
@@ -278,7 +263,7 @@ export default function ComponentManager() {
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-full">{component ? 'Update Component' : 'Create Component'}</Button>
+                <Button type="submit" className="w-10/12 mx-auto flex">{component ? 'Update Component' : 'Create Component'}</Button>
             </form>
         )
     }
@@ -296,13 +281,21 @@ export default function ComponentManager() {
             photoURL
         } = component
 
+        const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
+
         return (
             <div className="space-y-6">
-                <div className="flex justify-center">
-                    <Avatar className="h-32 w-32">
-                        <AvatarImage src={photoURL} alt={name} />
-                        <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-                    </Avatar>
+                <div className="flex justify-center bg-gray-300 p-2 rounded">
+                    <div className="flex items-center justify-center rounded h-full">
+                        <Image
+                            src={fullPhotoURL}
+                            alt={name}
+                            width={50}
+                            height={50}
+                            priority
+                            quality={100}
+                            className="rounded object-cover w-auto h-auto" />
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col space-y-1">
@@ -402,6 +395,7 @@ export default function ComponentManager() {
                             placeholder="search components..."
                             className="pl-8"
                             value={searchTerm}
+                            disabled
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
@@ -443,7 +437,7 @@ export default function ComponentManager() {
                             </Button>
                         </div>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="sm:max-w-[700px] bg-card">
                         <DialogHeader>
                             <DialogTitle>Create New Component</DialogTitle>
                         </DialogHeader>
@@ -477,15 +471,24 @@ export default function ComponentManager() {
             masterBatch
         } = component
 
+        const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
+
+
         return (
-            <Card key={component.code} className="overflow-hidden">
+            <Card key={component.code} className="overflow-hidden bg-card">
                 <CardContent className="p-0">
                     <div className="flex flex-col items-center">
-                        <div className="w-full h-32 flex items-center justify-center bg-gray-100">
-                            <Avatar className="h-24 w-24">
-                                <AvatarImage src={photoURL} alt={name} />
-                                <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-                            </Avatar>
+                        <div className="w-full h-40 flex items-center justify-center bg-gray-100">
+                            <div className="flex items-center justify-center rounded h-full">
+                                <Image
+                                    src={fullPhotoURL}
+                                    alt={name}
+                                    width={50}
+                                    height={50}
+                                    priority
+                                    quality={100}
+                                    className="rounded object-cover w-auto h-auto" />
+                            </div>
                         </div>
                         <div className="p-4 w-full">
                             <div className="flex items-center mb-2">
@@ -509,7 +512,7 @@ export default function ComponentManager() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onSelect={() => handleEditClick(component)}>
-                                            <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <Component className="stroke-success mr-2" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
@@ -536,11 +539,11 @@ export default function ComponentManager() {
                                             setViewingComponent(typedComponent);
                                             setIsViewComponentOpen(true);
                                         }}>
-                                            <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <Component className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             View
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => handleDeleteComponent(Number(component?.code))}>
-                                            <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <Component className="stroke-destructive mr-2" strokeWidth={1} size={18} />
                                             Delete
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
@@ -571,7 +574,7 @@ export default function ComponentManager() {
                 </Select>
                 <div className="flex items-center space-x-2">
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1}
@@ -580,7 +583,7 @@ export default function ComponentManager() {
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
                         disabled={currentPage === pageCount}
@@ -596,7 +599,7 @@ export default function ComponentManager() {
     const EditComponentModal = () => {
         return (
             <Dialog open={isEditComponentOpen} onOpenChange={setIsEditComponentOpen}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="sm:max-w-[700px] bg-card">
                     <DialogHeader>
                         <DialogTitle>Edit Component</DialogTitle>
                     </DialogHeader>
@@ -610,7 +613,7 @@ export default function ComponentManager() {
     const ViewComponentDetailModal = () => {
         return (
             <Dialog open={isViewComponentOpen} onOpenChange={setIsViewComponentOpen}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px] bg-card">
                     <DialogHeader>
                         <DialogTitle>Component Details</DialogTitle>
                     </DialogHeader>

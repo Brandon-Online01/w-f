@@ -297,7 +297,7 @@ export default function StaffManagement() {
                 </Select>
                 <div className="flex items-center space-x-2">
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                         disabled={currentPage === 1}>
@@ -305,7 +305,7 @@ export default function StaffManagement() {
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
                         disabled={currentPage === pageCount}>

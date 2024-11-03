@@ -1,8 +1,34 @@
 import { Component } from '@/types/component'
 import { create } from 'zustand'
 
+const initialComponents = [
+    {
+        "id": 1,
+        "name": "Component A",
+        "description": "This is a description of Component A.",
+        "photoURL": "/placeholder.svg?height=100&width=100",
+        "weight": 10,
+        "volume": 300,
+        "code": "COMP-A-001",
+        "color": "Red",
+        "cycleTime": 30,
+        "targetTime": 25,
+        "coolingTime": 15,
+        "chargingTime": 10,
+        "cavity": 1,
+        "configuration": "Box",
+        "configQTY": 5,
+        "palletQty": 10,
+        "testMachine": "Test Machine A",
+        "masterBatch": 2,
+        "status": "Active" as const,
+        "createdAt": "2023-01-01T00:00:00Z",
+        "updatedAt": "2023-01-02T00:00:00Z"
+    },
+]
+
 export interface ComponentStore {
-    // State
+    // Data
     components: Component[]
     searchTerm: string
     statusFilter: string
@@ -29,7 +55,8 @@ export interface ComponentStore {
 
 
 export const useComponentStore = create<ComponentStore>((set) => ({
-    components: [],
+    // Initial state
+    components: initialComponents,
     searchTerm: '',
     statusFilter: 'All',
     currentPage: 1,

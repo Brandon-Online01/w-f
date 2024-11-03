@@ -114,6 +114,8 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		macAddress
 	} = machineInUse
 
+	const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
+
 	const DialogSectionHeader = () => {
 		return (
 			<div className="flex flex-col gap-1">
@@ -167,7 +169,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 				<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden h-48">
 					<div className="flex items-center justify-center border rounded border-[1px] h-full">
 						<Image
-							src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
+							src={fullPhotoURL}
 							alt={componentName}
 							width={50}
 							height={50}
@@ -372,7 +374,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 									{
 										status === 'Active' ?
 											<Image
-												src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
+												src={fullPhotoURL}
 												alt={componentName}
 												width={screenSize.width > 768 ? 50 : 20}
 												height={screenSize.width > 768 ? 50 : 20}
@@ -387,7 +389,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 												</div>
 												:
 												<Image
-													src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
+													src={fullPhotoURL}
 													alt={componentName}
 													width={screenSize.width > 768 ? 50 : 20}
 													height={screenSize.width > 768 ? 50 : 20}

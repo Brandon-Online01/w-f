@@ -1,7 +1,7 @@
 'use client'
 
 
-import { Component, FolderKanban, Users, Stamp, ServerCog } from "lucide-react";
+import { Component, FolderKanban, Users, Stamp, ServerCog, Rss } from "lucide-react";
 import {
     Tabs,
     TabsContent,
@@ -13,7 +13,6 @@ import StaffTab from "@/modules/office/staff";
 import MouldsManagement from "@/modules/office/moulds";
 import ComponentsManagement from "@/modules/office/components";
 import MachinesManagement from "@/modules/office/machines";
-import LiveRunHighlights from "@/modules/office/highlights";
 
 export default function Home() {
 
@@ -52,10 +51,9 @@ export default function Home() {
         <div className="flex flex-col items-start justify-start gap-4 h-full w-full overflow-y-scroll outline-none">
             <ScrollArea className="h-full w-full pr-3 flex flex-col justify-start gap-3">
                 <div className="flex flex-row items-center justify-start gap-2 px-1 w-full mb-3">
-                    <p className="text-lg font-medium uppercase">Factory Assets</p>
-                    <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
+                    <p className="text-lg font-medium uppercase">Highlights</p>
+                    <Rss className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
-                <LiveRunHighlights />
                 <div className="flex flex-row items-center justify-start gap-2 px-1 w-full my-3">
                     <p className="text-lg font-medium uppercase">Management</p>
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
