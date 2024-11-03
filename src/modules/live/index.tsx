@@ -11,7 +11,6 @@ import {
 	AlertTriangle,
 	ChartSpline,
 	Weight,
-	Info,
 	PauseOctagonIcon,
 	ComponentIcon,
 	HeartHandshake,
@@ -665,7 +664,7 @@ export default function LiveRunCards() {
 	}
 
 	return (
-		<div className="w-full">
+		<div className="w-full flex flex-col justify-start gap-2">
 			<SectionHeader />
 			<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
 				{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
@@ -679,15 +678,52 @@ const MachineCardsLoader = () => {
 	const { socketStatus } = liveRunStore();
 
 	return (
-		<div className="flex flex-wrap items-center justify-center w-full h-[calc(100vh-100px)]">
-			{Array.from({ length: 1 }).map((_, index) => (
-				<div key={index} className="w-full h-full bg-gray-200 animate-pulse rounded-md m-2 flex items-center justify-center">
-					<p className="text-xs flex items-center">
-						<Info className="mr-2 h-4 w-4" />
-						{socketStatus}
-					</p>
-				</div>
-			))}
+		<div className="w-full">
+			<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1">
+				{Array.from({ length: 16 }).map((_, index) => (
+					<motion.div
+						key={index}
+						className="relative bg-card rounded p-4 h-[380px] border shadow animate-pulse flex flex-col justify-start gap-2"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.3, delay: index * 0.1 }}>
+						<div className="aspect-video w-full bg-gray-200 rounded mb-4 h-48 flex items-center justify-center" >
+							<div className="w-full h-full flex items-center justify-center">
+								<div className="loading">
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+								</div>
+							</div>
+						</div>
+
+						{/* Content placeholders */}
+						<div className="flex items-center gap-2 justify-between">
+							<div className="h-4 bg-gray-200 rounded w-1/2" />
+							<div className="h-4 bg-gray-200 rounded w-1/4" />
+						</div>
+						<div className="space-y-3">
+							<div className="h-4 bg-gray-200 rounded w-2/3" />
+						</div>
+						<div className="flex items-center gap-2 justify-between mt-4">
+							<div className="h-4 bg-gray-200 rounded w-3/12" />
+							<div className="h-4 bg-gray-200 rounded w-1/4" />
+							<div className="h-4 bg-gray-200 rounded w-1/4" />
+						</div>
+						<div className="flex items-center gap-2 justify-between -mt-1">
+							<div className="h-4 bg-gray-200 rounded w-2/12" />
+							<div className="h-4 bg-gray-200 rounded w-2/12" />
+							<div className="h-4 bg-gray-200 rounded w-2/12" />
+						</div>
+						<div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-muted-foreground">
+							<div className={`w-2 h-2 rounded-full ${socketStatus === 'Connected to live stream' ? 'bg-success' : 'bg-destructive'} animate-pulse`} />
+							{socketStatus}
+						</div>
+					</motion.div>
+				))}
+			</div>
 		</div>
 	);
 };
