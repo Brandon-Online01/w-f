@@ -99,12 +99,12 @@ export default function StaffManagement() {
         allUsers()
     }, [setUsers]);
 
-    const filteredUsers = users.filter(user =>
-        (user.name.toLowerCase() + ' ' + user.lastName.toLowerCase()).includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || user.role === statusFilter)
+    const filteredUsers = users?.filter(user =>
+        (user?.name?.toLowerCase() + ' ' + user?.lastName.toLowerCase())?.includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || user?.role === statusFilter)
     )
 
-    const pageCount = Math.ceil(filteredUsers.length / itemsPerPage)
+    const pageCount = Math.ceil(filteredUsers?.length / itemsPerPage)
 
     const paginatedUsers = filteredUsers.slice(
         (currentPage - 1) * itemsPerPage,
@@ -455,7 +455,7 @@ export default function StaffManagement() {
                         {errors?.status && <p className="text-red-500 text-xs mt-1">{errors?.status?.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-10/12 mx-auto flex">
+                <Button type="submit" className="w-10/12 mx-auto flex" disabled> 
                     {
                         isLoading ? <Loader2 className="mr-2 animate-spin stroke-white" strokeWidth={1.5} size={18} /> :
                             <>

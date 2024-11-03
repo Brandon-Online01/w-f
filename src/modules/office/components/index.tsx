@@ -75,9 +75,9 @@ export default function ComponentManager() {
         allComponents()
     }, [setComponents]);
 
-    const filteredComponents = components.filter((component: ComponentType) =>
-        component.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || component.status === statusFilter)
+    const filteredComponents = components?.filter((component: ComponentType) =>
+        component?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || component?.status === statusFilter)
     )
 
     const pageCount = Math.ceil(filteredComponents.length / itemsPerPage)
@@ -264,7 +264,7 @@ export default function ComponentManager() {
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-10/12 mx-auto flex">{component ? 'Update Component' : 'Create Component'}</Button>
+                <Button type="submit" className="w-10/12 mx-auto flex" disabled>{component ? 'Update Component' : 'Create Component'}</Button>
             </form>
         )
     }
@@ -430,9 +430,9 @@ export default function ComponentManager() {
                     </Select>
                 </div>
                 <Dialog open={isCreateComponentOpen} onOpenChange={setIsCreateComponentOpen}>
-                    <DialogTrigger asChild>
+                    <DialogTrigger asChild disabled>
                         <div className='w-full flex items-end justify-end lg:w-64'>
-                            <Button className="w-full ">
+                            <Button className="w-full">
                                 <Component className="mr-2 stroke-whte" strokeWidth={1.5} size={18} />
                                 Create Component
                             </Button>

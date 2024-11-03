@@ -10,10 +10,10 @@ import {
     EllipsisVertical,
     FolderKanban,
     LayoutDashboard,
+    PlugZap2Icon,
     Power,
     Replace,
     TrendingUpDown,
-    Wifi,
 } from "lucide-react";
 import {
     Dialog,
@@ -155,7 +155,7 @@ export const DesktopNavigation = () => {
                                                 {factory?.name}
                                             </span>
                                             <MenubarShortcut>
-                                                <Wifi size={20} strokeWidth={1.2} className={`${factoryReferenceID === factory?.referenceID ? 'stroke-success' : 'stroke-card-foreground'}`} />
+                                                <PlugZap2Icon size={20} strokeWidth={1.2} className={`${factoryReferenceID === factory?.referenceID ? 'stroke-success' : 'stroke-card-foreground'}`} />
                                             </MenubarShortcut>
                                         </MenubarItem>
                                     )

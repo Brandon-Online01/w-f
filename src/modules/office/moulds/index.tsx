@@ -78,13 +78,13 @@ export default function MouldManager() {
 
     console.log(moulds)
 
-    const filteredMoulds = moulds.filter((mould: Mould) =>
-        mould.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || mould.status === statusFilter)
+    const filteredMoulds = moulds?.filter((mould: Mould) =>
+        mould?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || mould?.status === statusFilter)
     )
 
-    const pageCount = Math.ceil(filteredMoulds.length / itemsPerPage)
-    const paginatedMoulds = filteredMoulds.slice(
+    const pageCount = Math.ceil(filteredMoulds?.length / itemsPerPage)
+    const paginatedMoulds = filteredMoulds?.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
@@ -170,7 +170,7 @@ export default function MouldManager() {
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-full">{mould ? 'Update Mould' : 'Create Mould'}</Button>
+                <Button type="submit" className="w-full" disabled>{mould ? 'Update Mould' : 'Create Mould'}</Button>
             </form>
         )
     }
