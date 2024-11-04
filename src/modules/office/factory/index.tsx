@@ -451,9 +451,9 @@ export default function FactoryManagement() {
                         <SelectValue placeholder="Items per page" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="10">10 per page</SelectItem>
-                        <SelectItem value="20">20 per page</SelectItem>
-                        <SelectItem value="50">50 per page</SelectItem>
+                        <SelectItem value="8">8 per page</SelectItem>
+                        <SelectItem value="16">16 per page</SelectItem>
+                        <SelectItem value="32">32 per page</SelectItem>
                     </SelectContent>
                 </Select>
                 <div className="flex items-center space-x-2">

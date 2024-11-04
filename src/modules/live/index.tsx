@@ -666,7 +666,7 @@ export default function LiveRunCards() {
 		return machineData?.filter(machine =>
 			(machine?.machine?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
 				machine?.component?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())) &&
-			(statusFilter === 'all' || status?.toLowerCase() === statusFilter)
+			(statusFilter === 'all' || machine?.status?.toLowerCase() === statusFilter)
 		);
 	}, [machineData, searchQuery, statusFilter]);
 
@@ -727,7 +727,7 @@ export default function LiveRunCards() {
 	return (
 		<div className="w-full flex flex-col justify-start gap-2">
 			<SectionHeader />
-			<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'}`}>
+			<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'} -mt-4`}>
 				{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
 			</div>
 			<TablePagination />
