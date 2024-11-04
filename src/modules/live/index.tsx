@@ -64,7 +64,7 @@ import {
 import { cn } from "@/lib/utils"
 import Image from 'next/image'
 import { io } from 'socket.io-client';
-import { isEmpty } from 'lodash'
+import { isEmpty, isWeakMap } from 'lodash'
 import { MachineLiveRun } from '../../types/common.types'
 import { chartColors } from '../../tools/data'
 import { signalIcon } from './helpers/signal-icons'
@@ -724,13 +724,22 @@ export default function LiveRunCards() {
 		)
 	}
 
+	console.log(currentMachines, 'filtered machines')
+
 	return (
 		<div className="w-full flex flex-col justify-start gap-2">
 			<SectionHeader />
-			<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'} -mt-4`}>
-				{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
-			</div>
-			<TablePagination />
+			{
+				isEmpty(currentMachines) ?
+					<div className="w-full h-full flex items-center justify-center">
+						<p className="text-card-foreground text-[14px]">No matches found</p>
+					</div>
+					:
+					<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'} -mt-4`}>
+						{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
+					</div>
+			}
+			{!isEmpty(currentMachines) && <TablePagination />}
 		</div>
 	)
 }
