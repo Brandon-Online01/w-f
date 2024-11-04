@@ -6,15 +6,12 @@ import {
     ChevronLeft,
     ChevronRight,
     MoreVertical,
-    Edit,
-    Eye,
-    Trash2,
     Activity,
     Hash,
     Wrench,
     Gauge,
     Component,
-    Stamp
+    Puzzle
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -161,25 +158,25 @@ export default function MouldManager() {
                             <SelectContent>
                                 <SelectItem value="Active">
                                     <span className="flex items-center gap-2">
-                                        <Stamp className="stroke-success" strokeWidth={1} size={18} />
+                                        <Puzzle className="stroke-success" strokeWidth={1} size={18} />
                                         Active
                                     </span>
                                 </SelectItem>
                                 <SelectItem value="Inactive">
                                     <span className="flex items-center gap-2">
-                                        <Stamp className="stroke-destructive" strokeWidth={1} size={18} />
+                                        <Puzzle className="stroke-destructive" strokeWidth={1} size={18} />
                                         In Active
                                     </span>
                                 </SelectItem>
                                 <SelectItem value="Maintenance">
                                     <span className="flex items-center gap-2">
-                                        <Stamp className="stroke-warning" strokeWidth={1} size={18} />
+                                        <Puzzle className="stroke-warning" strokeWidth={1} size={18} />
                                         Maintenance
                                     </span>
                                 </SelectItem>
                                 <SelectItem value="Maintenance">
                                     <span className="flex items-center gap-2">
-                                        <Stamp className="stroke-warning" strokeWidth={1} size={18} />
+                                        <Puzzle className="stroke-warning" strokeWidth={1} size={18} />
                                         Out Of Service
                                     </span>
                                 </SelectItem>
@@ -209,7 +206,7 @@ export default function MouldManager() {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Puzzle className="stroke-card-foreground" strokeWidth={1} size={18} />
                             <Label className="text-sm font-medium text-card-foreground">Name</Label>
                         </div>
                         <p className="text-sm font-semibold">{name}</p>
@@ -268,6 +265,7 @@ export default function MouldManager() {
                     <div className="relative flex-grow w-64 sm:w-96">
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
+                            disabled
                             type="text"
                             placeholder="search moulds..."
                             className="pl-8"
@@ -285,25 +283,25 @@ export default function MouldManager() {
                         <SelectContent>
                             <SelectItem value="All">
                                 <span className="flex items-center gap-2">
-                                    <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <Puzzle className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     All
                                 </span>
                             </SelectItem>
                             <SelectItem value="Active">
                                 <span className="flex items-center gap-2">
-                                    <Stamp className="stroke-success" strokeWidth={1} size={18} />
+                                    <Puzzle className="stroke-success" strokeWidth={1} size={18} />
                                     Active
                                 </span>
                             </SelectItem>
                             <SelectItem value="Inactive">
                                 <span className="flex items-center gap-2">
-                                    <Stamp className="stroke-destructive" strokeWidth={1} size={18} />
+                                    <Puzzle className="stroke-destructive" strokeWidth={1} size={18} />
                                     In Active
                                 </span>
                             </SelectItem>
                             <SelectItem value="Maintenance">
                                 <span className="flex items-center gap-2">
-                                    <Stamp className="stroke-warning" strokeWidth={1} size={18} />
+                                    <Puzzle className="stroke-warning" strokeWidth={1} size={18} />
                                     Maintenance
                                 </span>
                             </SelectItem>
@@ -314,7 +312,7 @@ export default function MouldManager() {
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
-                                <Stamp className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
+                                <Puzzle className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
                                 Create Mould
                             </Button>
                         </div>
@@ -351,7 +349,7 @@ export default function MouldManager() {
                         <div className="flex flex-col space-y-2">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                    <Stamp className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <Puzzle className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     <h3 className="font-semibold">{name}</h3>
                                 </div>
                                 <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' :
@@ -384,7 +382,7 @@ export default function MouldManager() {
                                             })
                                             setIsEditing(true)
                                         }}>
-                                            <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
@@ -396,11 +394,11 @@ export default function MouldManager() {
                                             })
                                             setIsViewing(true)
                                         }}>
-                                            <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             View
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => handleDeleteMould(Number(serialNumber))}>
-                                            <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Delete
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>

@@ -4,9 +4,9 @@ import {
     Component,
     FolderKanban,
     Users,
-    Stamp,
     ServerCog,
-    Factory
+    Factory,
+    Puzzle
 } from "lucide-react";
 import {
     Tabs,
@@ -59,7 +59,7 @@ export default function Home() {
             { value: "staff", icon: Users, label: "Staff" },
             { value: "components", icon: Component, label: "Components" },
             { value: "machines", icon: ServerCog, label: "Machines" },
-            { value: "moulds", icon: Stamp, label: "Moulds" },
+            { value: "moulds", icon: Puzzle, label: "Moulds" },
         ];
 
         return (

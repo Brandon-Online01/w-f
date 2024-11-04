@@ -147,6 +147,7 @@ export default function StaffManagement() {
                     <div className="relative flex-grow w-64 sm:w-96">
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
+                            disabled
                             type="text"
                             placeholder="search users..."
                             className="pl-8"
@@ -342,6 +343,8 @@ export default function StaffManagement() {
             defaultValues: user || {},
         })
 
+        const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
+
         return (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-card">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -349,7 +352,7 @@ export default function StaffManagement() {
                         <Label htmlFor="photoURL">User Image</Label>
                         <div className="flex items-center space-x-4">
                             <Avatar className="h-20 w-20">
-                                <AvatarImage src={imagePreview} alt="User avatar" />
+                                <AvatarImage src={fullPhotoURL} alt="User avatar" />
                                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                             <Input
