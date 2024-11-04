@@ -163,7 +163,7 @@ export default function StaffManagement() {
                         <SelectContent>
                             <SelectItem value="All">
                                 <Users className="mr-2 h-4 w-4 inline-block" />
-                                All Roles
+                                All
                             </SelectItem>
                             <SelectItem value="Admin">
                                 <Shield className="mr-2 h-4 w-4 inline-block" />
@@ -184,7 +184,7 @@ export default function StaffManagement() {
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
-                                <UserPlus className="mr-2 h-4 w-4" /> Create User
+                                <UserPlus className="mr-2 h-4 w-4" /> Add A User
                             </Button>
                         </div>
                     </DialogTrigger>

@@ -363,10 +363,12 @@ export default function FactoryManagement() {
                 </div>
                 <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
-                        <Button className="w-full sm:w-auto">
-                            <FactoryIcon className="mr-2 h-4 w-4" />
-                            Create Factory
-                        </Button>
+                        <div className='w-full flex items-end justify-end lg:w-64'>
+                            <Button className="w-full">
+                                <FactoryIcon className="mr-2 h-4 w-4" />
+                                Add A Factory
+                            </Button>
+                        </div>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[700px]">
                         <DialogHeader>

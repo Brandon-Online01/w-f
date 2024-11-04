@@ -1,22 +1,15 @@
+import { UserType } from '@/types/user';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-interface User {
-    uid: string;
-    name: string;
-    email: string;
-    role: string;
-    surname: string;
-}
-
 interface SessionState {
-    user: User | null;
+    user: UserType | null;
     message: string | null;
     status: 'authenticated' | 'unauthenticated';
     token: string | null;
     signOut: () => void;
     signIn: (sessionData: {
-        user: User;
+        user: UserType;
         message: string;
         status: 'authenticated';
         token: string

@@ -30,7 +30,7 @@ export const useFactoryStore = create<FactoryState>((set) => ({
 
 export const FactorySelector = () => {
     const { token } = useSessionStore(state => state)
-    const { setFactoryReferenceID } = useFactorySetter()
+    const { setFactoryReferenceID, factoryReferenceID } = useFactorySetter()
 
     const { data: factories, isLoading, isError } = useQuery({
         queryKey: ['factoryList'],
@@ -61,7 +61,7 @@ export const FactorySelector = () => {
                                         {factory.name}
                                     </span>
                                     <MenubarShortcut>
-                                        <FactoryIcon size={18} strokeWidth={1.5} className="stroke-destructive" />
+                                        <FactoryIcon size={18} strokeWidth={1.5} className={`${factory?.factoryReferenceID === factoryReferenceID ? 'stroke-success' : 'stroke-card-foreground'}`} />
                                     </MenubarShortcut>
                                 </MenubarItem>
                                 <MenubarSeparator />
