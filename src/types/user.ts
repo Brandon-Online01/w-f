@@ -9,6 +9,7 @@ export type UserType = {
     photoURL: string;
     phoneNumber: string;
     status: string;
+    factoryReferenceID: string;
 }
 
 export type NewUserType = {

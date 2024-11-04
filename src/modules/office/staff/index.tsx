@@ -163,7 +163,7 @@ export default function StaffManagement() {
                         <SelectContent>
                             <SelectItem value="All">
                                 <Users className="mr-2 h-4 w-4 inline-block" />
-                                All Roles
+                                All
                             </SelectItem>
                             <SelectItem value="Admin">
                                 <Shield className="mr-2 h-4 w-4 inline-block" />
