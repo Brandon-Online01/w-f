@@ -6,9 +6,6 @@ import {
     ChevronLeft,
     ChevronRight,
     MoreVertical,
-    Edit,
-    Eye,
-    Trash2,
     Server,
     Activity,
     Hash,
@@ -27,7 +24,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { machineList } from '@/data/data'
+import { machineList } from '@/data/machines'
 import { Machine } from '@/types/machine'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
@@ -209,9 +206,10 @@ export default function MachineManager() {
                     <div className="relative flex-grow w-64 sm:w-96">
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
+                            disabled
                             type="text"
                             placeholder="search machines..."
-                            className="pl-8"
+                            className="pl-8 py-[9px]"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -313,18 +311,18 @@ export default function MachineManager() {
                                             setMachineInFocus(machine)
                                             setIsEditing(true)
                                         }}>
-                                            <Edit className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <ServerCog className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
                                             setMachineInFocus(machine)
                                             setIsViewing(true)
                                         }}>
-                                            <Eye className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <ServerCrash className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             View
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.machineNumber))}>
-                                            <Trash2 className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                            <ServerOff className="stroke-destructive mr-2" strokeWidth={1} size={18} />
                                             Delete
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>

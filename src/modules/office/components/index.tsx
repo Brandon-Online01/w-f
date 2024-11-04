@@ -47,12 +47,12 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { componentSchema } from '@/schemas/component'
-import { componentList } from '@/data/data'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
 import { useSessionStore } from '@/providers/session.provider'
+import { componentList } from '@/data/components'
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
@@ -415,7 +415,7 @@ export default function ComponentManager() {
                         <Input
                             type="text"
                             placeholder="search components..."
-                            className="pl-8"
+                            className="pl-8 py-[9px]"
                             value={searchTerm}
                             disabled
                             onChange={(e) => setSearchTerm(e.target.value)}
