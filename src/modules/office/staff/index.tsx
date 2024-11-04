@@ -559,7 +559,7 @@ export default function StaffManagement() {
                     return <UserCard key={index} user={userWithDefaultPhoto} index={index} />;
                 })}
             </div>
-            <PaginationControls />
+            {paginatedUsers && paginatedUsers?.length >= 8 && <PaginationControls />}
             <EditModal />
             <ViewModal />
         </div>

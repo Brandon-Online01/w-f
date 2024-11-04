@@ -99,7 +99,7 @@ export default function Home() {
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>
-                        <AnimatePresence mode="wait">
+                        <AnimatePresence mode="sync">
                             <motion.div
                                 key="factory"
                                 variants={contentVariants}
