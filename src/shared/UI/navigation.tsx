@@ -10,9 +10,7 @@ import {
     EllipsisVertical,
     FolderKanban,
     LayoutDashboard,
-    PlugZap2Icon,
     Power,
-    Replace,
     TrendingUpDown,
 } from "lucide-react";
 import {
@@ -34,22 +32,6 @@ import {
     MenubarShortcut,
     MenubarTrigger,
 } from "@/components/ui/menubar"
-import { useFactoryStore } from "../state/endpoint";
-
-const factories = [
-    {
-        referenceID: '001',
-        name: 'Otima Meadowdale',
-    },
-    {
-        referenceID: '002',
-        name: 'Otima CPT',
-    },
-    {
-        referenceID: '003',
-        name: 'Otime Brazil',
-    }
-]
 
 export const Navigation = () => {
     return (
@@ -106,7 +88,6 @@ export const MobileNavigation = () => {
 export const DesktopNavigation = () => {
     const pathname = usePathname()
     const signOut = useSessionStore(state => state?.signOut)
-    const { factoryReferenceID, setFactoryReferenceID } = useFactoryStore()
 
     return (
         <div className="xl:flex w-full flex-col justify-between py-4 h-full hidden">
@@ -138,29 +119,6 @@ export const DesktopNavigation = () => {
                             <MenubarTrigger className="p-0 bg-none border-none focus:bg-none outline-none">
                                 <ThemeModeToggler />
                             </MenubarTrigger>
-                        </MenubarMenu>
-                    </Menubar>
-                </li>
-                <li className="flex items-center justify-center cursor-pointer rounded">
-                    <Menubar>
-                        <MenubarMenu>
-                            <MenubarTrigger className="p-0 bg-none border-none focus:bg-none outline-none">
-                                <Replace size={18} strokeWidth={1} className="stroke-card-foreground" />
-                            </MenubarTrigger>
-                            <MenubarContent>
-                                {
-                                    factories.map((factory, index) =>
-                                        <MenubarItem className="cursor-pointer" onClick={() => setFactoryReferenceID(factory?.referenceID)} key={index}>
-                                            <span className="flex items-center justify-center gap-2 text-[12px] uppercase">
-                                                {factory?.name}
-                                            </span>
-                                            <MenubarShortcut>
-                                                <PlugZap2Icon size={20} strokeWidth={1.2} className={`${factoryReferenceID === factory?.referenceID ? 'stroke-success' : 'stroke-card-foreground'}`} />
-                                            </MenubarShortcut>
-                                        </MenubarItem>
-                                    )
-                                }
-                            </MenubarContent>
                         </MenubarMenu>
                     </Menubar>
                 </li>

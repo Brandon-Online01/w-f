@@ -48,7 +48,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { mouldSchema } from '@/schemas/mould'
 import { Mould } from '@/types/mould'
-import { mouldList } from '@/data/data'
+import { mouldList } from '@/data/mould'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
@@ -268,7 +268,7 @@ export default function MouldManager() {
                             disabled
                             type="text"
                             placeholder="search moulds..."
-                            className="pl-8"
+                            className="pl-8 py-[9px]"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />

@@ -55,11 +55,11 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { userList } from '@/data/data'
 import { newUserSchema } from '@/schemas/user'
 import userPlaceHolderIcon from '@/assets/svg/user-placeholder.svg'
 import { useOfficeStore } from './state/state'
 import { useSessionStore } from '@/providers/session.provider'
+import { staffList } from '@/data/staff'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
@@ -70,18 +70,16 @@ export default function StaffManagement() {
         statusFilter,
         currentPage,
         itemsPerPage,
-        editingUser,
-        viewingUser,
         isCreating,
         isEditing,
         isViewing,
         setUsers,
+        userInFocus,
+        setUserInFocus,
         setSearchTerm,
         setStatusFilter,
         setCurrentPage,
         setItemsPerPage,
-        setEditingUser,
-        setViewingUser,
         setIsCreating,
         setIsEditing,
         setIsViewing,
@@ -94,7 +92,7 @@ export default function StaffManagement() {
         setIsLoading(true)
         const allUsers = async () => {
             if (token) {
-                const users = await userList(token)
+                const users = await staffList(token)
                 setUsers(users?.data)
             }
         }
@@ -127,14 +125,7 @@ export default function StaffManagement() {
         setIsCreating(false)
     }
 
-    const handleEditUser: SubmitHandler<UserFormData> = (data) => {
-        const updatedUser = {
-            ...editingUser!,
-            ...data,
-        }
-        setUsers(users.map(user => user.uid === updatedUser.uid ? updatedUser : user))
-        setEditingUser(null)
-    }
+    const handleEditUser: SubmitHandler<UserFormData> = (data) => console.log(data, '- edit the user with this data')
 
     const handleDeleteUser = (uid: number) => console.log(uid, '- delete the user with this uid')
 
@@ -248,14 +239,14 @@ export default function StaffManagement() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onSelect={() => {
-                                            setEditingUser(user)
+                                            setUserInFocus(user)
                                             setIsEditing(true)
                                         }}>
                                             <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={17} />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onSelect={() => {
-                                            setViewingUser(user)
+                                            setUserInFocus(user)
                                             setIsViewing(true)
                                         }}>
                                             <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1.5} size={17} />
@@ -282,7 +273,7 @@ export default function StaffManagement() {
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
                     </DialogHeader>
-                    {editingUser && <UserForm user={{ ...editingUser, photoURL: editingUser.photoURL || '/placeholder.svg' }} onSubmit={handleEditUser} />}
+                    {userInFocus && <UserForm user={{ ...userInFocus, photoURL: userInFocus.photoURL || '/placeholder.svg' }} onSubmit={handleEditUser} />}
                 </DialogContent>
             </Dialog>
         )
@@ -295,7 +286,7 @@ export default function StaffManagement() {
                     <DialogHeader>
                         <DialogTitle>User Details</DialogTitle>
                     </DialogHeader>
-                    {viewingUser && <ViewUserModal user={viewingUser as UserFormData & { uid: number, password: string }} />}
+                    {userInFocus && <ViewUserModal user={userInFocus as UserFormData & { uid: number, password: string }} />}
                 </DialogContent>
             </Dialog>
         )

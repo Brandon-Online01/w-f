@@ -24,7 +24,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { machineList } from '@/data/data'
+import { machineList } from '@/data/machines'
 import { Machine } from '@/types/machine'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
@@ -209,7 +209,7 @@ export default function MachineManager() {
                             disabled
                             type="text"
                             placeholder="search machines..."
-                            className="pl-8"
+                            className="pl-8 py-[9px]"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
