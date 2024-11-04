@@ -142,7 +142,7 @@ export const DesktopNavigation = () => {
                                     </MenubarShortcut>
                                 </MenubarItem>
                                 <MenubarSeparator />
-                                <MenubarItem className="cursor-pointer" disabled>
+                                <MenubarItem className="cursor-disabled" disabled>
                                     <span className="flex items-center justify-center gap-2 text-[12px] uppercase">
                                         Notifications
                                     </span>

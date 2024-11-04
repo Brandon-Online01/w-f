@@ -8,7 +8,7 @@ import axios from "axios"
 import toast from 'react-hot-toast';
 import { useMutation } from '@tanstack/react-query'
 import { useForm, SubmitHandler } from "react-hook-form"
-import { Loader2 } from 'lucide-react'
+import { Loader2, Lock } from 'lucide-react'
 import { useSessionStore } from '@/session/session.provider'
 
 type SignInInputs = {
@@ -106,13 +106,13 @@ export default function Page() {
     };
 
     return (
-        <div className="w-full flex items-center justify-center lg:justify-end h-full overflow-hidden bg-signInCover bg-cover bg-no-repeat">
-            <div className="flex items-center justify-center p-3 md:p-8 w-11/12 rounded lg:rounded-none md:w-8/12 lg:w-4/12 lg:h-full bg-card">
+        <div className="w-full flex items-center justify-center lg:justify-end lg:p-4 h-full overflow-hidden bg-signInCover bg-cover bg-no-repeat">
+            <div className="flex items-center justify-center md:p-8 w-11/12 sm:w-10/12 ease-in-out duration-300 rounded md:w-8/12 lg:w-4/12 bg-card">
                 <div className="w-full flex flex-col justify-start gap-4 p-3 lg:p-0">
                     <div className="flex flex-col items-center justify-center gap-0 text-center w-full">
                         <h1 className="text-3xl font-normal">Warese-Sense</h1>
                         <p className="text-balance text-muted-foreground -mt-1 text-xs">
-                            Enter your email below to sign in to your account
+                            Enter your credentials below to sign in to your ware-sense account
                         </p>
                     </div>
                     <div className="grid gap-4 w-full">
@@ -123,12 +123,12 @@ export default function Page() {
                                 type="email"
                                 disabled={isLoading}
                                 placeholder="demo@warese.co.za"
-                                className="w-full placeholder:text-xs placeholder:italic"
+                                className="w-full placeholder:text-xs placeholder:italic bg-background/30"
                                 {...register("username", {
                                     required: "*username is required",
                                 })}
                             />
-                            {errors.username && <span className="text-red-500 text-xs -mt-1">{errors.username.message}</span>}
+                            {errors?.username && <span className="text-red-500 text-xs -mt-1">{errors?.username?.message}</span>}
                         </div>
                         <div className="flex items-start gap-1 flex-col">
                             <Label htmlFor="password">Password</Label>
@@ -138,17 +138,25 @@ export default function Page() {
                                     id="password"
                                     type={isPasswordVisible ? "text" : "password"}
                                     placeholder="**************"
-                                    className="w-full pr-10 placeholder:text-xs placeholder:italic"
+                                    className="w-full pr-10 placeholder:text-xs placeholder:italic bg-background/30"
                                     {...register("password", {
                                         required: "*password is required"
                                     })}
                                 />
-                                <span className="absolute right-2 cursor-pointer uppercase text-[9px]" onClick={togglePasswordVisibility}>{isPasswordVisible ? 'Hide' : 'Show'}</span>
+                                {!isLoading && <span className="absolute right-2 cursor-pointer uppercase text-[9px]" onClick={togglePasswordVisibility}>{isPasswordVisible ? 'Hide' : 'Show'}</span>}
                             </div>
-                            {errors.password && <span className="text-red-500 text-xs mt-1">{errors.password.message}</span>}
+                            {errors?.password && <span className="text-red-500 text-xs mt-1">{errors?.password?.message}</span>}
                         </div>
                         <Button type="submit" className="w-10/12 mx-auto" onClick={handleSubmit(onSubmit)} disabled={isLoading}>
-                            {isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : 'SIGN IN'}
+                            {
+                                isLoading
+                                    ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+                                    :
+                                    <>
+                                        <Lock className="mr-2" strokeWidth={1.5} size={16} />
+                                        <span className="uppercase">SIGN IN</span>
+                                    </>
+                            }
                         </Button>
                     </div>
                 </div>

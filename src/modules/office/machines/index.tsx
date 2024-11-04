@@ -248,7 +248,7 @@ export default function MachineManager() {
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
                                 <ServerCog className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
-                                Create Machine
+                                Add A Machine
                             </Button>
                         </div>
                     </DialogTrigger>

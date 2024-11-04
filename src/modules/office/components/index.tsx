@@ -54,7 +54,6 @@ import { isEmpty } from 'lodash'
 import { useSessionStore } from '@/providers/session.provider'
 import { componentList } from '@/data/components'
 
-
 type ComponentFormData = z.infer<typeof componentSchema>
 
 export default function ComponentManager() {
@@ -455,7 +454,7 @@ export default function ComponentManager() {
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full">
                                 <Component className="mr-2 stroke-whte" strokeWidth={1.5} size={18} />
-                                Create Component
+                                Add A Component
                             </Button>
                         </div>
                     </DialogTrigger>
@@ -662,7 +661,7 @@ export default function ComponentManager() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full h-full overflow-y-scroll">
                 {paginatedComponents?.map((component: ComponentFormData, index: number) => <ComponentCard key={index} component={component} index={index} />)}
             </div>
             {paginatedComponents?.length >= 8 && <PageControls />}

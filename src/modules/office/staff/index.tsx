@@ -184,7 +184,7 @@ export default function StaffManagement() {
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
-                                <UserPlus className="mr-2 h-4 w-4" /> Create User
+                                <UserPlus className="mr-2 h-4 w-4" /> Add A User
                             </Button>
                         </div>
                     </DialogTrigger>
