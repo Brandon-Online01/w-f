@@ -313,7 +313,7 @@ export default function MouldManager() {
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full ">
                                 <Puzzle className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
-                                Create Mould
+                                Add A Mould
                             </Button>
                         </div>
                     </DialogTrigger>
