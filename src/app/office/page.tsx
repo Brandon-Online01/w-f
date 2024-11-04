@@ -4,9 +4,9 @@ import {
     Component,
     FolderKanban,
     Users,
-    Stamp,
     ServerCog,
-    Factory
+    Factory,
+    Puzzle
 } from "lucide-react";
 import {
     Tabs,
@@ -20,6 +20,7 @@ import MouldsManagement from "@/modules/office/moulds";
 import ComponentsManagement from "@/modules/office/components";
 import MachinesManagement from "@/modules/office/machines";
 import { motion, AnimatePresence } from "framer-motion";
+import FactoryManagement from "@/modules/office/factory";
 
 export default function Home() {
 
@@ -59,7 +60,7 @@ export default function Home() {
             { value: "staff", icon: Users, label: "Staff" },
             { value: "components", icon: Component, label: "Components" },
             { value: "machines", icon: ServerCog, label: "Machines" },
-            { value: "moulds", icon: Stamp, label: "Moulds" },
+            { value: "moulds", icon: Puzzle, label: "Moulds" },
         ];
 
         return (
@@ -94,11 +95,21 @@ export default function Home() {
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <div className="w-full h-[98vh] bg-card p-1 rounded overflow-y-auto mt-4">
-                    <Tabs defaultValue="staff" className="w-full overflow-hidden h-full">
+                    <Tabs defaultValue="factory" className="w-full overflow-hidden h-full">
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>
                         <AnimatePresence mode="wait">
+                            <motion.div
+                                key="factory"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="factory" className="w-full bg-background p-1 rounded">
+                                    <FactoryManagement />
+                                </TabsContent>
+                            </motion.div>
                             <motion.div
                                 key="staff"
                                 variants={contentVariants}
@@ -137,18 +148,6 @@ export default function Home() {
                                 exit="exit">
                                 <TabsContent value="machines" className="w-full bg-background p-1 rounded">
                                     <MachinesManagement />
-                                </TabsContent>
-                            </motion.div>
-                            <motion.div
-                                key="factory"
-                                variants={contentVariants}
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit">
-                                <TabsContent value="factory" className="w-full bg-background p-1 rounded">
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <p className="text-[10px] font-medium uppercase">Factory Management Coming Soon</p>
-                                    </div>
                                 </TabsContent>
                             </motion.div>
                         </AnimatePresence>

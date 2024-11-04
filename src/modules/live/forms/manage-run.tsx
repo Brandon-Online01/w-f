@@ -1,7 +1,7 @@
 'use client'
 
 import { format } from "date-fns"
-import { noteTypes } from "@/tools/data"
+import { baseColors, noteTypes } from "@/tools/data"
 import { NoteInputs, UpdateLiveRun } from "@/types/live-run"
 import { liveRunStore } from "../state/state"
 import { Label } from "@/components/ui/label"
@@ -30,15 +30,12 @@ import {
     DialogDescription,
     DialogTrigger
 } from "@/components/ui/dialog"
-import {
-    componentList,
-    userList,
-    mouldList,
-    colors
-} from "../../../data/data"
 import { useEffect } from "react"
 import { updateLiveRuns } from "../helpers/live-run"
 import { useSessionStore } from "@/providers/session.provider"
+import { componentList } from "@/data/components"
+import { staffList } from "@/data/staff"
+import { mouldList } from "@/data/mould"
 
 export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) {
     const { formState: { errors }, control, handleSubmit } = useForm<NoteInputs>();
@@ -65,7 +62,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
         setIsLoading(true)
         const fetchData = async () => {
             if (token) {
-                const users = await userList(token);
+                const users = await staffList(token);
                 const components = await componentList(token);
                 const moulds = await mouldList(token);
 
@@ -190,7 +187,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                                             <p className="text-card-foreground text-[12px] uppercase">Color</p>
                                         </Label>
                                         <BaseDropDownSelector
-                                            items={colors}
+                                            items={baseColors}
                                             placeholder="Select a color"
                                             command="Type to search..."
                                             onChange={(selectedValue) => setUpdateColor(selectedValue)}

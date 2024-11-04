@@ -58,7 +58,7 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { newUserSchema, editUserSchema } from '@/schemas/user'
-import { userList } from '@/data/data'
+import { staffList } from '@/data/staff'
 import { useOfficeStore } from '../state/state'
 import { NewUserType } from '@/types/user'
 import { motion } from 'framer-motion'
@@ -77,9 +77,9 @@ export default function StaffManagement() {
         isCreating,
         isEditing,
         isViewing,
-        editingUser,
-        viewingUser,
         isLoading,
+        userInFocus,
+        setUserInFocus,
         setUsers,
         setSearchTerm,
         setStatusFilter,
@@ -88,10 +88,9 @@ export default function StaffManagement() {
         setIsCreating,
         setIsEditing,
         setIsViewing,
-        setEditingUser,
-        setViewingUser,
         setIsLoading,
     } = useOfficeStore();
+
     const token = useSessionStore(state => state?.token)
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -99,7 +98,7 @@ export default function StaffManagement() {
         setIsLoading(true)
         const allUsers = async () => {
             if (token) {
-                const users = await userList(token)
+                const users = await staffList(token)
                 setUsers(users?.data)
             }
         }
@@ -147,9 +146,10 @@ export default function StaffManagement() {
                     <div className="relative flex-grow w-64 sm:w-96">
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
+                            disabled
                             type="text"
                             placeholder="search users..."
-                            className="pl-8"
+                            className="pl-8 py-[9px]"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -244,14 +244,14 @@ export default function StaffManagement() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem onSelect={() => {
-                                                setEditingUser(user)
+                                                setUserInFocus(user)
                                                 setIsEditing(true)
                                             }}>
                                                 <UserPen className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
                                                 Edit
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onSelect={() => {
-                                                setViewingUser(user)
+                                                setUserInFocus(user)
                                                 setIsViewing(true)
                                             }}>
                                                 <UserSearch className="mr-2 stroke-card-foreground" strokeWidth={1} size={17} />
@@ -279,7 +279,7 @@ export default function StaffManagement() {
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
                     </DialogHeader>
-                    {editingUser && <UserForm user={{ ...editingUser, photoURL: editingUser.photoURL || '/placeholder.svg' }} onSubmit={handleEditUser} />}
+                    {userInFocus && <UserForm user={{ ...userInFocus, photoURL: userInFocus.photoURL || '/placeholder.svg' }} onSubmit={handleEditUser} />}
                 </DialogContent>
             </Dialog>
         )
@@ -292,7 +292,7 @@ export default function StaffManagement() {
                     <DialogHeader>
                         <DialogTitle>User Details</DialogTitle>
                     </DialogHeader>
-                    {viewingUser && <ViewUserModal user={viewingUser as UserFormData & { uid: number, password: string }} />}
+                    {userInFocus && <ViewUserModal user={userInFocus as UserFormData & { uid: number, password: string }} />}
                 </DialogContent>
             </Dialog>
         )
@@ -342,6 +342,8 @@ export default function StaffManagement() {
             defaultValues: user || {},
         })
 
+        const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
+
         return (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-card">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -349,7 +351,7 @@ export default function StaffManagement() {
                         <Label htmlFor="photoURL">User Image</Label>
                         <div className="flex items-center space-x-4">
                             <Avatar className="h-20 w-20">
-                                <AvatarImage src={imagePreview} alt="User avatar" />
+                                <AvatarImage src={fullPhotoURL} alt="User avatar" />
                                 <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
                             </Avatar>
                             <Input

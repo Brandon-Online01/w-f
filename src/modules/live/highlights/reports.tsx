@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
-import { latestReports } from '@/data/data'
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ArrowDownToLine, FileText } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { useSessionStore } from '@/providers/session.provider'
 import { create } from 'zustand'
+import { reportList } from '@/data/reports'
 
 type HighlightReport = {
     uid: number,
@@ -44,7 +44,7 @@ export default function ProductionReportCard() {
     useEffect(() => {
         const getReports = async () => {
             if (token) {
-                const reports = await latestReports(token)
+                const reports = await reportList(token)
 
                 const reportsList = reports?.data?.map((report: HighlightReport) => ({
                     uid: report?.uid,
@@ -79,7 +79,7 @@ export default function ProductionReportCard() {
             </CardHeader>
             <CardContent>
                 <ScrollArea className="pr-4">
-                    {reports.map((report) => (
+                    {reports?.map((report) => (
                         <div key={report?.uid} className="flex items-center justify-between py-4 border-b last:border-b-0">
                             <div className="flex items-center space-x-4">
                                 <FileText className="stroke-card-foreground w-" strokeWidth={1} size={22} />
