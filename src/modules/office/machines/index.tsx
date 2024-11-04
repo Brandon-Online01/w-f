@@ -414,7 +414,7 @@ export default function MachineManager() {
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
                 {paginatedMachines?.map((machine: Machine, index: number) => <MachineCard machine={machine} key={index} index={index} />)}
             </div>
-            <PageControls />
+            {paginatedMachines?.length >= 8 && <PageControls />}
             <EditMachineModal />
             <ViewMachineDetailModal />
         </div>

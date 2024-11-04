@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import logoIcon from '../../assets/logo/waresense.png';
 import {
     Bell,
-    EllipsisVertical,
+    Ellipsis,
     FolderKanban,
     LayoutDashboard,
     Power,
@@ -32,6 +32,7 @@ import {
     MenubarShortcut,
     MenubarTrigger,
 } from "@/components/ui/menubar"
+import { FactorySelector } from "../factory-toggler";
 
 export const Navigation = () => {
     return (
@@ -123,10 +124,13 @@ export const DesktopNavigation = () => {
                     </Menubar>
                 </li>
                 <li className="flex items-center justify-center cursor-pointer rounded">
+                    <FactorySelector />
+                </li>
+                <li className="flex items-center justify-center cursor-pointer rounded">
                     <Menubar>
                         <MenubarMenu>
                             <MenubarTrigger className="p-0 bg-none border-none focus:bg-none outline-none">
-                                <EllipsisVertical size={18} strokeWidth={1} className="stroke-card-foreground" />
+                                <Ellipsis size={18} strokeWidth={1} className="stroke-card-foreground" />
                             </MenubarTrigger>
                             <MenubarContent>
                                 <MenubarItem className="cursor-pointer" onClick={signOut}>

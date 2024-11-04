@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
-interface FactoryState {
+interface FactorySetter {
     factoryReferenceID: string;
     setFactoryReferenceID: (referenceID: string) => void;
 }
 
-export const useFactoryStore = create<FactoryState>((set) => ({
-    factoryReferenceID: '001',
+export const useFactorySetter = create<FactorySetter>((set) => ({
+    factoryReferenceID: '',
     setFactoryReferenceID: (referenceID: string) => set({ factoryReferenceID: referenceID }),
 }));
