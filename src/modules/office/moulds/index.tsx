@@ -493,7 +493,7 @@ export default function MouldManager() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {paginatedMoulds.map((mould, index) => <MouldCard mould={mould} key={index} index={index} />)}
             </div>
-            <PageControls />
+            {paginatedMoulds?.length >= 8 && <PageControls />}
             <EditMouldModal />
             <ViewMouldDetailModal />
         </div>

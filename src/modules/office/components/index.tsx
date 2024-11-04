@@ -54,6 +54,7 @@ import { isEmpty } from 'lodash'
 import { useSessionStore } from '@/providers/session.provider'
 import { componentList } from '@/data/components'
 
+
 type ComponentFormData = z.infer<typeof componentSchema>
 
 export default function ComponentManager() {
@@ -423,8 +424,7 @@ export default function ComponentManager() {
                     </div>
                     <Select
                         value={statusFilter}
-                        onValueChange={setStatusFilter}
-                    >
+                        onValueChange={setStatusFilter}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Filter by status" />
                         </SelectTrigger>
@@ -663,9 +663,9 @@ export default function ComponentManager() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
-                {paginatedComponents.map((component, index) => <ComponentCard key={index} component={component} index={index} />)}
+                {paginatedComponents?.map((component: ComponentFormData, index: number) => <ComponentCard key={index} component={component} index={index} />)}
             </div>
-            <PageControls />
+            {paginatedComponents?.length >= 8 && <PageControls />}
             <EditComponentModal />
             <ViewComponentDetailModal />
         </div>

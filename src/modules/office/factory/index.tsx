@@ -519,7 +519,7 @@ export default function FactoryManagement() {
                 {paginatedFactories?.map((factory, index) => (<FactoryCard key={index} factory={factory} />
                 ))}
             </div>
-            <PaginationControls />
+            {paginatedFactories?.length >= 8 && <PaginationControls />}
             <EditModal />
             <ViewModal />
         </div>
