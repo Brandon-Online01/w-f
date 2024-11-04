@@ -64,7 +64,7 @@ import {
 import { cn } from "@/lib/utils"
 import Image from 'next/image'
 import { io } from 'socket.io-client';
-import { isEmpty, isWeakMap } from 'lodash'
+import { isEmpty } from 'lodash'
 import { MachineLiveRun } from '../../types/common.types'
 import { chartColors } from '../../tools/data'
 import { signalIcon } from './helpers/signal-icons'
