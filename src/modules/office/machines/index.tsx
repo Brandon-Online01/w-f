@@ -60,7 +60,7 @@ export default function MachineManager() {
 
         const sessionData = JSON.parse(session)
         const config = { headers: { 'token': sessionData?.state?.token } };
-        const url = generateFactoryEndpoint('components')
+        const url = generateFactoryEndpoint('machines')
         const { data } = await axios.get(url, config)
         return data;
     }
