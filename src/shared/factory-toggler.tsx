@@ -13,24 +13,13 @@ import { useSessionStore } from "@/session/session.provider"
 import { factoryList } from "@/data/factory"
 import { useQuery } from "@tanstack/react-query"
 import { SwatchBook, Factory as FactoryIcon, Loader2 } from "lucide-react"
-import { create } from 'zustand'
 import { Factory } from "@/types/factory"
 import { isEmpty } from "lodash"
-import { useFactorySetter } from "./state/endpoint"
-
-type FactoryState = {
-    factories: Factory[],
-    setFactories: (factories: Factory[]) => void
-}
-
-export const useFactoryStore = create<FactoryState>((set) => ({
-    factories: [],
-    setFactories: (factories) => set({ factories }),
-}))
+import { useFactoryToggler } from "./state/factory-toggler"
 
 export const FactorySelector = () => {
-    const { token } = useSessionStore(state => state)
-    const { setFactoryReferenceID, factoryReferenceID } = useFactorySetter()
+    const { token } = useSessionStore()
+    const { factoryReferenceID, setFactoryReferenceID } = useFactoryToggler()
 
     const { data: factories, isLoading, isError } = useQuery({
         queryKey: ['factoryList'],
@@ -45,6 +34,8 @@ export const FactorySelector = () => {
     });
 
     if (isError || !factories || isEmpty(factories?.data)) return;
+
+    console.log(factoryReferenceID, 'selected factory reference')
 
     return (
         <Menubar>

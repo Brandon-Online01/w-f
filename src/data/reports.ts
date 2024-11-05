@@ -1,9 +1,10 @@
 import axios from "axios";
+import { generateFactoryEndpoint } from "@/hooks/factory-endpoint";
 
 export const reportList = async (token: string) => {
     try {
         const config = { headers: { 'token': token } };
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/reports`
+        const url = generateFactoryEndpoint('reports')
         const { data } = await axios.get(url, config)
         return data;
     } catch (error) {
