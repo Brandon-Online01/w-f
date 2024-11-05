@@ -41,7 +41,7 @@ export const useSessionStore = create<SessionState>()(
             setFactoryReferenceID: (id) => set({ factoryReferenceID: id }),
         }),
         {
-            name: 'waresense',
+            name: 'session',
             storage: createJSONStorage(() => sessionStorage),
         }
     )

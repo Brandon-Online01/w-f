@@ -449,7 +449,7 @@ export default function ComponentManager() {
                             </Button>
                         </div>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px] bg-card">
+                    <DialogContent className="sm:max-w-[700px] bg-card" aria-describedby="create-component">
                         <DialogHeader>
                             <DialogTitle>Create New Component</DialogTitle>
                         </DialogHeader>
@@ -617,7 +617,7 @@ export default function ComponentManager() {
     const EditComponentModal = () => {
         return (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogContent className="sm:max-w-[700px] bg-card">
+                <DialogContent className="sm:max-w-[700px] bg-card" aria-describedby="edit-component">
                     <DialogHeader>
                         <DialogTitle>Edit Component</DialogTitle>
                     </DialogHeader>
@@ -631,7 +631,7 @@ export default function ComponentManager() {
     const ViewComponentDetailModal = () => {
         return (
             <Dialog open={isViewing} onOpenChange={setIsViewing}>
-                <DialogContent className="sm:max-w-[500px] bg-card">
+                <DialogContent className="sm:max-w-[500px] bg-card" aria-describedby="view-component">
                     <DialogHeader>
                         <DialogTitle>Component Details</DialogTitle>
                     </DialogHeader>

@@ -357,7 +357,7 @@ export default function FactoryManagement() {
                             </Button>
                         </div>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="sm:max-w-[700px]" aria-describedby="create-factory">
                         <DialogHeader>
                             <DialogTitle>Create New Factory</DialogTitle>
                         </DialogHeader>
@@ -469,7 +469,7 @@ export default function FactoryManagement() {
     const EditModal = () => {
         return (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="sm:max-w-[700px]" aria-describedby="edit-factory">
                     <DialogHeader>
                         <DialogTitle>Edit Factory</DialogTitle>
                     </DialogHeader>
@@ -482,7 +482,7 @@ export default function FactoryManagement() {
     const ViewModal = () => {
         return (
             <Dialog open={isViewing} onOpenChange={setIsViewing}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px]" aria-describedby="view-factory">
                     <DialogHeader>
                         <DialogTitle>Factory Details</DialogTitle>
                     </DialogHeader>

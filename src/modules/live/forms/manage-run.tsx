@@ -33,9 +33,11 @@ import {
 import { useEffect } from "react"
 import { updateLiveRuns } from "../helpers/live-run"
 import { useSessionStore } from "@/providers/session.provider"
-import { staffList } from "@/data/staff"
 import { componentList } from "@/data/components"
 import { mouldList } from "@/data/moulds"
+import { generateFactoryEndpoint } from "@/hooks/factory-endpoint"
+import axios from "axios"
+import { useQuery } from "@tanstack/react-query"
 
 export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) {
     const { formState: { errors }, control, handleSubmit } = useForm<NoteInputs>();
@@ -50,23 +52,38 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
         updateComponent,
         updateColor,
         updateMould,
-        setAllUsers,
         setAllComponents,
         setAllMoulds,
         allComponents,
         allMoulds
     } = liveRunStore();
-    const token = useSessionStore(state => state?.token)
+    const { token } = useSessionStore()
+
+    const fetchComponents = async () => {
+        const config = { headers: { 'token': token } };
+        const url = generateFactoryEndpoint('components')
+        const { data } = await axios.get(url, config)
+        return data;
+    }
+
+    const { data: components, isLoading: componentsLoading, error: componentsError } = useQuery({
+        queryKey: ['allComponents'],
+        queryFn: fetchComponents,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60000,
+    });
+
+    console.log(components, componentsLoading, componentsError)
 
     useEffect(() => {
         setIsLoading(true)
         const fetchData = async () => {
             if (token) {
-                const users = await staffList(token);
                 const components = await componentList(token);
                 const moulds = await mouldList(token);
 
-                setAllUsers(users?.data)
                 setAllComponents(components?.data)
                 setAllMoulds(moulds?.data)
             }
@@ -74,7 +91,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
 
         fetchData();
         setIsLoading(false)
-    }, [setAllComponents, setAllMoulds, setAllUsers, token, setIsLoading]);
+    }, [setAllComponents, setAllMoulds, token, setIsLoading]);
 
     if (!liveRun) return null
 
@@ -98,7 +115,8 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
             creationDate: format(new Date(), "EEE MMM dd yyyy HH:mm:ss 'GMT'xxx '(South Africa Standard Time)'")?.replace(/GMT([+-]\d{2}):(\d{2})/, 'GMT$1$2'),
         }
 
-        const saved = await saveNote(newNote)
+        const config = { headers: { 'token': 'token' } };
+        const saved = await saveNote(newNote, config)
 
         if (saved) {
             setIsLoading(false)
@@ -115,7 +133,8 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
             machineNumber: Number(machineNumber),
         }
 
-        const updated = await updateLiveRuns(updatePayload)
+        const config = { headers: { 'token': 'token' } };
+        const updated = await updateLiveRuns(updatePayload, config)
 
         if (updated) {
             setIsLoading(false)
@@ -131,7 +150,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                         <p className='text-card-foreground text-[10px] uppercase'>Update Live Run</p>
                     </div>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent aria-describedby="machine-details">
                     <DialogHeader>
                         <DialogTitle>
                             <div className="flex items-center justify-center md:justify-start">
@@ -209,7 +228,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                         <p className='text-card-foreground text-[10px] uppercase'>Save Notes</p>
                     </div>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent aria-describedby="machine-details">
                     <DialogHeader>
                         <DialogTitle>
                             <div className="flex items-center justify-center md:justify-start">

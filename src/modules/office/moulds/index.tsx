@@ -307,7 +307,7 @@ export default function MouldManager() {
                             </Button>
                         </div>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="sm:max-w-[700px]" aria-describedby="create-mould">
                         <DialogHeader>
                             <DialogTitle>Create New Mould</DialogTitle>
                         </DialogHeader>
@@ -442,7 +442,7 @@ export default function MouldManager() {
     const EditMouldModal = () => {
         return (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="sm:max-w-[700px]" aria-describedby="edit-mould">
                     <DialogHeader>
                         <DialogTitle>Edit Mould</DialogTitle>
                     </DialogHeader>
@@ -458,7 +458,7 @@ export default function MouldManager() {
     const ViewMouldDetailModal = () => {
         return (
             <Dialog open={isViewing} onOpenChange={setIsViewing}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px]" aria-describedby="view-mould">
                     <DialogHeader>
                         <DialogTitle>Mould Details</DialogTitle>
                     </DialogHeader>

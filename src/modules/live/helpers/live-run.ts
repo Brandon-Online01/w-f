@@ -1,10 +1,11 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import { UpdateLiveRun } from "../../../types/live-run";
+import { RequestConfig } from "@/types/requests";
 
-export const updateLiveRuns = async (updatePayload: UpdateLiveRun) => {
+export const updateLiveRuns = async (updatePayload: UpdateLiveRun, config:  RequestConfig) => {
     try {
-        const { data } = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/live-run/current/${updatePayload?.machineNumber}`, updatePayload)
+        const { data } = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/live-run/current/${updatePayload?.machineNumber}`, updatePayload, config)
 
         if (data?.message === 'Live Run Updated') {
             toast(`${data?.message}`,

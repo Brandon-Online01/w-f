@@ -234,7 +234,7 @@ export default function MachineManager() {
                             </Button>
                         </div>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="sm:max-w-[700px]" aria-describedby="create-machine">
                         <DialogHeader>
                             <DialogTitle>Create New Machine</DialogTitle>
                         </DialogHeader>
@@ -358,7 +358,7 @@ export default function MachineManager() {
     const EditMachineModal = () => {
         return (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="sm:max-w-[700px]" aria-describedby="edit-machine">
                     <DialogHeader>
                         <DialogTitle>Edit Machine</DialogTitle>
                     </DialogHeader>
@@ -371,7 +371,7 @@ export default function MachineManager() {
     const ViewMachineDetailModal = () => {
         return (
             <Dialog open={isViewing} onOpenChange={setIsViewing}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px]" aria-describedby="view-machine">
                     <DialogHeader>
                         <DialogTitle>Machine Details</DialogTitle>
                     </DialogHeader>
