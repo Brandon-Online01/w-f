@@ -5,10 +5,10 @@ export type UserType = {
     email: string;
     username: string;
     password: string;
-    role: string;
+    role: Role;
     photoURL: string;
     phoneNumber: string;
-    status: string;
+    status: Status;
     factoryReferenceID: string;
 }
 
@@ -23,3 +23,6 @@ export type NewUserType = {
     phoneNumber: string;
     status: string;
 }
+
+export type Status = 'Active' | 'Inactive'
+export type Role = "Admin" | "User" | "Editor"

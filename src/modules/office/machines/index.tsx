@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -24,21 +23,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { machineList } from '@/data/machines'
 import { Machine } from '@/types/machine'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
 import { useSessionStore } from '@/providers/session.provider'
-
-// Validation schema
-const machineSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-    machineNumber: z.string().min(3, "Machine number must be at least 3 characters"),
-    macAddress: z.string().regex(/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/, "Invalid MAC address format"),
-    description: z.string().min(10, "Description must be at least 10 characters"),
-    status: z.enum(["Active", "Inactive"], { required_error: "Status is required" }),
-})
+import axios from 'axios'
+import { useQuery } from '@tanstack/react-query'
+import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
+import { machineSchema } from '@/schemas/machine'
 
 type MachineFormData = z.infer<typeof machineSchema>
 
@@ -46,7 +39,6 @@ export default function MachineManager() {
     const {
         machineInFocus,
         setMachineInFocus,
-        machines,
         searchTerm,
         statusFilter,
         currentPage,
@@ -54,7 +46,6 @@ export default function MachineManager() {
         isCreating,
         isEditing,
         isViewing,
-        setMachines,
         setSearchTerm,
         setStatusFilter,
         setCurrentPage,
@@ -62,33 +53,24 @@ export default function MachineManager() {
         setIsCreating,
         setIsEditing,
         setIsViewing,
-        isLoading,
-        setIsLoading,
     } = useOfficeStore();
     const token = useSessionStore(state => state?.token)
 
-    useEffect(() => {
-        setIsLoading(true)
-        const allMachines = async () => {
-            if (token) {
-                const machines = await machineList(token)
-                setMachines(machines?.data)
-            }
-        }
-        allMachines()
-        setIsLoading(false)
-    }, [setMachines, setIsLoading, token]);
+    const fetchMachines = async () => {
+        const config = { headers: { 'token': token } };
+        const url = generateFactoryEndpoint('components')
+        const { data } = await axios.get(url, config)
+        return data;
+    }
 
-    const filteredMachines = machines?.filter((machine: Machine) =>
-        machine?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || machine?.status === statusFilter)
-    )
-
-    const pageCount = Math.ceil(filteredMachines?.length / itemsPerPage)
-    const paginatedMachines = filteredMachines?.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    )
+    const { data: machines, isLoading, isError } = useQuery({
+        queryKey: ['allMachines'],
+        queryFn: fetchMachines,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60000,
+    });
 
     const handleCreateMachine: SubmitHandler<MachineFormData> = (data) => console.log('create machine with data ', data)
 
@@ -399,7 +381,7 @@ export default function MachineManager() {
         )
     }
 
-    if (isLoading || isEmpty(machines)) {
+    if (isLoading || isEmpty(machines?.data) || isError) {
         return (
             <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
@@ -407,6 +389,17 @@ export default function MachineManager() {
             </div>
         )
     }
+
+    const filteredMachines = machines?.data?.filter((machine: Machine) =>
+        machine?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || machine?.status === statusFilter)
+    )
+
+    const pageCount = Math.ceil(filteredMachines?.length / itemsPerPage)
+    const paginatedMachines = filteredMachines?.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     return (
         <div className="w-full flex flex-col justify-start gap-2">

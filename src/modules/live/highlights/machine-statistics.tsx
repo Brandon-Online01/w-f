@@ -61,7 +61,7 @@ export function MachineStatistics({ data }: MachineStatisticsProps) {
     ];
 
     return (
-        <Card className="flex flex-col w-full h-[380px]">
+        <Card className="flex flex-col w-full h-[380px] machines">
             <CardHeader className="items-center pb-0">
                 <CardDescription>
                     <p className="text-sm text-card-foreground -mt-3 uppercase">Machines</p>

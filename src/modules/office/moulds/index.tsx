@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -48,11 +47,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { mouldSchema } from '@/schemas/mould'
 import { Mould } from '@/types/mould'
-import { mouldList } from '@/data/mould'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
 import { useSessionStore } from '@/providers/session.provider'
+import { useQuery } from '@tanstack/react-query'
+import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
+import axios from 'axios'
 
 type MouldFormData = z.infer<typeof mouldSchema>
 
@@ -60,7 +61,6 @@ export default function MouldManager() {
     const {
         mouldInFocus,
         setMouldInFocus,
-        moulds,
         searchTerm,
         statusFilter,
         currentPage,
@@ -68,9 +68,6 @@ export default function MouldManager() {
         isCreating,
         isEditing,
         isViewing,
-        isLoading,
-        setIsLoading,
-        setMoulds,
         setSearchTerm,
         setStatusFilter,
         setCurrentPage,
@@ -81,28 +78,21 @@ export default function MouldManager() {
     } = useOfficeStore();
     const token = useSessionStore(state => state?.token)
 
-    useEffect(() => {
-        setIsLoading(true)
-        const allMoulds = async () => {
-            if (token) {
-                const moulds = await mouldList(token)
-                setMoulds(moulds?.data)
-            }
-        }
-        allMoulds()
-        setIsLoading(false)
-    }, [setMoulds, setIsLoading, token]);
+    const fetchMoulds = async () => {
+        const config = { headers: { 'token': token } };
+        const url = generateFactoryEndpoint('components')
+        const { data } = await axios.get(url, config)
+        return data;
+    }
 
-    const filteredMoulds = moulds?.filter((mould: Mould) =>
-        mould?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || mould?.status === statusFilter)
-    )
-
-    const pageCount = Math.ceil(filteredMoulds?.length / itemsPerPage)
-    const paginatedMoulds = filteredMoulds?.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    )
+    const { data: moulds, isLoading, isError } = useQuery({
+        queryKey: ['allMoulds'],
+        queryFn: fetchMoulds,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60000,
+    });
 
     const handleCreateMould: SubmitHandler<MouldFormData> = (data) => console.log('create mould with data ', data)
 
@@ -478,7 +468,7 @@ export default function MouldManager() {
         )
     }
 
-    if (isLoading || isEmpty(moulds)) {
+    if (isLoading || isEmpty(moulds?.data) || isError) {
         return (
             <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
@@ -487,11 +477,22 @@ export default function MouldManager() {
         )
     }
 
+    const filteredMoulds = moulds?.data?.filter((mould: Mould) =>
+        mould?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || mould?.status === statusFilter)
+    )
+
+    const pageCount = Math.ceil(filteredMoulds?.length / itemsPerPage)
+    const paginatedMoulds = filteredMoulds?.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+    
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedMoulds.map((mould, index) => <MouldCard mould={mould} key={index} index={index} />)}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {paginatedMoulds?.map((mould: Mould, index: number) => <MouldCard mould={mould} key={index} index={index} />)}
             </div>
             {paginatedMoulds?.length >= 8 && <PageControls />}
             <EditMouldModal />
