@@ -408,11 +408,11 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 											<Image
 												src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
 												alt={componentName}
-												width={screenSize.width > 768 ? 50 : 20}
-												height={screenSize.width > 768 ? 50 : 20}
+												width={screenSize.width > 768 ? 30 : 20}
+												height={screenSize.width > 768 ? 30 : 20}
 												priority
 												quality={100}
-												className="rounded object-cover w-auto h-auto" />
+												className="rounded object-contain w-auto h-auto" />
 											:
 											status === 'Idle' ?
 												<div className="flex items-center justify-center flex-col">
@@ -423,7 +423,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 												<Image
 													src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
 													alt={componentName}
-													width={screenSize.width > 768 ? 50 : 20}
+													width={screenSize.width > 768 ? 30 : 20}
 													height={screenSize.width > 768 ? 50 : 20}
 													priority
 													quality={100}

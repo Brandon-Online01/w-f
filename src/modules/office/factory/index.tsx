@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -46,21 +45,20 @@ import * as z from "zod"
 import { factorySchema } from '@/schemas/factory'
 import { useSessionStore } from '@/session/session.provider'
 import { useOfficeStore } from '../state/state'
-import { factoryList } from '@/data/factory'
 import { motion } from 'framer-motion'
 import { isEmpty } from 'lodash'
 import { Factory } from '@/types/factory'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 
 type FactoryFormData = z.infer<typeof factorySchema>
 
 export default function FactoryManagement() {
     const {
-        factories,
         searchTerm,
         statusFilter,
         currentPage,
         itemsPerPage,
-        isLoading,
         isCreating,
         isEditing,
         isViewing,
@@ -69,40 +67,29 @@ export default function FactoryManagement() {
         setStatusFilter,
         setCurrentPage,
         setItemsPerPage,
-        setIsLoading,
         setIsCreating,
         setIsEditing,
         setIsViewing,
-        setFactories,
         setFactoryInFocus,
     } = useOfficeStore();
 
     const token = useSessionStore(state => state?.token)
 
-    useEffect(() => {
-        setIsLoading(true)
-        const allFactories = async () => {
-            if (token) {
-                const factories = await factoryList(token)
-                setFactories(factories?.data)
-            }
-        }
+    const fetchFactories = async () => {
+        const config = { headers: { 'token': token } };
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/factory`
+        const { data } = await axios.get(url, config)
+        return data;
+    }
 
-        allFactories()
-        setIsLoading(false)
-    }, [setIsLoading, token, setFactories]);
-
-
-    const filteredFactories = factories?.filter(factory =>
-        factory?.name?.toLowerCase()?.includes(searchTerm?.toLowerCase()) &&
-        (statusFilter === 'All' || factory?.status === statusFilter)
-    )
-
-    const pageCount = Math.ceil(filteredFactories?.length / itemsPerPage)
-    const paginatedFactories = filteredFactories?.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    )
+    const { data: factoryList, isLoading, isError } = useQuery({
+        queryKey: ['allFactories'],
+        queryFn: fetchFactories,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60000,
+    });
 
     const handleCreateFactory: SubmitHandler<FactoryFormData> = (data) => console.log(data, 'as new factory data')
 
@@ -505,7 +492,7 @@ export default function FactoryManagement() {
         )
     }
 
-    if (isLoading || isEmpty(factories)) {
+    if (isLoading || isEmpty(factoryList?.data) || isError) {
         return (
             <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
@@ -514,11 +501,22 @@ export default function FactoryManagement() {
         )
     }
 
+    const filteredFactories = factoryList?.data?.filter((factory: Factory) =>
+        factory?.name?.toLowerCase()?.includes(searchTerm?.toLowerCase()) &&
+        (statusFilter === 'All' || factory?.status === statusFilter)
+    )
+
+    const pageCount = Math.ceil(filteredFactories?.length / itemsPerPage)
+    const paginatedFactories = filteredFactories?.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedFactories?.map((factory, index) => (<FactoryCard key={index} factory={factory} />
+                {paginatedFactories?.map((factory: Factory, index: number) => (<FactoryCard key={index} factory={factory} />
                 ))}
             </div>
             {paginatedFactories?.length >= 8 && <PaginationControls />}
@@ -527,7 +525,6 @@ export default function FactoryManagement() {
         </div>
     )
 }
-
 
 const FactoryCardsLoader = () => {
     return (

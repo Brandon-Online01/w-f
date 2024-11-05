@@ -35,8 +35,6 @@ export const FactorySelector = () => {
 
     if (isError || !factories || isEmpty(factories?.data)) return;
 
-    console.log(factoryReferenceID, 'selected factory reference')
-
     return (
         <Menubar>
             <MenubarMenu>

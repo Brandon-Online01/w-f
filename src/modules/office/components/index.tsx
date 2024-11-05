@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -52,24 +52,23 @@ import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
 import { useSessionStore } from '@/providers/session.provider'
-import { componentList } from '@/data/components'
+import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
+import axios from 'axios'
+import { useQuery } from '@tanstack/react-query'
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
 export default function ComponentManager() {
     const {
-        components,
         searchTerm,
         statusFilter,
         currentPage,
         itemsPerPage,
-        isLoading,
         isCreating,
         isEditing,
         isViewing,
         componentInFocus,
         setComponentInFocus,
-        setComponents,
         setSearchTerm,
         setStatusFilter,
         setCurrentPage,
@@ -77,36 +76,26 @@ export default function ComponentManager() {
         setIsCreating,
         setIsEditing,
         setIsViewing,
-        setIsLoading,
     } = useOfficeStore();
     const token = useSessionStore(state => state?.token)
 
     const fileInputRef = useRef<HTMLInputElement>(null)
 
-    useEffect(() => {
-        setIsLoading(true)
-        const allComponents = async () => {
-            if (token) {
-                const components = await componentList(token)
-                setComponents(components?.data)
-            }
-        }
+    const fetchComponents = async () => {
+        const config = { headers: { 'token': token } };
+        const url = generateFactoryEndpoint('components')
+        const { data } = await axios.get(url, config)
+        return data;
+    }
 
-        allComponents()
-        setIsLoading(false)
-    }, [setComponents, setIsLoading, token]);
-
-    const filteredComponents = components?.filter((component: ComponentFormData) =>
-        component?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || component?.status === statusFilter)
-    )
-
-    const pageCount = Math.ceil(filteredComponents?.length / itemsPerPage)
-
-    const paginatedComponents = filteredComponents?.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    )
+    const { data: components, isLoading, isError } = useQuery({
+        queryKey: ['allComponents'],
+        queryFn: fetchComponents,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60000,
+    });
 
     const handleCreateComponent: SubmitHandler<ComponentFormData> = (data) => {
         const newComponent = {
@@ -150,6 +139,8 @@ export default function ComponentManager() {
             defaultValues: component || {},
         })
 
+        const screenSize = { width: window.innerWidth, height: window.innerHeight }
+
         const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
 
         return (
@@ -162,11 +153,11 @@ export default function ComponentManager() {
                                 <Image
                                     src={fullPhotoURL}
                                     alt={'Existing Preview Image'}
-                                    width={40}
-                                    height={40}
+                                    width={screenSize.width > 768 ? 30 : 20}
+                                    height={screenSize.width > 768 ? 30 : 20}
                                     priority
                                     quality={100}
-                                    className="rounded object-cover w-auto h-auto" />
+                                    className="rounded object-contain w-auto h-auto" />
                             </div>
                             <Input
                                 id="photoURL"
@@ -470,6 +461,7 @@ export default function ComponentManager() {
     }
 
     const ComponentCard = ({ component, index }: { component: ComponentFormData, index: number }) => {
+        const screenSize = { width: window.innerWidth, height: window.innerHeight }
 
         const {
             status,
@@ -511,11 +503,11 @@ export default function ComponentManager() {
                                     <Image
                                         src={fullPhotoURL}
                                         alt={name}
-                                        width={50}
-                                        height={50}
+                                        width={screenSize.width > 768 ? 30 : 20}
+                                        height={screenSize.width > 768 ? 30 : 20}
                                         priority
                                         quality={100}
-                                        className="rounded object-cover w-auto h-auto" />
+                                        className="rounded object-contain w-auto h-auto" />
                                 </div>
                             </div>
                             <div className="p-4 w-full">
@@ -649,7 +641,7 @@ export default function ComponentManager() {
         )
     }
 
-    if (isLoading || isEmpty(components)) {
+    if (isLoading || isEmpty(components?.data) || isError) {
         return (
             <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
@@ -657,6 +649,18 @@ export default function ComponentManager() {
             </div>
         )
     }
+
+    const filteredComponents = components?.data?.filter((component: ComponentFormData) =>
+        component?.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || component?.status === statusFilter)
+    )
+
+    const pageCount = Math.ceil(filteredComponents?.length / itemsPerPage)
+
+    const paginatedComponents = filteredComponents?.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
 
     return (
         <div className="w-full flex flex-col justify-start gap-2">
