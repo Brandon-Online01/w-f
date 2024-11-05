@@ -27,7 +27,6 @@ import { Machine } from '@/types/machine'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
-import { useSessionStore } from '@/providers/session.provider'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
 import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
@@ -54,10 +53,13 @@ export default function MachineManager() {
         setIsEditing,
         setIsViewing,
     } = useOfficeStore();
-    const token = useSessionStore(state => state?.token)
+    const session = sessionStorage.getItem('waresense');
 
     const fetchMachines = async () => {
-        const config = { headers: { 'token': token } };
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
         const url = generateFactoryEndpoint('components')
         const { data } = await axios.get(url, config)
         return data;
@@ -234,7 +236,7 @@ export default function MachineManager() {
                             </Button>
                         </div>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="sm:max-w-[700px]" aria-describedby="create-machine">
                         <DialogHeader>
                             <DialogTitle>Create New Machine</DialogTitle>
                         </DialogHeader>
@@ -358,7 +360,7 @@ export default function MachineManager() {
     const EditMachineModal = () => {
         return (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="sm:max-w-[700px]" aria-describedby="edit-machine">
                     <DialogHeader>
                         <DialogTitle>Edit Machine</DialogTitle>
                     </DialogHeader>
@@ -371,7 +373,7 @@ export default function MachineManager() {
     const ViewMachineDetailModal = () => {
         return (
             <Dialog open={isViewing} onOpenChange={setIsViewing}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px]" aria-describedby="view-machine">
                     <DialogHeader>
                         <DialogTitle>Machine Details</DialogTitle>
                     </DialogHeader>

@@ -1,9 +1,9 @@
 import axios from "axios";
 import { generateFactoryEndpoint } from "@/hooks/factory-endpoint";
+import { RequestConfig } from "@/types/requests";
 
-export const mouldList = async (token: string) => {
+export const mouldList = async (config: RequestConfig) => {
     try {
-        const config = { headers: { 'token': token } };
         const url = generateFactoryEndpoint('moulds')
         const { data } = await axios.get(url, config)
         return data;

@@ -32,8 +32,6 @@ import {
 } from "@/components/ui/dialog"
 import { useEffect } from "react"
 import { updateLiveRuns } from "../helpers/live-run"
-import { useSessionStore } from "@/providers/session.provider"
-import { staffList } from "@/data/staff"
 import { componentList } from "@/data/components"
 import { mouldList } from "@/data/moulds"
 
@@ -50,31 +48,31 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
         updateComponent,
         updateColor,
         updateMould,
-        setAllUsers,
         setAllComponents,
         setAllMoulds,
         allComponents,
         allMoulds
     } = liveRunStore();
-    const token = useSessionStore(state => state?.token)
+    const session = sessionStorage.getItem('waresense');
 
     useEffect(() => {
         setIsLoading(true)
         const fetchData = async () => {
-            if (token) {
-                const users = await staffList(token);
-                const components = await componentList(token);
-                const moulds = await mouldList(token);
+            if (!session) return
 
-                setAllUsers(users?.data)
-                setAllComponents(components?.data)
-                setAllMoulds(moulds?.data)
-            }
+            const sessionData = JSON.parse(session)
+            const config = { headers: { 'token': sessionData?.state?.token } };
+
+            const components = await componentList(config);
+            const moulds = await mouldList(config);
+
+            setAllComponents(components?.data)
+            setAllMoulds(moulds?.data)
         };
 
         fetchData();
         setIsLoading(false)
-    }, [setAllComponents, setAllMoulds, setAllUsers, token, setIsLoading]);
+    }, [setAllComponents, setAllMoulds, setIsLoading, session]);
 
     if (!liveRun) return null
 
@@ -89,7 +87,12 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
     } = machine
 
     const saveNotes = async (data: NoteInputs) => {
+        if (!session) return
+
         setIsLoading(true)
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
 
         const newNote = {
             note: data?.note,
@@ -98,7 +101,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
             creationDate: format(new Date(), "EEE MMM dd yyyy HH:mm:ss 'GMT'xxx '(South Africa Standard Time)'")?.replace(/GMT([+-]\d{2}):(\d{2})/, 'GMT$1$2'),
         }
 
-        const saved = await saveNote(newNote)
+        const saved = await saveNote(newNote, config)
 
         if (saved) {
             setIsLoading(false)
@@ -106,16 +109,20 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
     };
 
     const saveLiveRun = async () => {
+        if (!session) return
+
         setIsLoading(true)
+
+        const sessionData = JSON.parse(session);
+        const config = { headers: { 'token': sessionData?.state?.token } };
 
         const updatePayload: UpdateLiveRun = {
             component: updateComponent,
             color: updateColor,
             mould: updateMould,
-            machineNumber: Number(machineNumber),
         }
 
-        const updated = await updateLiveRuns(updatePayload)
+        const updated = await updateLiveRuns(updatePayload, config, Number(machineNumber))
 
         if (updated) {
             setIsLoading(false)
@@ -131,7 +138,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                         <p className='text-card-foreground text-[10px] uppercase'>Update Live Run</p>
                     </div>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent aria-describedby="machine-details">
                     <DialogHeader>
                         <DialogTitle>
                             <div className="flex items-center justify-center md:justify-start">
@@ -209,7 +216,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                         <p className='text-card-foreground text-[10px] uppercase'>Save Notes</p>
                     </div>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent aria-describedby="machine-details">
                     <DialogHeader>
                         <DialogTitle>
                             <div className="flex items-center justify-center md:justify-start">
@@ -254,7 +261,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                                                 />
                                             )}
                                         />
-                                        {errors?.note && <span className="text-red-500 text-[10px] -mt-4">{errors?.note?.message}</span>}
+                                        {errors?.note && <span className="text-red-500 text-[10px] -mt-1">{errors?.note?.message}</span>}
                                     </div>
                                     <Button type="submit" className="w-10/12 mx-auto" disabled={isLoading}>
                                         {isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : "Save Notes"}

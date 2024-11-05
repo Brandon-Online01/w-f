@@ -15,6 +15,7 @@ import { Factory } from "@/types/factory"
 import { isEmpty } from "lodash"
 import { useFactoryToggler } from "./state/factory-toggler"
 import axios from "axios"
+import { useEffect } from "react"
 
 export const FactorySelector = () => {
     const { token } = useSessionStore()
@@ -35,6 +36,10 @@ export const FactorySelector = () => {
         refetchOnWindowFocus: true,
         staleTime: 60000,
     });
+
+    useEffect(() => {
+        setFactoryReferenceID(factories?.data?.[0]?.factoryReferenceID)
+    }, [setFactoryReferenceID, factories])
 
     if (isError || !factories || isEmpty(factories?.data)) return;
 

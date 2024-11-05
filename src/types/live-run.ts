@@ -15,5 +15,4 @@ export type UpdateLiveRun = {
     component: string;
     color: string;
     mould: string;
-    machineNumber: number;
 }
