@@ -33,9 +33,9 @@ import {
 import { useEffect } from "react"
 import { updateLiveRuns } from "../helpers/live-run"
 import { useSessionStore } from "@/providers/session.provider"
-import { componentList } from "@/data/components"
 import { staffList } from "@/data/staff"
-import { mouldList } from "@/data/mould"
+import { componentList } from "@/data/components"
+import { mouldList } from "@/data/moulds"
 
 export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) {
     const { formState: { errors }, control, handleSubmit } = useForm<NoteInputs>();

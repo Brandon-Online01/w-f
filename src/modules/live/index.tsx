@@ -391,7 +391,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	return (
 		<motion.div
-			className="bg-card rounded shadow-md cursor-pointer"
+			className="bg-card rounded shadow-md cursor-pointer production-machine"
 			whileTap={{ scale: 0.98 }}
 			initial={{ opacity: 0, y: 50 }}
 			animate={{ opacity: 1, y: 0 }}
@@ -402,7 +402,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					<Card className={cn("h-full cursor-pointer hover:shadow-md transition-shadow duration-300 ease-in-out", "rounded w-full")} >
 						<CardContent className="p-2 space-y-2 h-full">
 							<div className={`aspect-video w-full rounded overflow-hidden ${status === 'Active' ? 'bg-green-500/80' : status === 'Idle' ? 'bg-yellow-500' : 'bg-red-500'}`}>
-								<div className="flex items-center justify-center rounded flex-col w-full h-full">
+								<div className="flex items-center justify-center rounded flex-col w-full h-full component-image">
 									{
 										status === 'Active' ?
 											<Image
@@ -434,36 +434,36 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							<div className="flex items-center justify-between w-full gap-2 flex-col">
 								<div className="flex items-center justify-between w-full gap-2">
 									<div className="flex flex-col w-1/2">
-										<span className="text-card-foreground text-[11px] md:text-[18px] font-medium uppercase flex items-center gap-1">
+										<span className="text-card-foreground text-[11px] md:text-[18px] font-medium uppercase flex items-center gap-1  machine-name">
 											{machineName} {machineNumber}
 										</span>
 									</div>
 									<div className="w-1/2 flex items-end justify-end">
-										<span className="text-card-foreground text-[10px] text-right md:text-[12px] font-medium uppercase">{componentCode}</span>
+										<span className="text-card-foreground text-[10px] text-right md:text-[12px] font-medium uppercase component-code">{componentCode}</span>
 									</div>
 								</div>
-								<div className="flex items-start justify-start -mt-2 w-full gap-2">
-									<span className="text-card-foreground text-[10px] md:text-[12px] -mt-1 flex-col flex">
+								<div className="flex items-start justify-start -mt-2 w-full gap-2 ">
+									<span className="text-card-foreground text-[10px] md:text-[12px] -mt-1 flex-col flex record-age">
 										{eventTimeStamp ? formatDistanceToNow(new Date(eventTimeStamp), { addSuffix: true }) : ''}
 									</span>
 								</div>
 								<div className="flex items-center gap-2 justify-between gap-2 w-full">
-									<div className="flex items-center gap-0 flex-col">
+									<div className="flex items-center gap-0 flex-col act-time">
 										<p className="text-card-foreground text-[10px] uppercase">ACT Time</p>
 										<p className="text-card-foreground text-[14px]">{cycleTime}<span className="text-card-foreground text-[12px]">s</span></p>
 									</div>
-									<div className="flex items-center gap-0 flex-col">
+									<div className="flex items-center gap-0 flex-col std-time">
 										<p className="text-card-foreground text-[10px] uppercase">STD Time</p>
 										<p className="text-card-foreground text-[14px]">{targetTime}<span className="text-card-foreground text-[12px]">s</span></p>
 									</div>
-									<div className="flex items-center gap-0 flex-col">
+									<div className="flex items-center gap-0 flex-col signal">
 										{signalIcon(signalQuality)}
 										<span className="text-card-foreground text-[10px] uppercase">{signalQuality}</span>
 									</div>
 								</div>
 								<div className="flex flex-col items-end gap-2 mt-4 justify-end w-full">
 									<div className="flex items-center justify-end md:justify-between w-full">
-										<p className="text-card-foreground text-[10px] uppercase flex items-center gap-1 hidden md:flex">
+										<p className="text-card-foreground text-[10px] uppercase flex items-center gap-1 hidden md:flex first-check">
 											{
 												machineFirstReportType === 'Data' ?
 													<ComponentIcon className="stroke-success" size={20} strokeWidth={1.5} />
@@ -479,7 +479,9 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 											<span className="text-card-foreground text-[8px] md:text-[12px]"> units</span>
 										</p>
 									</div>
-									<Progress value={((Number(String(currentProduction)?.replace('.00', '')) || 0) / (Number(String(targetProduction)?.replace('.00', '')?.replace(',', '')) || 1) * 100)} />
+									<div className="progress w-full flex items-center justify-center">
+										<Progress value={((Number(String(currentProduction)?.replace('.00', '')) || 0) / (Number(String(targetProduction)?.replace('.00', '')?.replace(',', '')) || 1) * 100)} />
+									</div>
 								</div>
 							</div>
 						</CardContent>
@@ -607,7 +609,7 @@ export default function LiveRunCards() {
 						<Input
 							type="text"
 							placeholder="search staff..."
-							className="pl-8 w-full"
+							className="pl-8 w-full search-live"
 							value={searchQuery}
 							onChange={(e) =>
 								setSearchQuery(e.target.value)}
@@ -615,7 +617,7 @@ export default function LiveRunCards() {
 						/>
 					</div>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
-						<SelectTrigger className="w-[180px]">
+						<SelectTrigger className="w-[180px] filter">
 							<SelectValue placeholder="Filter by status" />
 						</SelectTrigger>
 						<SelectContent>
@@ -648,7 +650,7 @@ export default function LiveRunCards() {
 				</div>
 				<div className="w-full xl:w-1/2 mt-1 lg:mt-0 flex items-center justify-end">
 					<Select value={itemsPerPage.toString()} onValueChange={(value) => setItemsPerPage(Number(value))}>
-						<SelectTrigger className="w-full sm:w-[180px]">
+						<SelectTrigger className="w-full sm:w-[180px] pagination">
 							<SelectValue placeholder="Items per page" />
 						</SelectTrigger>
 						<SelectContent>

@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/dialog";
 import { useSessionStore } from "@/session/session.provider";
 import { ThemeModeToggler } from "./theme-mode-toggler";
-import { motion } from "framer-motion";
 import {
     Menubar,
     MenubarContent,
@@ -33,6 +32,10 @@ import {
     MenubarTrigger,
 } from "@/components/ui/menubar"
 import { FactorySelector } from "../factory-toggler";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+import { useEffect } from "react";
+import { navigationTour } from "@/tools/data";
 
 export const Navigation = () => {
     return (
@@ -42,6 +45,7 @@ export const Navigation = () => {
         </div>
     )
 }
+
 
 export const MobileNavigation = () => {
     const signOut = useSessionStore(state => state.signOut)
@@ -90,31 +94,36 @@ export const DesktopNavigation = () => {
     const pathname = usePathname()
     const signOut = useSessionStore(state => state?.signOut)
 
+    const driverObj = driver({
+        showProgress: true,
+        steps: navigationTour
+    });
+
+    useEffect(() => {
+        // Delay the drive call to ensure DOM is ready
+        const timeoutId = setTimeout(() => {
+            driverObj.drive();
+        }, 100);
+
+        return () => clearTimeout(timeoutId); // Cleanup on unmount
+    }, [driverObj]);
+
     return (
         <div className="xl:flex w-full flex-col justify-between py-4 h-full hidden">
             <ul className="flex w-full flex-col gap-5">
-                {[
-                    { href: "/", Icon: TrendingUpDown, ariaLabel: "Dashboard" },
-                    { href: "/office", Icon: FolderKanban, ariaLabel: "Office" },
-                ].map((item, index) => (
-                    <motion.li
-                        key={item.href}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                        className="flex items-center justify-center cursor-pointer">
-                        <Link href={item.href} aria-label={item.ariaLabel}>
-                            <item.Icon
-                                strokeWidth={1}
-                                size={18}
-                                className={`${pathname === item.href ? 'stroke-primary' : 'stroke-card-foreground'}`}
-                            />
-                        </Link>
-                    </motion.li>
-                ))}
+                <li className="flex items-center justify-center cursor-pointer rounded live">
+                    <Link href="/" aria-label="Dashboard">
+                        <TrendingUpDown strokeWidth={1} size={18} className={pathname === "/" ? "stroke-primary" : "stroke-card-foreground"} />
+                    </Link>
+                </li>
+                <li className="flex items-center justify-center cursor-pointer rounded management">
+                    <Link href="/office" aria-label="Office">
+                        <FolderKanban strokeWidth={1} size={18} className={pathname === "/office" ? "stroke-primary" : "stroke-card-foreground"} />
+                    </Link>
+                </li>
             </ul>
             <ul className="flex w-full flex-col gap-0 relative justify-end items-center">
-                <li className="flex items-center justify-center cursor-pointer rounded">
+                <li className="flex items-center justify-center cursor-pointer rounded theme">
                     <Menubar>
                         <MenubarMenu>
                             <MenubarTrigger className="p-0 bg-none border-none focus:bg-none outline-none">
@@ -123,10 +132,10 @@ export const DesktopNavigation = () => {
                         </MenubarMenu>
                     </Menubar>
                 </li>
-                <li className="flex items-center justify-center cursor-pointer rounded">
+                <li className="flex items-center justify-center cursor-pointer rounded factory">
                     <FactorySelector />
                 </li>
-                <li className="flex items-center justify-center cursor-pointer rounded">
+                <li className="flex items-center justify-center cursor-pointer rounded signout">
                     <Menubar>
                         <MenubarMenu>
                             <MenubarTrigger className="p-0 bg-none border-none focus:bg-none outline-none">

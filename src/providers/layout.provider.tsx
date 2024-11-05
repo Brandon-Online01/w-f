@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSessionStore } from '@/session/session.provider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { motion } from "framer-motion";
+import "driver.js/dist/driver.css";
 
 const queryClient = new QueryClient();
 

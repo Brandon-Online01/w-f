@@ -487,6 +487,7 @@ export default function MouldManager() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
+    
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />

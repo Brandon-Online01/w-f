@@ -6,31 +6,34 @@ import {
     MenubarTrigger,
     MenubarContent,
     MenubarItem,
-    MenubarSeparator,
     MenubarShortcut
 } from "@/components/ui/menubar"
 import { useSessionStore } from "@/session/session.provider"
-import { factoryList } from "@/data/factory"
 import { useQuery } from "@tanstack/react-query"
-import { SwatchBook, Factory as FactoryIcon, Loader2 } from "lucide-react"
+import { SwatchBook, Factory as FactoryIcon, Loader2, X } from "lucide-react"
 import { Factory } from "@/types/factory"
 import { isEmpty } from "lodash"
 import { useFactoryToggler } from "./state/factory-toggler"
+import axios from "axios"
 
 export const FactorySelector = () => {
     const { token } = useSessionStore()
     const { factoryReferenceID, setFactoryReferenceID } = useFactoryToggler()
 
+    const fetchFactories = async () => {
+        const config = { headers: { 'token': token } };
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/factory`
+        const { data } = await axios.get(url, config)
+        return data;
+    }
+
     const { data: factories, isLoading, isError } = useQuery({
-        queryKey: ['factoryList'],
-        queryFn: () => {
-            if (token) {
-                return factoryList(token);
-            }
-        },
+        queryKey: ['allFactories'],
+        queryFn: fetchFactories,
         refetchInterval: 1000,
         refetchIntervalInBackground: true,
         refetchOnWindowFocus: true,
+        staleTime: 60000,
     });
 
     if (isError || !factories || isEmpty(factories?.data)) return;
@@ -53,10 +56,17 @@ export const FactorySelector = () => {
                                         <FactoryIcon size={18} strokeWidth={1.5} className={`${factory?.factoryReferenceID === factoryReferenceID ? 'stroke-success' : 'stroke-card-foreground'}`} />
                                     </MenubarShortcut>
                                 </MenubarItem>
-                                <MenubarSeparator />
                             </>
                         )
                     }
+                    <MenubarItem className="cursor-pointer" >
+                        <span className="flex items-center justify-center gap-2 text-[12px] uppercase text-destructive">
+                            Close
+                        </span>
+                        <MenubarShortcut>
+                            <X size={18} strokeWidth={1.5} className="stroke-destructive" />
+                        </MenubarShortcut>
+                    </MenubarItem>
                 </MenubarContent>
             </MenubarMenu>
         </Menubar>
