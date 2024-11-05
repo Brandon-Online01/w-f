@@ -94,11 +94,17 @@ export const DesktopNavigation = () => {
 
     const driverObj = driver({
         showProgress: true,
-        steps: navigationTour
+        steps: navigationTour,
+        stageRadius: 3,
+        allowKeyboardControl: true,
+
     });
 
     useEffect(() => {
-        if (pathname === '/') {
+        const screenSize = { width: window.innerWidth, height: window.innerHeight };
+
+        console.log(screenSize?.width, 'screenSize')
+        if (pathname === '/' && screenSize?.width > 768) {
             const timeoutId = setTimeout(() => {
                 driverObj.drive();
             }, 100);
@@ -109,7 +115,7 @@ export const DesktopNavigation = () => {
 
     return (
         <div className="xl:flex w-full flex-col justify-between h-full hidden">
-            <ul className="flex w-full flex-col gap-5 h-1/2">
+            <ul className="flex w-full flex-col gap-5 h-1/2 pt-2">
                 <li className="flex items-center justify-center cursor-pointer rounded live">
                     <Link href="/" aria-label="Dashboard">
                         <TrendingUpDown strokeWidth={1} size={18} className={pathname === "/" ? "stroke-primary" : "stroke-card-foreground"} />
