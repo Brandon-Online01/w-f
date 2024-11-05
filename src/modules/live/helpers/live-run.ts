@@ -3,9 +3,9 @@ import toast from "react-hot-toast";
 import { UpdateLiveRun } from "../../../types/live-run";
 import { RequestConfig } from "@/types/requests";
 
-export const updateLiveRuns = async (updatePayload: UpdateLiveRun, config:  RequestConfig) => {
+export const updateLiveRuns = async (updatePayload: UpdateLiveRun, config:  RequestConfig, machineNumber: number) => {
     try {
-        const { data } = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/live-run/current/${updatePayload?.machineNumber}`, updatePayload, config)
+        const { data } = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/live-run/current/${machineNumber}`, updatePayload, config)
 
         if (data?.message === 'Live Run Updated') {
             toast(`${data?.message}`,

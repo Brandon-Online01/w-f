@@ -32,12 +32,8 @@ import {
 } from "@/components/ui/dialog"
 import { useEffect } from "react"
 import { updateLiveRuns } from "../helpers/live-run"
-import { useSessionStore } from "@/providers/session.provider"
 import { componentList } from "@/data/components"
 import { mouldList } from "@/data/moulds"
-import { generateFactoryEndpoint } from "@/hooks/factory-endpoint"
-import axios from "axios"
-import { useQuery } from "@tanstack/react-query"
 
 export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) {
     const { formState: { errors }, control, handleSubmit } = useForm<NoteInputs>();
@@ -57,41 +53,26 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
         allComponents,
         allMoulds
     } = liveRunStore();
-    const { token } = useSessionStore()
-
-    const fetchComponents = async () => {
-        const config = { headers: { 'token': token } };
-        const url = generateFactoryEndpoint('components')
-        const { data } = await axios.get(url, config)
-        return data;
-    }
-
-    const { data: components, isLoading: componentsLoading, error: componentsError } = useQuery({
-        queryKey: ['allComponents'],
-        queryFn: fetchComponents,
-        refetchInterval: 1000,
-        refetchIntervalInBackground: true,
-        refetchOnWindowFocus: true,
-        staleTime: 60000,
-    });
-
-    console.log(components, componentsLoading, componentsError)
+    const session = sessionStorage.getItem('waresense');
 
     useEffect(() => {
         setIsLoading(true)
         const fetchData = async () => {
-            if (token) {
-                const components = await componentList(token);
-                const moulds = await mouldList(token);
+            if (!session) return
 
-                setAllComponents(components?.data)
-                setAllMoulds(moulds?.data)
-            }
+            const sessionData = JSON.parse(session)
+            const config = { headers: { 'token': sessionData?.state?.token } };
+
+            const components = await componentList(config);
+            const moulds = await mouldList(config);
+
+            setAllComponents(components?.data)
+            setAllMoulds(moulds?.data)
         };
 
         fetchData();
         setIsLoading(false)
-    }, [setAllComponents, setAllMoulds, token, setIsLoading]);
+    }, [setAllComponents, setAllMoulds, setIsLoading, session]);
 
     if (!liveRun) return null
 
@@ -106,7 +87,12 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
     } = machine
 
     const saveNotes = async (data: NoteInputs) => {
+        if (!session) return
+
         setIsLoading(true)
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
 
         const newNote = {
             note: data?.note,
@@ -115,7 +101,6 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
             creationDate: format(new Date(), "EEE MMM dd yyyy HH:mm:ss 'GMT'xxx '(South Africa Standard Time)'")?.replace(/GMT([+-]\d{2}):(\d{2})/, 'GMT$1$2'),
         }
 
-        const config = { headers: { 'token': 'token' } };
         const saved = await saveNote(newNote, config)
 
         if (saved) {
@@ -124,17 +109,20 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
     };
 
     const saveLiveRun = async () => {
+        if (!session) return
+
         setIsLoading(true)
+
+        const sessionData = JSON.parse(session);
+        const config = { headers: { 'token': sessionData?.state?.token } };
 
         const updatePayload: UpdateLiveRun = {
             component: updateComponent,
             color: updateColor,
             mould: updateMould,
-            machineNumber: Number(machineNumber),
         }
 
-        const config = { headers: { 'token': 'token' } };
-        const updated = await updateLiveRuns(updatePayload, config)
+        const updated = await updateLiveRuns(updatePayload, config, Number(machineNumber))
 
         if (updated) {
             setIsLoading(false)
@@ -273,7 +261,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                                                 />
                                             )}
                                         />
-                                        {errors?.note && <span className="text-red-500 text-[10px] -mt-4">{errors?.note?.message}</span>}
+                                        {errors?.note && <span className="text-red-500 text-[10px] -mt-1">{errors?.note?.message}</span>}
                                     </div>
                                     <Button type="submit" className="w-10/12 mx-auto" disabled={isLoading}>
                                         {isLoading ? <Loader2 className="animate-spin" strokeWidth={1.5} size={16} /> : "Save Notes"}
