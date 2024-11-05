@@ -5,6 +5,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 interface SessionState {
     user: UserType | null;
     message: string | null;
+    factoryReferenceID: string | null;
     status: 'authenticated' | 'unauthenticated';
     token: string | null;
     signOut: () => void;
@@ -14,6 +15,7 @@ interface SessionState {
         status: 'authenticated';
         token: string
     }) => void;
+    setFactoryReferenceID: (id: string | null) => void;
 }
 
 export const useSessionStore = create<SessionState>()(
@@ -21,6 +23,7 @@ export const useSessionStore = create<SessionState>()(
         (set) => ({
             user: null,
             message: null,
+            factoryReferenceID: null,
             status: 'unauthenticated',
             token: null,
             signIn: (sessionData) => set({
@@ -35,6 +38,7 @@ export const useSessionStore = create<SessionState>()(
                 status: 'unauthenticated',
                 token: null
             }),
+            setFactoryReferenceID: (id) => set({ factoryReferenceID: id }),
         }),
         {
             name: 'waresense',
