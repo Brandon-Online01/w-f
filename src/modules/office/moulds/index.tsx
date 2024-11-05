@@ -82,7 +82,7 @@ export default function MouldManager() {
 
         const sessionData = JSON.parse(session)
         const config = { headers: { 'token': sessionData?.state?.token } };
-        const url = generateFactoryEndpoint('components')
+        const url = generateFactoryEndpoint('moulds')
         const { data } = await axios.get(url, config)
         return data;
     }
