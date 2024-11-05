@@ -726,8 +726,6 @@ export default function LiveRunCards() {
 		)
 	}
 
-	console.log(currentMachines, 'filtered machines')
-
 	return (
 		<div className="w-full flex flex-col justify-start gap-2">
 			<SectionHeader />

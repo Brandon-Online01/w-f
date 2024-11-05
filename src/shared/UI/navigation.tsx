@@ -100,13 +100,14 @@ export const DesktopNavigation = () => {
     });
 
     useEffect(() => {
-        // Delay the drive call to ensure DOM is ready
-        const timeoutId = setTimeout(() => {
-            driverObj.drive();
-        }, 100);
+        if (pathname === '/') {
+            const timeoutId = setTimeout(() => {
+                driverObj.drive();
+            }, 100);
 
-        return () => clearTimeout(timeoutId); // Cleanup on unmount
-    }, [driverObj]);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [driverObj, pathname]);
 
     return (
         <div className="xl:flex w-full flex-col justify-between py-4 h-full hidden">
