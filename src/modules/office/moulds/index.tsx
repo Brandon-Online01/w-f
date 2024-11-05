@@ -50,7 +50,6 @@ import { Mould } from '@/types/mould'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
-import { useSessionStore } from '@/providers/session.provider'
 import { useQuery } from '@tanstack/react-query'
 import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
 import axios from 'axios'
@@ -76,10 +75,13 @@ export default function MouldManager() {
         setIsEditing,
         setIsViewing,
     } = useOfficeStore();
-    const token = useSessionStore(state => state?.token)
+    const session = sessionStorage.getItem('waresense');
 
     const fetchMoulds = async () => {
-        const config = { headers: { 'token': token } };
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
         const url = generateFactoryEndpoint('components')
         const { data } = await axios.get(url, config)
         return data;

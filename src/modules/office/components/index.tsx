@@ -51,7 +51,6 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
-import { useSessionStore } from '@/providers/session.provider'
 import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
@@ -77,12 +76,16 @@ export default function ComponentManager() {
         setIsEditing,
         setIsViewing,
     } = useOfficeStore();
-    const token = useSessionStore(state => state?.token)
+    const session = sessionStorage.getItem('waresense');
 
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const fetchComponents = async () => {
-        const config = { headers: { 'token': token } };
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
         const url = generateFactoryEndpoint('components')
         const { data } = await axios.get(url, config)
         return data;

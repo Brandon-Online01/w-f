@@ -43,7 +43,6 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { factorySchema } from '@/schemas/factory'
-import { useSessionStore } from '@/session/session.provider'
 import { useOfficeStore } from '../state/state'
 import { motion } from 'framer-motion'
 import { isEmpty } from 'lodash'
@@ -72,11 +71,13 @@ export default function FactoryManagement() {
         setIsViewing,
         setFactoryInFocus,
     } = useOfficeStore();
-
-    const token = useSessionStore(state => state?.token)
+    const session = sessionStorage.getItem('waresense');
 
     const fetchFactories = async () => {
-        const config = { headers: { 'token': token } };
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
         const url = `${process.env.NEXT_PUBLIC_API_URL}/factory`
         const { data } = await axios.get(url, config)
         return data;
