@@ -490,7 +490,7 @@ export default function MouldManager() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
                 {paginatedMoulds?.map((mould: Mould, index: number) => <MouldCard mould={mould} key={index} index={index} />)}
             </div>
             {paginatedMoulds?.length >= 8 && <PageControls />}
