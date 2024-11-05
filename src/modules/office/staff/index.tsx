@@ -62,7 +62,6 @@ import { useOfficeStore } from '../state/state'
 import { NewUserType, UserType } from '@/types/user'
 import { motion } from 'framer-motion'
 import { isEmpty } from 'lodash'
-import { useSessionStore } from '@/providers/session.provider'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
@@ -88,13 +87,16 @@ export default function StaffManagement() {
         setIsEditing,
         setIsViewing,
     } = useOfficeStore();
+    const session = sessionStorage.getItem('waresense');
 
-    const token = useSessionStore(state => state?.token)
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
     const fetchStaff = async () => {
-        const config = { headers: { 'token': token } };
-        const url = generateFactoryEndpoint('staff')
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+        const url = generateFactoryEndpoint('users')
         const { data } = await axios.get(url, config)
         return data;
     }
@@ -177,7 +179,7 @@ export default function StaffManagement() {
                             </Button>
                         </div>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px] bg-card">
+                    <DialogContent className="sm:max-w-[700px] bg-card" aria-describedby="create-user">
                         <DialogHeader>
                             <DialogTitle>Create New User</DialogTitle>
                         </DialogHeader>
@@ -264,7 +266,7 @@ export default function StaffManagement() {
     const EditModal = () => {
         return (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogContent className="sm:max-w-[700px] bg-card">
+                <DialogContent className="sm:max-w-[700px] bg-card" aria-describedby="edit-user">
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
                     </DialogHeader>
@@ -277,7 +279,7 @@ export default function StaffManagement() {
     const ViewModal = () => {
         return (
             <Dialog open={isViewing} onOpenChange={setIsViewing}>
-                <DialogContent className="sm:max-w-[500px] bg-card">
+                <DialogContent className="sm:max-w-[500px] bg-card" aria-describedby="view-user">
                     <DialogHeader>
                         <DialogTitle>User Details</DialogTitle>
                     </DialogHeader>

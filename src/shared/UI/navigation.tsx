@@ -46,7 +46,6 @@ export const Navigation = () => {
     )
 }
 
-
 export const MobileNavigation = () => {
     const signOut = useSessionStore(state => state.signOut)
 
@@ -57,7 +56,7 @@ export const MobileNavigation = () => {
                 <DialogTrigger>
                     <LayoutDashboard />
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent aria-describedby="navigation">
                     <DialogHeader>
                         <DialogDescription>
                             <div className="flex items-center justify-center flex-col gap-4 mt-10 w-full">
@@ -85,7 +84,6 @@ export const MobileNavigation = () => {
                     </DialogHeader>
                 </DialogContent>
             </Dialog>
-
         </div>
     )
 }
@@ -110,8 +108,8 @@ export const DesktopNavigation = () => {
     }, [driverObj, pathname]);
 
     return (
-        <div className="xl:flex w-full flex-col justify-between py-4 h-full hidden">
-            <ul className="flex w-full flex-col gap-5">
+        <div className="xl:flex w-full flex-col justify-between h-full hidden">
+            <ul className="flex w-full flex-col gap-5 h-1/2">
                 <li className="flex items-center justify-center cursor-pointer rounded live">
                     <Link href="/" aria-label="Dashboard">
                         <TrendingUpDown strokeWidth={1} size={18} className={pathname === "/" ? "stroke-primary" : "stroke-card-foreground"} />
@@ -123,7 +121,7 @@ export const DesktopNavigation = () => {
                     </Link>
                 </li>
             </ul>
-            <ul className="flex w-full flex-col gap-0 relative justify-end items-center">
+            <ul className="flex w-full flex-col gap-0 relative justify-end items-center h-1/2">
                 <li className="flex items-center justify-center cursor-pointer rounded theme">
                     <Menubar>
                         <MenubarMenu>
@@ -136,7 +134,7 @@ export const DesktopNavigation = () => {
                 <li className="flex items-center justify-center cursor-pointer rounded factory">
                     <FactorySelector />
                 </li>
-                <li className="flex items-center justify-center cursor-pointer rounded signout">
+                <li className="flex flex-col items-center justify-end cursor-pointer rounded signout">
                     <Menubar>
                         <MenubarMenu>
                             <MenubarTrigger className="p-0 bg-none border-none focus:bg-none outline-none">

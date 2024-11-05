@@ -43,7 +43,6 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { factorySchema } from '@/schemas/factory'
-import { useSessionStore } from '@/session/session.provider'
 import { useOfficeStore } from '../state/state'
 import { motion } from 'framer-motion'
 import { isEmpty } from 'lodash'
@@ -72,11 +71,13 @@ export default function FactoryManagement() {
         setIsViewing,
         setFactoryInFocus,
     } = useOfficeStore();
-
-    const token = useSessionStore(state => state?.token)
+    const session = sessionStorage.getItem('waresense');
 
     const fetchFactories = async () => {
-        const config = { headers: { 'token': token } };
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
         const url = `${process.env.NEXT_PUBLIC_API_URL}/factory`
         const { data } = await axios.get(url, config)
         return data;
@@ -357,7 +358,7 @@ export default function FactoryManagement() {
                             </Button>
                         </div>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[700px]">
+                    <DialogContent className="sm:max-w-[700px]" aria-describedby="create-factory">
                         <DialogHeader>
                             <DialogTitle>Create New Factory</DialogTitle>
                         </DialogHeader>
@@ -469,7 +470,7 @@ export default function FactoryManagement() {
     const EditModal = () => {
         return (
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogContent className="sm:max-w-[700px]">
+                <DialogContent className="sm:max-w-[700px]" aria-describedby="edit-factory">
                     <DialogHeader>
                         <DialogTitle>Edit Factory</DialogTitle>
                     </DialogHeader>
@@ -482,7 +483,7 @@ export default function FactoryManagement() {
     const ViewModal = () => {
         return (
             <Dialog open={isViewing} onOpenChange={setIsViewing}>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[500px]" aria-describedby="view-factory">
                     <DialogHeader>
                         <DialogTitle>Factory Details</DialogTitle>
                     </DialogHeader>

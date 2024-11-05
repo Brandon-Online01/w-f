@@ -497,7 +497,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<TabsList>
 							<TabListHeaders />
 						</TabsList>
-						<AnimatePresence mode="wait">
+						<AnimatePresence mode="sync">
 							<motion.div
 								key="overview"
 								variants={contentVariants}

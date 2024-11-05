@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ArrowDownToLine, FileText } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
-import { useSessionStore } from '@/providers/session.provider'
 import { create } from 'zustand'
 import { reportList } from '@/data/reports'
 
@@ -38,16 +37,20 @@ const useReportStore = create<ReportStore>((set) => ({
 }))
 
 export default function ProductionReportCard() {
-    const token = useSessionStore(state => state?.token)
+    const session = sessionStorage.getItem('waresense');
     const { reports, setReports, downloadingId, setDownloadingId } = useReportStore()
 
     useEffect(() => {
         const getReports = async () => {
-            if (token) {
-                const reports = await reportList(token)
+            if (!session) return
 
-                const reportsList = reports?.data?.map((report: HighlightReport) => ({
-                    uid: report?.uid,
+            const sessionData = JSON.parse(session)
+            const config = { headers: { 'token': sessionData?.state?.token } };
+
+            const reports = await reportList(config)
+
+            const reportsList = reports?.data?.map((report: HighlightReport) => ({
+                uid: report?.uid,
                     title: report?.fileName,
                     date: report?.creationDate,
                     url: report?.reportURL,
@@ -55,11 +58,10 @@ export default function ProductionReportCard() {
                 }))
 
                 setReports(reportsList)
-            }
         }
 
         getReports()
-    }, [token, setReports, setDownloadingId])
+    }, [session, setReports, setDownloadingId])
 
     const handleDownload = (referenceID: number, referenceURL: string) => {
         setDownloadingId(referenceID)
