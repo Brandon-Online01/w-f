@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import {
     Search,
     ChevronLeft,
@@ -58,18 +58,19 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { newUserSchema, editUserSchema } from '@/schemas/user'
-import { staffList } from '@/data/staff'
 import { useOfficeStore } from '../state/state'
-import { NewUserType } from '@/types/user'
+import { NewUserType, UserType } from '@/types/user'
 import { motion } from 'framer-motion'
 import { isEmpty } from 'lodash'
 import { useSessionStore } from '@/providers/session.provider'
+import { useQuery } from '@tanstack/react-query'
+import axios from 'axios'
+import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
 export default function StaffManagement() {
     const {
-        users,
         searchTerm,
         statusFilter,
         currentPage,
@@ -77,10 +78,8 @@ export default function StaffManagement() {
         isCreating,
         isEditing,
         isViewing,
-        isLoading,
         userInFocus,
         setUserInFocus,
-        setUsers,
         setSearchTerm,
         setStatusFilter,
         setCurrentPage,
@@ -88,36 +87,26 @@ export default function StaffManagement() {
         setIsCreating,
         setIsEditing,
         setIsViewing,
-        setIsLoading,
     } = useOfficeStore();
 
     const token = useSessionStore(state => state?.token)
     const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-    useEffect(() => {
-        setIsLoading(true)
-        const allUsers = async () => {
-            if (token) {
-                const users = await staffList(token)
-                setUsers(users?.data)
-            }
-        }
+    const fetchStaff = async () => {
+        const config = { headers: { 'token': token } };
+        const url = generateFactoryEndpoint('staff')
+        const { data } = await axios.get(url, config)
+        return data;
+    }
 
-        allUsers()
-        setIsLoading(false)
-    }, [setUsers, setIsLoading, token]);
-
-    const filteredUsers = users?.filter(user =>
-        (user?.name?.toLowerCase() + ' ' + user?.lastName.toLowerCase())?.includes(searchTerm.toLowerCase()) &&
-        (statusFilter === 'All' || user?.role === statusFilter)
-    )
-
-    const pageCount = Math.ceil(filteredUsers?.length / itemsPerPage)
-
-    const paginatedUsers = filteredUsers?.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    )
+    const { data: staff, isLoading, isError } = useQuery({
+        queryKey: ['allStaff'],
+        queryFn: fetchStaff,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60000,
+    });
 
     const handleCreateUser: SubmitHandler<NewUserType> = async (data) => console.log(data)
 
@@ -538,7 +527,7 @@ export default function StaffManagement() {
         )
     }
 
-    if (isLoading || isEmpty(users)) {
+    if (isLoading || isEmpty(staff?.data) || isError) {
         return (
             <div className="w-full h-screen flex flex-col justify-start gap-2">
                 <PageHeader />
@@ -547,11 +536,23 @@ export default function StaffManagement() {
         )
     }
 
+    const filteredUsers = staff?.data?.filter((user: UserFormData) =>
+        (user?.name?.toLowerCase() + ' ' + user?.lastName.toLowerCase())?.includes(searchTerm.toLowerCase()) &&
+        (statusFilter === 'All' || user?.role === statusFilter)
+    )
+
+    const pageCount = Math.ceil(filteredUsers?.length / itemsPerPage)
+
+    const paginatedUsers = filteredUsers?.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
-                {paginatedUsers?.map((user, index) => {
+                {paginatedUsers?.map((user: UserType, index: number) => {
                     const userWithDefaultPhoto = {
                         ...user,
                         photoURL: user?.photoURL || userPlaceHolderIcon,
