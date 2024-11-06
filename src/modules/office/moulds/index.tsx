@@ -10,7 +10,8 @@ import {
     Wrench,
     Gauge,
     Component,
-    Puzzle
+    Puzzle,
+    ChartNoAxesGantt
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -275,7 +276,7 @@ export default function MouldManager() {
                         <SelectContent>
                             <SelectItem value="All">
                                 <span className="flex items-center gap-2">
-                                    <Puzzle className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <ChartNoAxesGantt className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     All
                                 </span>
                             </SelectItem>
@@ -489,7 +490,7 @@ export default function MouldManager() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
-    
+
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />

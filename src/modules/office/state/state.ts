@@ -4,6 +4,7 @@ import { Mould } from '@/types/mould';
 import { create } from 'zustand';
 import * as z from 'zod';
 import { Factory } from '@/types/factory';
+import { ToolRoom } from '@/types/tool-room';
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
@@ -76,6 +77,12 @@ export type OfficeState = {
     factoryInFocus: Factory | null;
     setFactories: (factories: Factory[]) => void;
     setFactoryInFocus: (factory: Factory | null) => void;
+
+    //toolroom
+    toolRoomItems: ToolRoom[];
+    toolRoomItemInFocus: ToolRoom | null;
+    setToolRoomItems: (toolRoomItems: ToolRoom[]) => void;
+    setToolRoomItemInFocus: (toolRoomItem: ToolRoom | null) => void;
 };
 
 export const useOfficeStore = create<OfficeState>((set) => ({
@@ -132,4 +139,10 @@ export const useOfficeStore = create<OfficeState>((set) => ({
     factoryInFocus: null,
     setFactories: (factories) => set({ factories }),
     setFactoryInFocus: (factory) => set({ factoryInFocus: factory }),
+
+    //toolroom
+    toolRoomItems: [],
+    toolRoomItemInFocus: null,
+    setToolRoomItems: (toolRoomItems) => set({ toolRoomItems }),
+    setToolRoomItemInFocus: (toolRoomItem) => set({ toolRoomItemInFocus: toolRoomItem }),
 }));

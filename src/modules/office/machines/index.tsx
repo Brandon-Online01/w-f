@@ -12,6 +12,7 @@ import {
     ServerCrash,
     ServerOff,
     ServerCog,
+    ChartNoAxesGanttIcon,
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -208,7 +209,7 @@ export default function MachineManager() {
                         <SelectContent>
                             <SelectItem value="All">
                                 <span className="flex items-center gap-2">
-                                    <Server className='stroke-card-foreground' strokeWidth={1} size={18} />
+                                    <ChartNoAxesGanttIcon className='stroke-card-foreground' strokeWidth={1} size={18} />
                                     All
                                 </span>
                             </SelectItem>

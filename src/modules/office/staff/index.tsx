@@ -9,7 +9,6 @@ import {
     Edit,
     User,
     Shield,
-    Users,
     UserPlus,
     Upload,
     Mail,
@@ -19,6 +18,7 @@ import {
     UserSearch,
     UserX,
     Loader2,
+    ChartNoAxesGantt,
 } from 'lucide-react'
 import { Phone, UserCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -153,20 +153,28 @@ export default function StaffManagement() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="All">
-                                <Users className="mr-2 h-4 w-4 inline-block" />
-                                All
+                                <span className="flex items-center gap-2">
+                                    <ChartNoAxesGantt className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    All
+                                </span>
                             </SelectItem>
                             <SelectItem value="Admin">
-                                <Shield className="mr-2 h-4 w-4 inline-block" />
-                                Admin
+                                <span className="flex items-center gap-2">
+                                    <Shield className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    Admin
+                                </span>
                             </SelectItem>
                             <SelectItem value="User">
-                                <User className="mr-2 h-4 w-4 inline-block" />
-                                User
+                                <span className="flex items-center gap-2">
+                                    <User className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    User
+                                </span>
                             </SelectItem>
                             <SelectItem value="Editor">
-                                <Edit className="mr-2 h-4 w-4 inline-block" />
-                                Editor
+                                <span className="flex items-center gap-2">
+                                    <Edit className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    Editor
+                                </span>
                             </SelectItem>
                         </SelectContent>
                     </Select>

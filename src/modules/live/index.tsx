@@ -717,7 +717,7 @@ export default function LiveRunCards() {
 		)
 	}
 
-	if (isLoading || isEmpty(machineData)) {
+	if (isLoading) {
 		return (
 			<div className="w-full h-screen">
 				<SectionHeader />
@@ -726,9 +726,20 @@ export default function LiveRunCards() {
 		)
 	}
 
+
+	if (isEmpty(machineData)) {
+		return (
+			<div className="w-full h-screen">
+				<SectionHeader />
+				<MachineCardsPlaceholder />
+			</div>
+		)
+	}
+
 	return (
 		<div className="w-full flex flex-col justify-start gap-2">
 			<SectionHeader />
+			<MachineCardsPlaceholder />
 			{
 				isEmpty(currentMachines) ?
 					<div className="w-full h-full flex items-center justify-center">
@@ -768,8 +779,6 @@ const MachineCardsLoader = () => {
 								</div>
 							</div>
 						</div>
-
-						{/* Content placeholders */}
 						<div className="flex items-center gap-2 justify-between">
 							<div className="h-4 bg-gray-200 rounded w-1/2" />
 							<div className="h-4 bg-gray-200 rounded w-1/4" />
@@ -798,3 +807,44 @@ const MachineCardsLoader = () => {
 	);
 };
 
+const MachineCardsPlaceholder = () => {
+	return (
+		<div className="w-full -mt-2">
+			<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1">
+				{Array.from({ length: 16 }).map((_, index) => (
+					<motion.div
+						key={index}
+						className="relative bg-card rounded p-4 h-[380px] border shadow flex flex-col justify-start gap-2"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.3, delay: index * 0.1 }}>
+						<div className="aspect-video w-full bg-destructive/10 rounded mb-4 h-48 flex items-center justify-center" >
+							<div className="w-full h-full flex items-center justify-center" />
+						</div>
+						<div className="flex items-center gap-2 justify-between">
+							<div className="h-4 bg-destructive/10 rounded w-1/2" />
+							<div className="h-4 bg-destructive/10 rounded w-1/4" />
+						</div>
+						<div className="space-y-3">
+							<div className="h-4 bg-destructive/10 rounded w-2/3" />
+						</div>
+						<div className="flex items-center gap-2 justify-between mt-4">
+							<div className="h-4 bg-destructive/10 rounded w-3/12" />
+							<div className="h-4 bg-destructive/10 rounded w-1/4" />
+							<div className="h-4 bg-destructive/10 rounded w-1/4" />
+						</div>
+						<div className="flex items-center gap-2 justify-between -mt-1">
+							<div className="h-4 bg-destructive/10 rounded w-2/12" />
+							<div className="h-4 bg-destructive/10 rounded w-2/12" />
+							<div className="h-4 bg-destructive/10 rounded w-2/12" />
+						</div>
+						<div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-muted-foreground">
+							<div className={`w-2 h-2 rounded-full bg-destructive`} />
+							<span className="text-destructive uppercase">Offline</span>
+						</div>
+					</motion.div>
+				))}
+			</div>
+		</div>
+	);
+};

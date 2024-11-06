@@ -6,7 +6,8 @@ import {
     Users,
     ServerCog,
     Factory,
-    Puzzle
+    Puzzle,
+    TrendingDown
 } from "lucide-react";
 import {
     Tabs,
@@ -21,6 +22,7 @@ import ComponentsManagement from "@/modules/office/components";
 import MachinesManagement from "@/modules/office/machines";
 import { motion, AnimatePresence } from "framer-motion";
 import FactoryManagement from "@/modules/office/factory";
+import ToolRoomManager from "@/modules/office/toolroom";
 
 export default function Home() {
 
@@ -61,6 +63,7 @@ export default function Home() {
             { value: "components", icon: Component, label: "Components" },
             { value: "machines", icon: ServerCog, label: "Machines" },
             { value: "moulds", icon: Puzzle, label: "Moulds" },
+            { value: "toolroom", icon: TrendingDown, label: "Tool Room" },
         ];
 
         return (
@@ -148,6 +151,16 @@ export default function Home() {
                                 exit="exit">
                                 <TabsContent value="machines" className="w-full bg-background p-1 rounded">
                                     <MachinesManagement />
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="toolroom"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="toolroom" className="w-full bg-background p-1 rounded">
+                                    <ToolRoomManager />
                                 </TabsContent>
                             </motion.div>
                         </AnimatePresence>

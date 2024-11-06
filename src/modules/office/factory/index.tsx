@@ -14,6 +14,7 @@ import {
     Mail,
     Phone,
     Factory as FactoryIcon,
+    ChartNoAxesGantt,
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -324,7 +325,7 @@ export default function FactoryManagement() {
                         <SelectContent>
                             <SelectItem value="All">
                                 <div className="flex items-center">
-                                    <FactoryIcon className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                    <ChartNoAxesGantt className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                     All
                                 </div>
                             </SelectItem>
@@ -516,9 +517,8 @@ export default function FactoryManagement() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedFactories?.map((factory: Factory, index: number) => (<FactoryCard key={index} factory={factory} />
-                ))}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {paginatedFactories?.map((factory: Factory, index: number) => <FactoryCard key={index} factory={factory} />)}
             </div>
             {paginatedFactories?.length >= 8 && <PaginationControls />}
             <EditModal />
