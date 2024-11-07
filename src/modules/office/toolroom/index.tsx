@@ -253,47 +253,47 @@ export default function ToolRoomManager() {
 			<div className="space-y-6">
 				<div className="grid grid-cols-2 gap-4">
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Factory Reference ID</Label>
+						<Label className="text-sm font-medium text-card-foreground">Factory Reference ID</Label>
 						<p className="text-sm font-semibold">{factoryReferenceID}</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Checked In By</Label>
+						<Label className="text-sm font-medium text-card-foreground">Checked In By</Label>
 						<p className="text-sm font-semibold">{checkedInBy}</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Checked Out By</Label>
+						<Label className="text-sm font-medium text-card-foreground">Checked Out By</Label>
 						<p className="text-sm font-semibold">{checkedOutBy || 'Not checked out'}</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Check-in Date</Label>
+						<Label className="text-sm font-medium text-card-foreground">Check-in Date</Label>
 						<p className="text-sm font-semibold">{new Date(checkInDate).toLocaleString()}</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Check-out Date</Label>
+						<Label className="text-sm font-medium text-card-foreground">Check-out Date</Label>
 						<p className="text-sm font-semibold">{checkOutDate ? new Date(checkOutDate).toLocaleString() : 'Not checked out'}</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Check-in Comments</Label>
+						<Label className="text-sm font-medium text-card-foreground">Check-in Comments</Label>
 						<p className="text-sm font-semibold">{checkInComments}</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Check-out Comments</Label>
+						<Label className="text-sm font-medium text-card-foreground">Check-out Comments</Label>
 						<p className="text-sm font-semibold">{checkOutComments || 'No comments'}</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Repair Comments</Label>
+						<Label className="text-sm font-medium text-card-foreground">Repair Comments</Label>
 						<p className="text-sm font-semibold">{repairComments}</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Damage Rating</Label>
+						<Label className="text-sm font-medium text-card-foreground">Damage Rating</Label>
 						<p className="text-sm font-semibold">{damageRating}/5</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Turnaround Time</Label>
+						<Label className="text-sm font-medium text-card-foreground">Turnaround Time</Label>
 						<p className="text-sm font-semibold">{turnaroundTime} hours</p>
 					</div>
 					<div className="flex flex-col space-y-1">
-						<Label className="text-sm font-medium text-gray-500">Status</Label>
+						<Label className="text-sm font-medium text-card-foreground">Status</Label>
 						<p className="text-sm font-semibold">{status}</p>
 					</div>
 				</div>
@@ -417,15 +417,15 @@ export default function ToolRoomManager() {
 							</div>
 							<div className="flex items-center space-x-2 text-sm text-gray-500">
 								<Calendar className="stroke-card-foreground" strokeWidth={1} size={18} />
-								<span>Check-in: {new Date(checkInDate).toLocaleString()}</span>
+								<span className="text-card-foreground">Check-in: {new Date(checkInDate).toLocaleString()}</span>
 							</div>
 							<div className="flex items-center space-x-2 text-sm text-gray-500">
 								<Users className="stroke-card-foreground" strokeWidth={1} size={18} />
-								<span>Checked in by: {checkedInBy}</span>
+								<span className="text-card-foreground">Checked in by: {checkedInBy}</span>
 							</div>
 							<div className="flex items-center space-x-2 text-sm text-gray-500">
 								<Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
-								<span>Damage Rating: {damageRating}/5</span>
+								<span className="text-card-foreground">Damage Rating: {damageRating}/5</span>
 							</div>
 							<div className="flex justify-end">
 								<DropdownMenu>
