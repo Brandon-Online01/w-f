@@ -215,13 +215,13 @@ export default function MachineManager() {
                             </SelectItem>
                             <SelectItem value="Active">
                                 <span className="flex items-center gap-2">
-                                    <ServerCrash className='stroke-success' strokeWidth={1} size={18} />
+                                    <ServerCrash className='stroke-card-foreground' strokeWidth={1} size={18} />
                                     Active
                                 </span>
                             </SelectItem>
                             <SelectItem value="Inactive">
                                 <span className="flex items-center gap-2">
-                                    <ServerOff className='stroke-destructive' strokeWidth={1} size={18} />
+                                    <ServerOff className='stroke-card-foreground' strokeWidth={1} size={18} />
                                     In Active
                                 </span>
                             </SelectItem>

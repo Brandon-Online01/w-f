@@ -198,7 +198,7 @@ export default function StaffManagement() {
         )
     }
 
-    const UserCard = ({ user, index }: { user: UserFormData & { uid: number, password: string }, index: number }) => {
+    const UserCard = ({ user, index }: { user: UserType, index: number }) => {
         const { name, lastName, email, status, photoURL = userPlaceHolderIcon, uid } = user
 
         const userABBR = `${name.charAt(0)}${lastName.charAt(0)}`
@@ -333,10 +333,10 @@ export default function StaffManagement() {
         )
     }
 
-    const UserForm = ({ user = null, onSubmit }: { user?: UserFormData | null; onSubmit: (data: UserFormData) => void }) => {
+    const UserForm = ({ user = null, onSubmit }: { user?: UserType | null; onSubmit: (data: UserType) => void }) => {
         const [imagePreview, setImagePreview] = useState(user?.photoURL || '/placeholder.svg?height=100&width=100')
 
-        const { register, handleSubmit, formState: { errors } } = useForm<UserFormData>({
+        const { register, handleSubmit, formState: { errors } } = useForm<UserType>({
             resolver: zodResolver(user ? editUserSchema : newUserSchema),
             defaultValues: user || {},
         })
@@ -546,7 +546,7 @@ export default function StaffManagement() {
         )
     }
 
-    const filteredUsers = staff?.data?.filter((user: UserFormData) =>
+    const filteredUsers = staff?.data?.filter((user: UserType) =>
         (user?.name?.toLowerCase() + ' ' + user?.lastName.toLowerCase())?.includes(searchTerm.toLowerCase()) &&
         (statusFilter === 'All' || user?.role === statusFilter)
     )
@@ -562,13 +562,7 @@ export default function StaffManagement() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
-                {paginatedUsers?.map((user: UserType, index: number) => {
-                    const userWithDefaultPhoto = {
-                        ...user,
-                        photoURL: user?.photoURL || userPlaceHolderIcon,
-                    };
-                    return <UserCard key={index} user={userWithDefaultPhoto} index={index} />;
-                })}
+                {paginatedUsers?.map((user: UserType, index: number) => <UserCard key={index} user={user} index={index} />)}
             </div>
             {paginatedUsers && paginatedUsers?.length >= 8 && <PaginationControls />}
             <EditModal />

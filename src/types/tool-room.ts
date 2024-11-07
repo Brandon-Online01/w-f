@@ -1,18 +1,22 @@
 export interface ToolRoom {
-    uid: number,
-    eta: string,
-    checkInDate: string
-    checkOutDate: string
-    componentName: string
-    completedTime: string
-    workDone: string
-    turnaroundTime: number
-    damageRating: number
-    inspectionRating: number
-    factoryReferenceID: string
-    status: 'In Progress' | 'Completed'
-    teamMembers?: []
-    materialsUsed?: []
-    mouldId: number
-    teamMemberIds: number[]
+    checkInComments: string;
+    checkInDate: string;
+    checkOutComments: string;
+    checkOutDate: string | null;
+    checkedInBy: string;
+    checkedOutBy: string;
+    damageRating: number;
+    factoryReferenceID: string;
+    materialsUsed: Material[];
+    repairComments: string;
+    status: 'In Progress' | 'Completed';
+	turnaroundTime: number;
+	uid: number;
+}
+
+export interface Material {
+	materialName: string;
+	quantityUsed: number;
+	uid: number;
+	unit: string;
 }

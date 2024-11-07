@@ -5,21 +5,9 @@ import { create } from 'zustand';
 import * as z from 'zod';
 import { Factory } from '@/types/factory';
 import { ToolRoom } from '@/types/tool-room';
+import { UserType } from '@/types/user';
 
 type ComponentFormData = z.infer<typeof componentSchema>
-
-type UserFormData = {
-    uid: number;
-    name: string;
-    lastName: string;
-    email: string;
-    username: string;
-    password: string;
-    role: 'Admin' | 'User' | 'Editor';
-    photoURL?: string;
-    phoneNumber: string;
-    status: 'Active' | 'Inactive';
-};
 
 export type OfficeState = {
     //filters
@@ -47,10 +35,10 @@ export type OfficeState = {
     setIsViewing: (isOpen: boolean) => void;
 
     //staff
-    users: UserFormData[];
-    userInFocus: UserFormData | null;
-    setUsers: (users: UserFormData[]) => void;
-    setUserInFocus: (user: UserFormData | null) => void;
+    users: UserType[];
+    userInFocus: UserType | null;
+    setUsers: (users: UserType[]) => void;
+    setUserInFocus: (user: UserType | null) => void;
 
 
     //components
@@ -78,11 +66,12 @@ export type OfficeState = {
     setFactories: (factories: Factory[]) => void;
     setFactoryInFocus: (factory: Factory | null) => void;
 
+
     //toolroom
-    toolRoomItems: ToolRoom[];
-    toolRoomItemInFocus: ToolRoom | null;
-    setToolRoomItems: (toolRoomItems: ToolRoom[]) => void;
-    setToolRoomItemInFocus: (toolRoomItem: ToolRoom | null) => void;
+    toolroomRecords: ToolRoom[];
+    toolroomRecordInFocus: ToolRoom | null;
+    setToolroomRecords: (records: ToolRoom[]) => void;
+    setToolroomRecordInFocus: (record: ToolRoom | null) => void;
 };
 
 export const useOfficeStore = create<OfficeState>((set) => ({
@@ -140,9 +129,10 @@ export const useOfficeStore = create<OfficeState>((set) => ({
     setFactories: (factories) => set({ factories }),
     setFactoryInFocus: (factory) => set({ factoryInFocus: factory }),
 
+
     //toolroom
-    toolRoomItems: [],
-    toolRoomItemInFocus: null,
-    setToolRoomItems: (toolRoomItems) => set({ toolRoomItems }),
-    setToolRoomItemInFocus: (toolRoomItem) => set({ toolRoomItemInFocus: toolRoomItem }),
+    toolroomRecords: [],
+    toolroomRecordInFocus: null,
+    setToolroomRecords: (records) => set({ toolroomRecords: records }),
+    setToolroomRecordInFocus: (record) => set({ toolroomRecordInFocus: record }),
 }));

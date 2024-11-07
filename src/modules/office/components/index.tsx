@@ -431,13 +431,13 @@ export default function ComponentManager() {
                             </SelectItem>
                             <SelectItem value="Active">
                                 <span className="flex items-center gap-2">
-                                    <Component className="stroke-success" strokeWidth={1} size={18} />
+                                    <Component className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     Active
                                 </span>
                             </SelectItem>
                             <SelectItem value="Inactive">
                                 <span className="flex items-center gap-2">
-                                    <Component className="stroke-destructive" strokeWidth={1} size={18} />
+                                    <Component className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     In Active
                                 </span>
                             </SelectItem>

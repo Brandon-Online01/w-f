@@ -282,19 +282,19 @@ export default function MouldManager() {
                             </SelectItem>
                             <SelectItem value="Active">
                                 <span className="flex items-center gap-2">
-                                    <Puzzle className="stroke-success" strokeWidth={1} size={18} />
+                                    <Puzzle className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     Active
                                 </span>
                             </SelectItem>
                             <SelectItem value="Inactive">
                                 <span className="flex items-center gap-2">
-                                    <Puzzle className="stroke-destructive" strokeWidth={1} size={18} />
+                                    <Puzzle className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     In Active
                                 </span>
                             </SelectItem>
                             <SelectItem value="Maintenance">
                                 <span className="flex items-center gap-2">
-                                    <Puzzle className="stroke-warning" strokeWidth={1} size={18} />
+                                    <Puzzle className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     Maintenance
                                 </span>
                             </SelectItem>

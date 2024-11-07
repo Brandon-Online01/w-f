@@ -197,7 +197,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		return (
 			<div className="space-y-4">
 				<div className="aspect-video w-full bg-card-foreground/10 rounded overflow-hidden h-48">
-					<div className="flex items-center justify-center border rounded border-[1px] h-full">
+					<div className="flex items-center justify-center border rounded h-full">
 						<Image
 							src={fullPhotoURL}
 							alt={componentName}
