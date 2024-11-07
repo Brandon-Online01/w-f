@@ -60,6 +60,8 @@ export function MachineStatistics({ data }: MachineStatisticsProps) {
         { browser: "Stopped (Not Reporting Or Producing) ", visitors: data.stoppedReporters || 0, fill: "hsl(var(--chart-3))" },
     ];
 
+    console.log(chartData)
+
     return (
         <Card className="flex flex-col w-full h-[380px] machines">
             <CardHeader className="items-center pb-0">

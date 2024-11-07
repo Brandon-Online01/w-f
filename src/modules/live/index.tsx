@@ -739,7 +739,6 @@ export default function LiveRunCards() {
 	return (
 		<div className="w-full flex flex-col justify-start gap-2">
 			<SectionHeader />
-			<MachineCardsPlaceholder />
 			{
 				isEmpty(currentMachines) ?
 					<div className="w-full h-full flex items-center justify-center">

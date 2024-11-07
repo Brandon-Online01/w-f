@@ -59,11 +59,11 @@ export default function Home() {
     const TabListHeaders = () => {
         const tabItems = [
             { value: "factory", icon: Factory, label: "Factory" },
-            { value: "staff", icon: Users, label: "Staff" },
-            { value: "components", icon: Component, label: "Components" },
+            { value: "toolroom", icon: TrendingDown, label: "Tool Room" },
             { value: "machines", icon: ServerCog, label: "Machines" },
             { value: "moulds", icon: Puzzle, label: "Moulds" },
-            { value: "toolroom", icon: TrendingDown, label: "Tool Room" },
+            { value: "components", icon: Component, label: "Components" },
+            { value: "staff", icon: Users, label: "Staff" },
         ];
 
         return (

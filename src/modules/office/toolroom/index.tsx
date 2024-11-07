@@ -5,9 +5,6 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	MoreVertical,
-	Edit,
-	Eye,
-	Trash2,
 	Wrench,
 	Calendar,
 	Users,
@@ -219,7 +216,7 @@ export default function ToolRoomManager() {
 					))}
 				</div>
 				<div className="flex justify-between">
-					<Button type="submit" className="w-1/2 mr-2">{record ? 'Update Report' : 'Check In'}</Button>
+					<Button type="submit" className="w-1/2 mr-2 mx-auto" disabled>{record ? 'Update Report' : 'Check In'}</Button>
 					{record && record?.status !== 'Completed' && <Button type="button" disabled className="w-1/2 ml-2" >Check Out</Button>}
 				</div>
 			</form>
@@ -316,7 +313,8 @@ export default function ToolRoomManager() {
 						<Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
 						<Input
 							type="text"
-							placeholder="Search maintenance records..."
+							disabled
+							placeholder="search records..."
 							className="pl-8"
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
@@ -425,18 +423,18 @@ export default function ToolRoomManager() {
 										setToolRoomItemInFocus(toolRoomItemCard)
 										setIsEditing(true)
 									}}>
-										<Edit className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
+										<TrendingDown className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
 										Edit
 									</DropdownMenuItem>
 									<DropdownMenuItem onSelect={() => {
 										setToolRoomItemInFocus(toolRoomItemCard)
 										setIsViewing(true)
 									}}>
-										<Eye className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
+										<TrendingDown className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
 										View
 									</DropdownMenuItem>
 									<DropdownMenuItem onSelect={() => handleDeleteRecord(uid)}>
-										<Trash2 className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
+										<TrendingDown className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
 										Delete
 									</DropdownMenuItem>
 								</DropdownMenuContent>
