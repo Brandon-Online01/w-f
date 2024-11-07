@@ -9,7 +9,6 @@ import {
     Edit,
     User,
     Shield,
-    Users,
     UserPlus,
     Upload,
     Mail,
@@ -19,6 +18,7 @@ import {
     UserSearch,
     UserX,
     Loader2,
+    ChartNoAxesGantt,
 } from 'lucide-react'
 import { Phone, UserCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -153,20 +153,28 @@ export default function StaffManagement() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="All">
-                                <Users className="mr-2 h-4 w-4 inline-block" />
-                                All
+                                <span className="flex items-center gap-2">
+                                    <ChartNoAxesGantt className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    All
+                                </span>
                             </SelectItem>
                             <SelectItem value="Admin">
-                                <Shield className="mr-2 h-4 w-4 inline-block" />
-                                Admin
+                                <span className="flex items-center gap-2">
+                                    <Shield className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    Admin
+                                </span>
                             </SelectItem>
                             <SelectItem value="User">
-                                <User className="mr-2 h-4 w-4 inline-block" />
-                                User
+                                <span className="flex items-center gap-2">
+                                    <User className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    User
+                                </span>
                             </SelectItem>
                             <SelectItem value="Editor">
-                                <Edit className="mr-2 h-4 w-4 inline-block" />
-                                Editor
+                                <span className="flex items-center gap-2">
+                                    <Edit className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    Editor
+                                </span>
                             </SelectItem>
                         </SelectContent>
                     </Select>
@@ -190,7 +198,7 @@ export default function StaffManagement() {
         )
     }
 
-    const UserCard = ({ user, index }: { user: UserFormData & { uid: number, password: string }, index: number }) => {
+    const UserCard = ({ user, index }: { user: UserType, index: number }) => {
         const { name, lastName, email, status, photoURL = userPlaceHolderIcon, uid } = user
 
         const userABBR = `${name.charAt(0)}${lastName.charAt(0)}`
@@ -325,10 +333,10 @@ export default function StaffManagement() {
         )
     }
 
-    const UserForm = ({ user = null, onSubmit }: { user?: UserFormData | null; onSubmit: (data: UserFormData) => void }) => {
+    const UserForm = ({ user = null, onSubmit }: { user?: UserType | null; onSubmit: (data: UserType) => void }) => {
         const [imagePreview, setImagePreview] = useState(user?.photoURL || '/placeholder.svg?height=100&width=100')
 
-        const { register, handleSubmit, formState: { errors } } = useForm<UserFormData>({
+        const { register, handleSubmit, formState: { errors } } = useForm<UserType>({
             resolver: zodResolver(user ? editUserSchema : newUserSchema),
             defaultValues: user || {},
         })
@@ -538,7 +546,7 @@ export default function StaffManagement() {
         )
     }
 
-    const filteredUsers = staff?.data?.filter((user: UserFormData) =>
+    const filteredUsers = staff?.data?.filter((user: UserType) =>
         (user?.name?.toLowerCase() + ' ' + user?.lastName.toLowerCase())?.includes(searchTerm.toLowerCase()) &&
         (statusFilter === 'All' || user?.role === statusFilter)
     )
@@ -554,13 +562,7 @@ export default function StaffManagement() {
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
-                {paginatedUsers?.map((user: UserType, index: number) => {
-                    const userWithDefaultPhoto = {
-                        ...user,
-                        photoURL: user?.photoURL || userPlaceHolderIcon,
-                    };
-                    return <UserCard key={index} user={userWithDefaultPhoto} index={index} />;
-                })}
+                {paginatedUsers?.map((user: UserType, index: number) => <UserCard key={index} user={user} index={index} />)}
             </div>
             {paginatedUsers && paginatedUsers?.length >= 8 && <PaginationControls />}
             <EditModal />
