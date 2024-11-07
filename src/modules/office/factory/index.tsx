@@ -243,57 +243,57 @@ export default function FactoryManagement() {
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-1">
-                        <Building2 className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Name</Label>
+                        <Building2 className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        <Label className="text-sm font-medium text-card-foreground">Name</Label>
                     </div>
                     <p className="text-sm font-semibold">{factory.name}</p>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Address</Label>
+                        <MapPin className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        <Label className="text-sm font-medium text-card-foreground">Address</Label>
                     </div>
                     <p className="text-sm font-semibold">{factory.address}, {factory.city}, {factory.stateOrProvince}, {factory.country} {factory.postalCode}</p>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Employees</Label>
+                        <Users className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        <Label className="text-sm font-medium text-card-foreground">Employees</Label>
                     </div>
                     <p className="text-sm font-semibold">{factory.numberOfEmployees}</p>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-1">
-                        <Cpu className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Machines</Label>
+                        <Cpu className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        <Label className="text-sm font-medium text-card-foreground">Machines</Label>
                     </div>
                     <p className="text-sm font-semibold">{factory.numberOfMachines}</p>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-1">
-                        <Smartphone className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Devices</Label>
+                        <Smartphone className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        <Label className="text-sm font-medium text-card-foreground">Devices</Label>
                     </div>
                     <p className="text-sm font-semibold">{factory.numberOfDevices}</p>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-1">
-                        <Activity className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Status</Label>
+                        <Activity className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        <Label className="text-sm font-medium text-card-foreground">Status</Label>
                     </div>
                     <p className="text-sm font-semibold">{factory.status}</p>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-1">
-                        <Mail className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Email</Label>
+                        <Mail className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        <Label className="text-sm font-medium text-card-foreground">Email</Label>
                     </div>
                     <p className="text-sm font-semibold">{factory.contactEmail}</p>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center gap-1">
-                        <Phone className="h-4 w-4 text-gray-500" />
-                        <Label className="text-sm font-medium text-gray-500">Phone</Label>
+                        <Phone className="stroke-card-foreground" strokeWidth={1} size={18} />
+                        <Label className="text-sm font-medium text-card-foreground">Phone</Label>
                     </div>
                     <p className="text-sm font-semibold">{factory.contactPhone}</p>
                 </div>
@@ -394,19 +394,19 @@ export default function FactoryManagement() {
                         <div className="flex flex-col space-y-2">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                    <FactoryIcon className="h-5 w-5 text-gray-500" />
-                                    <h3 className="font-semibold">{name}</h3>
+                                    <FactoryIcon className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <h3 className="font-semibold text-card-foreground">{name}</h3>
                                 </div>
                                 <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : status === 'Inactive' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                     {status}
                                 </span>
                             </div>
-                            <div className="flex items-center space-x-2 text-sm text-gray-500">
-                                <MapPin className="h-4 w-4" />
+                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                <MapPin className="stroke-card-foreground" strokeWidth={1} size={18} />
                                 <span>{city}, {country}</span>
                             </div>
-                            <div className="flex items-center space-x-2 text-sm text-gray-500">
-                                <Users className="h-4 w-4" />
+                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                <Users className="stroke-card-foreground" strokeWidth={1} size={18} />
                                 <span>{numberOfEmployees}</span>
                             </div>
                             <div className="flex justify-end">
