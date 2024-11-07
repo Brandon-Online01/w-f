@@ -14,6 +14,7 @@ import {
     Mail,
     Phone,
     Factory as FactoryIcon,
+    ChartNoAxesGantt,
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -237,7 +238,7 @@ export default function FactoryManagement() {
         )
     }
 
-    const ViewFactoryModal = ({ factory }: { factory: FactoryFormData }) => (
+    const ViewFactoryModal = ({ factory, }: { factory: FactoryFormData }) => (
         <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col space-y-1">
@@ -324,25 +325,25 @@ export default function FactoryManagement() {
                         <SelectContent>
                             <SelectItem value="All">
                                 <div className="flex items-center">
-                                    <FactoryIcon className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                    <ChartNoAxesGantt className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                     All
                                 </div>
                             </SelectItem>
                             <SelectItem value="Active">
                                 <div className="flex items-center">
-                                    <FactoryIcon className="stroke-success mr-2" strokeWidth={1} size={18} />
+                                    <FactoryIcon className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                     Active
                                 </div>
                             </SelectItem>
                             <SelectItem value="Inactive">
                                 <div className="flex items-center">
-                                    <FactoryIcon className="stroke-destructive mr-2" strokeWidth={1} size={18} />
+                                    <FactoryIcon className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                     In Active
                                 </div>
                             </SelectItem>
                             <SelectItem value="Maintenance">
                                 <div className="flex items-center">
-                                    <FactoryIcon className="stroke-warning mr-2" strokeWidth={1} size={18} />
+                                    <FactoryIcon className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                     Maintenance
                                 </div>
                             </SelectItem>
@@ -369,65 +370,78 @@ export default function FactoryManagement() {
         )
     }
 
-    const FactoryCard = ({ factory }: { factory: Factory }) => {
+    const FactoryCard = ({ factory, index }: { factory: Factory, index: number }) => {
         const {
             name,
             status,
             uid,
+            city,
+            country,
+            numberOfEmployees
         } = factory
+
         return (
-            <Card key={uid} className="overflow-hidden">
-                <CardContent className="p-4">
-                    <div className="flex flex-col space-y-2">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-2">
-                                <FactoryIcon className="h-5 w-5 text-gray-500" />
-                                <h3 className="font-semibold">{name}</h3>
+            <motion.div
+                className="bg-card rounded shadow-md cursor-pointer"
+                key={uid}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.01, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
+                transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
+                <Card key={uid} className="overflow-hidden">
+                    <CardContent className="p-4">
+                        <div className="flex flex-col space-y-2">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <FactoryIcon className="h-5 w-5 text-gray-500" />
+                                    <h3 className="font-semibold">{name}</h3>
+                                </div>
+                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : status === 'Inactive' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                    {status}
+                                </span>
                             </div>
-                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status === 'Active' ? 'bg-green-100 text-green-800' : status === 'Inactive' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                {status}
-                            </span>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                <MapPin className="h-4 w-4" />
+                                <span>{city}, {country}</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                <Users className="h-4 w-4" />
+                                <span>{numberOfEmployees}</span>
+                            </div>
+                            <div className="flex justify-end">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                            <MoreVertical className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onSelect={() => {
+                                            setFactoryInFocus(factory)
+                                            setIsEditing(true)
+                                        }}>
+                                            <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
+                                            Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => {
+                                            setFactoryInFocus(factory)
+                                            setIsViewing(true)
+                                        }}>
+                                            <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
+                                            View
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => handleDeleteFactory(uid)}>
+                                            <FactoryIcon className="mr-2 stroke-destructive" strokeWidth={1} size={18} />
+                                            Delete
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <MapPin className="h-4 w-4" />
-                            <span>{factory.city}, {factory.country}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <Users className="h-4 w-4" />
-                            <span>{factory.numberOfEmployees}</span>
-                        </div>
-                        <div className="flex justify-end">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="h-8 w-8 p-0">
-                                        <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onSelect={() => {
-                                        setFactoryInFocus(factory)
-                                        setIsEditing(true)
-                                    }}>
-                                        <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
-                                        Edit
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => {
-                                        setFactoryInFocus(factory)
-                                        setIsViewing(true)
-                                    }}>
-                                        <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
-                                        View
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => handleDeleteFactory(factory.uid)}>
-                                        <FactoryIcon className="mr-2 stroke-destructive" strokeWidth={1} size={18} />
-                                        Delete
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </motion.div>
         )
     }
 
@@ -516,9 +530,8 @@ export default function FactoryManagement() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {paginatedFactories?.map((factory: Factory, index: number) => (<FactoryCard key={index} factory={factory} />
-                ))}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {paginatedFactories?.map((factory: Factory, index: number) => <FactoryCard key={index} factory={factory} index={index} />)}
             </div>
             {paginatedFactories?.length >= 8 && <PaginationControls />}
             <EditModal />

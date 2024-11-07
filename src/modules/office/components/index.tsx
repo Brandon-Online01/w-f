@@ -14,6 +14,7 @@ import {
     Grid,
     Palette,
     Activity,
+    ChartNoAxesGantt,
     Component,
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -424,19 +425,19 @@ export default function ComponentManager() {
                         <SelectContent>
                             <SelectItem value="All">
                                 <span className="flex items-center gap-2">
-                                    <Component className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <ChartNoAxesGantt className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     All
                                 </span>
                             </SelectItem>
                             <SelectItem value="Active">
                                 <span className="flex items-center gap-2">
-                                    <Component className="stroke-success" strokeWidth={1} size={18} />
+                                    <Component className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     Active
                                 </span>
                             </SelectItem>
                             <SelectItem value="Inactive">
                                 <span className="flex items-center gap-2">
-                                    <Component className="stroke-destructive" strokeWidth={1} size={18} />
+                                    <Component className="stroke-card-foreground" strokeWidth={1} size={18} />
                                     In Active
                                 </span>
                             </SelectItem>
@@ -447,7 +448,7 @@ export default function ComponentManager() {
                     <DialogTrigger asChild disabled>
                         <div className='w-full flex items-end justify-end lg:w-64'>
                             <Button className="w-full">
-                                <Component className="mr-2 stroke-whte" strokeWidth={1.5} size={18} />
+                                <Component className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
                                 Add A Component
                             </Button>
                         </div>
