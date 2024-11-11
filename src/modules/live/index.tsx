@@ -74,9 +74,10 @@ import { liveRunStore } from './state/state'
 import { Progress } from '@/components/ui/progress'
 import { Input } from '@/components/ui/input'
 import ManagementTab from './forms/manage-run'
+import { useWindowDimensions } from '@/hooks/useWindowDimensions'
 
 const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, index: number }) => {
-	const screenSize = { width: window.innerWidth, height: window.innerHeight }
+	const { width } = useWindowDimensions()
 
 	const {
 		status,
@@ -283,8 +284,8 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					<h4 className="text-sm uppercase mb-2 text-card-foreground text-center">Last 10 Cycle Times</h4>
 					<ResponsiveContainer width="100%" height={300}>
 						<BarChart
-							barGap={screenSize?.width > 768 ? 5 : 0}
-							barSize={screenSize?.width > 768 ? 35 : 16}
+							barGap={width > 768 ? 5 : 0}
+							barSize={width > 768 ? 35 : 16}
 							margin={{ top: 30, bottom: 30 }}
 							accessibilityLayer
 							data={insertHistory}>
@@ -353,7 +354,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					<ResponsiveContainer width="100%" height={300}>
 						<BarChart
 							barGap={5}
-							barSize={screenSize.width > 768 ? 50 : 30}
+							barSize={width > 768 ? 50 : 30}
 							margin={{ top: 10, right: 10, left: 10 }}
 							data={[{ name: 'Virgin Material', value: virginMaterial }, { name: 'Master Batch', value: masterBatchMaterial }]}>
 							<XAxis dataKey="name" />
@@ -408,8 +409,8 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 											<Image
 												src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
 												alt={componentName}
-												width={screenSize.width > 768 ? 30 : 20}
-												height={screenSize.width > 768 ? 30 : 20}
+												width={width > 768 ? 30 : 20}
+												height={width > 768 ? 30 : 20}
 												priority
 												quality={100}
 												className="rounded object-contain w-auto h-auto" />
@@ -423,8 +424,8 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 												<Image
 													src={`${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`}
 													alt={componentName}
-													width={screenSize.width > 768 ? 30 : 20}
-													height={screenSize.width > 768 ? 50 : 20}
+													width={width > 768 ? 30 : 20}
+													height={width > 768 ? 50 : 20}
 													priority
 													quality={100}
 													className="rounded object-cover w-auto h-auto" />
@@ -447,7 +448,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 										{eventTimeStamp ? formatDistanceToNow(new Date(eventTimeStamp), { addSuffix: true }) : ''}
 									</span>
 								</div>
-								<div className="flex items-center gap-2 justify-between gap-2 w-full">
+								<div className="flex items-center justify-between gap-2 w-full">
 									<div className="flex items-center gap-0 flex-col act-time">
 										<p className="text-card-foreground text-[10px] uppercase">ACT Time</p>
 										<p className="text-card-foreground text-[14px]">{cycleTime}<span className="text-card-foreground text-[12px]">s</span></p>
@@ -463,7 +464,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 								</div>
 								<div className="flex flex-col items-end gap-2 mt-4 justify-end w-full">
 									<div className="flex items-center justify-end md:justify-between w-full">
-										<p className="text-card-foreground text-[10px] uppercase flex items-center gap-1 hidden md:flex first-check">
+										<p className="text-card-foreground text-[10px] uppercase items-center gap-1 hidden md:flex first-check">
 											{
 												machineFirstReportType === 'Data' ?
 													<ComponentIcon className="stroke-success" size={20} strokeWidth={1.5} />

@@ -97,40 +97,50 @@ export default function MachineManager() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" {...register("name")} placeholder="Machine name" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="name">Name</Label>
+                            <Input id="name" {...register("name")} placeholder="Machine name" />
+                        </div>
                         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="machineNumber">Machine Number</Label>
-                        <Input id="machineNumber" {...register("machineNumber")} placeholder="MACHINE-001" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="machineNumber">Machine Number</Label>
+                            <Input id="machineNumber" {...register("machineNumber")} placeholder="MACHINE-001" />
+                        </div>
                         {errors.machineNumber && <p className="text-red-500 text-xs mt-1">{errors.machineNumber.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="macAddress">MAC Address</Label>
-                        <Input id="macAddress" {...register("macAddress")} placeholder="00:1B:44:11:3A:B7" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="macAddress">MAC Address</Label>
+                            <Input id="macAddress" {...register("macAddress")} placeholder="00:1B:44:11:3A:B7" />
+                        </div>
                         {errors.macAddress && <p className="text-red-500 text-xs mt-1">{errors.macAddress.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="description">Description</Label>
-                        <Input id="description" {...register("description")} placeholder="Machine description" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="description">Description</Label>
+                            <Input id="description" {...register("description")} placeholder="Machine description" />
+                        </div>
                         {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="status">Status</Label>
-                        <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Active">Active</SelectItem>
-                                <SelectItem value="Inactive">Inactive</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="status">Status</Label>
+                            <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Active">Active</SelectItem>
+                                    <SelectItem value="Inactive">Inactive</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-full" disabled>{machine ? 'Update Machine' : 'Create Machine'}</Button>
+                <Button type="submit" className="w-11/12 mx-auto flex">{machine ? 'Update Machine' : 'Create Machine'}</Button>
             </form>
         )
     }

@@ -161,6 +161,7 @@ export default function ManagementTab({ liveRun }: { liveRun: MachineLiveRun }) 
                                                     items={allComponents?.map((component) => ({
                                                         value: String(component?.uid),
                                                         label: component?.name,
+                                                        image: `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${component?.photoURL}`,
                                                     }))}
                                                     placeholder="Select a component"
                                                     command="Type to search..."
