@@ -274,7 +274,7 @@ export default function FactoryManagement() {
                             {errors.factoryReferenceID && <p className="text-red-500 text-xs mt-1">{errors.factoryReferenceID.message}</p>}
                         </div>
                     </div>
-                    <Button type="submit" className="w-11/12 mx-auto flex mt-4">{factory ? 'Update Factory' : 'Create Factory'}</Button>
+                    <Button type="submit" className="w-11/12 mx-auto flex mt-4" disabled>{factory ? 'Update Factory' : 'Create Factory'}</Button>
                 </ScrollArea>
             </form>
         )

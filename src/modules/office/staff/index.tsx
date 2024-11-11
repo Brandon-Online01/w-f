@@ -465,7 +465,7 @@ export default function StaffManagement() {
                             {errors?.status && <p className="text-red-500 text-xs mt-1">{errors?.status?.message}</p>}
                         </div>
                     </div>
-                    <Button type="submit" className="w-11/12 mx-auto flex mt-4">
+                    <Button type="submit" className="w-11/12 mx-auto flex mt-4" disabled>
                         {isLoading ? <Loader2 className="mr-2 animate-spin stroke-white" strokeWidth={1.5} size={18} /> : <>{user ? 'Update User' : 'Create User'}</>}
                     </Button>
                 </ScrollArea>
