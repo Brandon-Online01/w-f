@@ -50,6 +50,7 @@ import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { isEmpty } from 'lodash'
 import { ToolRoom } from '@/types/tool-room'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 type MaintenanceRecordFormData = z.infer<typeof maintenanceRecordSchema>
 
@@ -125,110 +126,134 @@ export default function ToolRoomManager() {
 
 		return (
 			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					<div className="space-y-1">
-						<Label htmlFor="factoryReferenceID">Factory Reference ID</Label>
-						<Input id="factoryReferenceID" {...register("factoryReferenceID")} />
-						{errors.factoryReferenceID && <p className="text-red-500 text-xs mt-1">{errors.factoryReferenceID.message}</p>}
-					</div>
-					<div className="space-y-1">
-						<Label htmlFor="checkedInBy">Checked In By</Label>
-						<Input id="checkedInBy" {...register("checkedInBy")} />
-						{errors.checkedInBy && <p className="text-red-500 text-xs mt-1">{errors.checkedInBy.message}</p>}
-					</div>
-					<div className="space-y-1">
-						<Label htmlFor="checkedOutBy">Checked Out By</Label>
-						<Input id="checkedOutBy" {...register("checkedOutBy")} />
-						{errors.checkedOutBy && <p className="text-red-500 text-xs mt-1">{errors.checkedOutBy.message}</p>}
-					</div>
-					<div className="space-y-1">
-						<Label htmlFor="checkInDate">Check-in Date</Label>
-						<Input id="checkInDate" type="datetime-local" {...register("checkInDate")} />
-						{errors.checkInDate && <p className="text-red-500 text-xs mt-1">{errors.checkInDate.message}</p>}
-					</div>
-					<div className="space-y-1">
-						<Label htmlFor="checkOutDate">Check-out Date</Label>
-						<Input id="checkOutDate" type="datetime-local" {...register("checkOutDate")} />
-						{errors.checkOutDate && <p className="text-red-500 text-xs mt-1">{errors.checkOutDate.message}</p>}
-					</div>
-					<div className="space-y-1">
-						<Label htmlFor="damageRating">Damage Rating</Label>
-						<Input id="damageRating" type="number" min="1" max="5" {...register("damageRating", { valueAsNumber: true })} />
-						{errors.damageRating && <p className="text-red-500 text-xs mt-1">{errors.damageRating.message}</p>}
-					</div>
-					<div className="space-y-1">
-						<Label htmlFor="turnaroundTime">Turnaround Time (hours)</Label>
-						<Input id="turnaroundTime" type="number" {...register("turnaroundTime", { valueAsNumber: true })} />
-						{errors.turnaroundTime && <p className="text-red-500 text-xs mt-1">{errors.turnaroundTime.message}</p>}
-					</div>
-					<div className="space-y-1">
-						<Label htmlFor="status">Status</Label>
-						<Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
-							<SelectTrigger>
-								<SelectValue placeholder="Select status" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="In Progress">In Progress</SelectItem>
-								<SelectItem value="Completed">Completed</SelectItem>
-							</SelectContent>
-						</Select>
-						{errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
-					</div>
-					<div className="space-y-1 lg:col-span-3">
-						<Label htmlFor="checkInComments">Check-in Comments</Label>
-						<Textarea id="checkInComments" {...register("checkInComments")} />
-						{errors.checkInComments && <p className="text-red-500 text-xs mt-1">{errors.checkInComments.message}</p>}
-					</div>
-					<div className="space-y-1 lg:col-span-3">
-						<Label htmlFor="checkOutComments">Check-out Comments</Label>
-						<Textarea id="checkOutComments" {...register("checkOutComments")} />
-						{errors.checkOutComments && <p className="text-red-500 text-xs mt-1">{errors.checkOutComments.message}</p>}
-					</div>
-					<div className="space-y-1 lg:col-span-3">
-						<Label htmlFor="repairComments">Repair Comments</Label>
-						<Textarea id="repairComments" {...register("repairComments")} />
-						{errors.repairComments && <p className="text-red-500 text-xs mt-1">{errors.repairComments.message}</p>}
-					</div>
-				</div>
-				<div className="space-y-2">
-					<Label>Materials Used</Label>
-					{fields.map((field, index) => (
-						<div key={field.id} className="flex space-x-2">
-							<Select onValueChange={(value) => register(`materialsUsed.${index}.name`).onChange({ target: { value } })}>
-								<SelectTrigger className="w-[180px]">
-									<SelectValue placeholder="Select material" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="Bolt">Bolt</SelectItem>
-									<SelectItem value="Nut">Nut</SelectItem>
-									<SelectItem value="Screw">Screw</SelectItem>
-									<SelectItem value="Washer">Washer</SelectItem>
-								</SelectContent>
-							</Select>
-							<Input
-								type="number"
-								placeholder="Quantity"
-								{...register(`materialsUsed.${index}.quantity`, { valueAsNumber: true })}
-							/>
-							<Select onValueChange={(value) => register(`materialsUsed.${index}.unit`).onChange({ target: { value } })}>
-								<SelectTrigger className="w-[100px]">
-									<SelectValue placeholder="Unit" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="pcs">pcs</SelectItem>
-									<SelectItem value="kg">kg</SelectItem>
-									<SelectItem value="m">m</SelectItem>
-								</SelectContent>
-							</Select>
-							<Button type="button" variant="destructive" onClick={() => remove(index)}>Remove</Button>
+				<ScrollArea className="h-[80vh] lg:h-full w-full flex flex-col justify-start gap-3">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+						<div className="space-y-1">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="factoryReferenceID">Factory Reference ID</Label>
+								<Input id="factoryReferenceID" {...register("factoryReferenceID")} />
+							</div>
+							{errors.factoryReferenceID && <p className="text-red-500 text-xs mt-1">{errors.factoryReferenceID.message}</p>}
 						</div>
-					))}
-					<Button type="button" onClick={() => append({ name: '', quantity: 0, unit: '' })}>Add Material</Button>
-				</div>
-				<div className="flex justify-center gap-4 mt-6">
-					<Button type="submit" className="w-1/2" disabled>Update Report</Button>
-					{record && record?.status !== 'Completed' && <Button type="button" className="w-1/2" variant="default" disabled onClick={() => handleCheckOut(record)}>Check Out</Button>}
-				</div>
+						<div className="space-y-1">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="checkedInBy">Checked In By</Label>
+								<Input id="checkedInBy" {...register("checkedInBy")} />
+							</div>
+							{errors.checkedInBy && <p className="text-red-500 text-xs mt-1">{errors.checkedInBy.message}</p>}
+						</div>
+						<div className="space-y-1">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="checkedOutBy">Checked Out By</Label>
+								<Input id="checkedOutBy" {...register("checkedOutBy")} />
+							</div>
+							{errors.checkedOutBy && <p className="text-red-500 text-xs mt-1">{errors.checkedOutBy.message}</p>}
+						</div>
+						<div className="space-y-1">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="checkInDate">Check-in Date</Label>
+								<Input id="checkInDate" type="datetime-local" {...register("checkInDate")} />
+							</div>
+							{errors.checkInDate && <p className="text-red-500 text-xs mt-1">{errors.checkInDate.message}</p>}
+						</div>
+						<div className="space-y-1">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="checkOutDate">Check-out Date</Label>
+								<Input id="checkOutDate" type="datetime-local" {...register("checkOutDate")} />
+							</div>
+							{errors.checkOutDate && <p className="text-red-500 text-xs mt-1">{errors.checkOutDate.message}</p>}
+						</div>
+						<div className="space-y-1">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="damageRating">Damage Rating</Label>
+								<Input id="damageRating" type="number" min="1" max="5" {...register("damageRating", { valueAsNumber: true })} />
+							</div>
+							{errors.damageRating && <p className="text-red-500 text-xs mt-1">{errors.damageRating.message}</p>}
+						</div>
+						<div className="space-y-1">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="turnaroundTime">Turnaround Time (hours)</Label>
+								<Input id="turnaroundTime" type="number" {...register("turnaroundTime", { valueAsNumber: true })} />
+							</div>
+							{errors.turnaroundTime && <p className="text-red-500 text-xs mt-1">{errors.turnaroundTime.message}</p>}
+						</div>
+						<div className="space-y-1">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="status">Status</Label>
+								<Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
+									<SelectTrigger>
+										<SelectValue placeholder="Select status" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="In Progress">In Progress</SelectItem>
+										<SelectItem value="Completed">Completed</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+							{errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
+						</div>
+						<div className="space-y-1 lg:col-span-3">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="checkInComments">Check-in Comments</Label>
+								<Textarea id="checkInComments" {...register("checkInComments")} />
+							</div>
+							{errors.checkInComments && <p className="text-red-500 text-xs mt-1">{errors.checkInComments.message}</p>}
+						</div>
+						<div className="space-y-1 lg:col-span-3">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="checkOutComments">Check-out Comments</Label>
+								<Textarea id="checkOutComments" {...register("checkOutComments")} />
+							</div>
+							{errors.checkOutComments && <p className="text-red-500 text-xs mt-1">{errors.checkOutComments.message}</p>}
+						</div>
+						<div className="space-y-1 lg:col-span-3">
+							<div className='flex flex-col justify-start gap-0'>
+								<Label htmlFor="repairComments">Repair Comments</Label>
+								<Textarea id="repairComments" {...register("repairComments")} />
+							</div>
+							{errors.repairComments && <p className="text-red-500 text-xs mt-1">{errors.repairComments.message}</p>}
+						</div>
+					</div>
+					<div className="space-y-2 flex items-center justify-start gap-2">
+						<Label>Materials Used</Label>
+						{fields.map((field, index) => (
+							<div key={field.id} className="flex space-x-2">
+								<Select onValueChange={(value) => register(`materialsUsed.${index}.name`).onChange({ target: { value } })}>
+									<SelectTrigger className="w-[180px]">
+										<SelectValue placeholder="Select material" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="Bolt">Bolt</SelectItem>
+										<SelectItem value="Nut">Nut</SelectItem>
+										<SelectItem value="Screw">Screw</SelectItem>
+										<SelectItem value="Washer">Washer</SelectItem>
+									</SelectContent>
+								</Select>
+								<Input
+									type="number"
+									placeholder="Quantity"
+									{...register(`materialsUsed.${index}.quantity`, { valueAsNumber: true })}
+								/>
+								<Select onValueChange={(value) => register(`materialsUsed.${index}.unit`).onChange({ target: { value } })}>
+									<SelectTrigger className="w-[100px]">
+										<SelectValue placeholder="Unit" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="pcs">pcs</SelectItem>
+										<SelectItem value="kg">kg</SelectItem>
+										<SelectItem value="m">m</SelectItem>
+									</SelectContent>
+								</Select>
+								<Button type="button" variant="destructive" onClick={() => remove(index)}>Remove</Button>
+							</div>
+						))}
+						<Button type="button" onClick={() => append({ name: '', quantity: 0, unit: '' })}>Add Material</Button>
+					</div>
+					<div className="flex justify-center gap-4 mt-6">
+						<Button type="submit" className="w-11/12 mx-auto flex">Update Report</Button>
+						{record && record?.status !== 'Completed' && <Button type="button" className="w-1/2" variant="default" disabled onClick={() => handleCheckOut(record)}>Check Out</Button>}
+					</div>
+				</ScrollArea>
 			</form>
 		)
 	}

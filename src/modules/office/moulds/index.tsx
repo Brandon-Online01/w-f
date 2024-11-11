@@ -113,72 +113,86 @@ export default function MouldManager() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" {...register("name")} placeholder="Mould name" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="name">Name</Label>
+                            <Input id="name" {...register("name")} placeholder="Mould name" />
+                        </div>
                         {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="serialNumber">Serial Number</Label>
-                        <Input id="serialNumber" {...register("serialNumber")} placeholder="MOULD-001" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="serialNumber">Serial Number</Label>
+                            <Input id="serialNumber" {...register("serialNumber")} placeholder="MOULD-001" />
+                        </div>
                         {errors.serialNumber && <p className="text-red-500 text-xs mt-1">{errors.serialNumber.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="lastRepairDate">Last Repair Date</Label>
-                        <Input id="lastRepairDate" {...register("lastRepairDate")} type="datetime-local" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="lastRepairDate">Last Repair Date</Label>
+                            <Input id="lastRepairDate" {...register("lastRepairDate")} type="datetime-local" />
+                        </div>
                         {errors.lastRepairDate && <p className="text-red-500 text-xs mt-1">{errors.lastRepairDate.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="mileage">Mileage</Label>
-                        <Input id="mileage" {...register("mileage", { valueAsNumber: true })} type="number" placeholder="1000" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="mileage">Mileage</Label>
+                            <Input id="mileage" {...register("mileage", { valueAsNumber: true })} type="number" placeholder="1000" />
+                        </div>
                         {errors.mileage && <p className="text-red-500 text-xs mt-1">{errors.mileage.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="servicingMileage">Servicing Mileage</Label>
-                        <Input id="servicingMileage" {...register("servicingMileage", { valueAsNumber: true })} type="number" placeholder="1500" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="servicingMileage">Servicing Mileage</Label>
+                            <Input id="servicingMileage" {...register("servicingMileage", { valueAsNumber: true })} type="number" placeholder="1500" />
+                        </div>
                         {errors.servicingMileage && <p className="text-red-500 text-xs mt-1">{errors.servicingMileage.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="component">Component ID</Label>
-                        <Input id="component" {...register("component", { valueAsNumber: true })} type="number" placeholder="1" />
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="component">Component ID</Label>
+                            <Input id="component" {...register("component", { valueAsNumber: true })} type="number" placeholder="1" />
+                        </div>
                         {errors.component && <p className="text-red-500 text-xs mt-1">{errors.component.message}</p>}
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="status">Status</Label>
-                        <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Active">
-                                    <span className="flex items-center gap-2">
-                                        <Puzzle className="stroke-success" strokeWidth={1} size={18} />
-                                        Active
-                                    </span>
-                                </SelectItem>
-                                <SelectItem value="Inactive">
-                                    <span className="flex items-center gap-2">
-                                        <Puzzle className="stroke-destructive" strokeWidth={1} size={18} />
-                                        In Active
-                                    </span>
-                                </SelectItem>
-                                <SelectItem value="Maintenance">
-                                    <span className="flex items-center gap-2">
-                                        <Puzzle className="stroke-warning" strokeWidth={1} size={18} />
-                                        Maintenance
-                                    </span>
-                                </SelectItem>
-                                <SelectItem value="Maintenance">
-                                    <span className="flex items-center gap-2">
-                                        <Puzzle className="stroke-warning" strokeWidth={1} size={18} />
-                                        Out Of Service
-                                    </span>
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="status">Status</Label>
+                            <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Active">
+                                        <span className="flex items-center gap-2">
+                                            <Puzzle className="stroke-success" strokeWidth={1} size={18} />
+                                            Active
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value="Inactive">
+                                        <span className="flex items-center gap-2">
+                                            <Puzzle className="stroke-destructive" strokeWidth={1} size={18} />
+                                            In Active
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value="Maintenance">
+                                        <span className="flex items-center gap-2">
+                                            <Puzzle className="stroke-warning" strokeWidth={1} size={18} />
+                                            Maintenance
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value="Maintenance">
+                                        <span className="flex items-center gap-2">
+                                            <Puzzle className="stroke-warning" strokeWidth={1} size={18} />
+                                            Out Of Service
+                                        </span>
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-full" disabled>{mould ? 'Update Mould' : 'Create Mould'}</Button>
+                <Button type="submit" className="w-11/12 mx-auto flex">{mould ? 'Update Mould' : 'Create Mould'}</Button>
             </form>
         )
     }

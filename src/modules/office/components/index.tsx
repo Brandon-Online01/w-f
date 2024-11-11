@@ -55,6 +55,8 @@ import { isEmpty } from 'lodash'
 import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
 import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
+import { useSessionStore } from '@/providers/session.provider'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
@@ -77,6 +79,7 @@ export default function ComponentManager() {
         setIsEditing,
         setIsViewing,
     } = useOfficeStore();
+    const { user } = useSessionStore()
     const session = sessionStorage.getItem('waresense');
 
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -147,140 +150,144 @@ export default function ComponentManager() {
 
         const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
 
+        console.log('component ', imagePreview)
+
         return (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-card">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="photoURL">Component Image</Label>
-                        <div className="flex items-center space-x-4">
-                            <div className="flex items-center justify-center rounded h-40 w-40 border">
-                                <Image
-                                    src={fullPhotoURL}
-                                    alt={'Existing Preview Image'}
-                                    width={screenSize.width > 768 ? 30 : 20}
-                                    height={screenSize.width > 768 ? 30 : 20}
-                                    priority
-                                    quality={100}
-                                    className="rounded object-contain w-auto h-auto" />
+                <ScrollArea className="h-[80vh] md:h-full w-full flex flex-col justify-start gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2 col-span-full">
+                            <Label htmlFor="photoURL">Component Image</Label>
+                            <div className="flex items-center space-x-4">
+                                <div className="flex items-center justify-center rounded h-40 w-40 border">
+                                    <Image
+                                        src={fullPhotoURL}
+                                        alt={'Existing Preview Image'}
+                                        width={screenSize.width > 768 ? 30 : 20}
+                                        height={screenSize.width > 768 ? 30 : 20}
+                                        priority
+                                        quality={100}
+                                        className="rounded object-contain w-auto h-auto" />
+                                </div>
+                                <Input
+                                    id="photoURL"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => handleImageUpload(e, setImagePreview)}
+                                    ref={fileInputRef}
+                                />
+                                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                    Upload Image
+                                </Button>
                             </div>
-                            <Input
-                                id="photoURL"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => handleImageUpload(e, setImagePreview)}
-                                ref={fileInputRef}
-                            />
-                            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                                Upload Image
-                            </Button>
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="name">Name</Label>
+                            <Input id="name" {...register("name")} placeholder="Component name" />
+                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="description">Description</Label>
+                            <Input id="description" {...register("description")} placeholder="Component description" />
+                            {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="weight">Weight</Label>
+                            <Input id="weight" type="number" {...register("weight", { valueAsNumber: true })} placeholder="Weight" />
+                            {errors.weight && <p className="text-red-500 text-xs mt-1">{errors.weight.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="volume">Volume</Label>
+                            <Input id="volume" type="number" {...register("volume", { valueAsNumber: true })} placeholder="Volume" />
+                            {errors.volume && <p className="text-red-500 text-xs mt-1">{errors.volume.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="code">Code</Label>
+                            <Input id="code" {...register("code")} placeholder="Component code" />
+                            {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="color">Color</Label>
+                            <Input id="color" {...register("color")} placeholder="Component color" />
+                            {errors.color && <p className="text-red-500 text-xs mt-1">{errors.color.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="cycleTime">Cycle Time</Label>
+                            <Input id="cycleTime" type="number" {...register("cycleTime", { valueAsNumber: true })} placeholder="Cycle time" />
+                            {errors.cycleTime && <p className="text-red-500 text-xs mt-1">{errors.cycleTime.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="targetTime">Target Time</Label>
+                            <Input id="targetTime" type="number" {...register("targetTime", { valueAsNumber: true })} placeholder="Target time" />
+                            {errors.targetTime && <p className="text-red-500 text-xs mt-1">{errors.targetTime.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="coolingTime">Cooling Time</Label>
+                            <Input id="coolingTime" type="number" {...register("coolingTime", { valueAsNumber: true })} placeholder="Cooling time" />
+                            {errors.coolingTime && <p className="text-red-500 text-xs mt-1">{errors.coolingTime.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="chargingTime">Charging Time</Label>
+                            <Input id="chargingTime" type="number" {...register("chargingTime", { valueAsNumber: true })} placeholder="Charging time" />
+                            {errors.chargingTime && <p className="text-red-500 text-xs mt-1">{errors.chargingTime.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="cavity">Cavity</Label>
+                            <Input id="cavity" type="number" {...register("cavity", { valueAsNumber: true })} placeholder="Cavity" />
+                            {errors.cavity && <p className="text-red-500 text-xs mt-1">{errors.cavity.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="configuration">Configuration</Label>
+                            <Input id="configuration" {...register("configuration")} placeholder="Configuration" />
+                            {errors.configuration && <p className="text-red-500 text-xs mt-1">{errors.configuration.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="configQTY">Config Quantity</Label>
+                            <Input id="configQTY" type="number" {...register("configQTY", { valueAsNumber: true })} placeholder="Config quantity" />
+                            {errors.configQTY && <p className="text-red-500 text-xs mt-1">{errors.configQTY.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="palletQty">Pallet Quantity</Label>
+                            <Input id="palletQty" type="number" {...register("palletQty", { valueAsNumber: true })} placeholder="Pallet quantity" />
+                            {errors.palletQty && <p className="text-red-500 text-xs mt-1">{errors.palletQty.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="testMachine">Test Machine</Label>
+                            <Input id="testMachine" {...register("testMachine")} placeholder="Test machine" />
+                            {errors.testMachine && <p className="text-red-500 text-xs mt-1">{errors.testMachine.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="masterBatch">Master Batch</Label>
+                            <Input id="masterBatch" type="number" {...register("masterBatch", { valueAsNumber: true })} placeholder="Master batch" />
+                            {errors.masterBatch && <p className="text-red-500 text-xs mt-1">{errors.masterBatch.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="status">Status</Label>
+                            <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Active">
+                                        <span className="flex items-center gap-2">
+                                            <Activity className="stroke-success" strokeWidth={1} size={18} />
+                                            Active
+                                        </span>
+                                    </SelectItem>
+                                    <SelectItem value="Inactive">
+                                        <span className="flex items-center gap-2">
+                                            <Activity className="stroke-destructive" strokeWidth={1} size={18} />
+                                            In Active
+                                        </span>
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                         </div>
                     </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" {...register("name")} placeholder="Component name" />
-                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="description">Description</Label>
-                        <Input id="description" {...register("description")} placeholder="Component description" />
-                        {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="weight">Weight</Label>
-                        <Input id="weight" type="number" {...register("weight", { valueAsNumber: true })} placeholder="Weight" />
-                        {errors.weight && <p className="text-red-500 text-xs mt-1">{errors.weight.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="volume">Volume</Label>
-                        <Input id="volume" type="number" {...register("volume", { valueAsNumber: true })} placeholder="Volume" />
-                        {errors.volume && <p className="text-red-500 text-xs mt-1">{errors.volume.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="code">Code</Label>
-                        <Input id="code" {...register("code")} placeholder="Component code" />
-                        {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="color">Color</Label>
-                        <Input id="color" {...register("color")} placeholder="Component color" />
-                        {errors.color && <p className="text-red-500 text-xs mt-1">{errors.color.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="cycleTime">Cycle Time</Label>
-                        <Input id="cycleTime" type="number" {...register("cycleTime", { valueAsNumber: true })} placeholder="Cycle time" />
-                        {errors.cycleTime && <p className="text-red-500 text-xs mt-1">{errors.cycleTime.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="targetTime">Target Time</Label>
-                        <Input id="targetTime" type="number" {...register("targetTime", { valueAsNumber: true })} placeholder="Target time" />
-                        {errors.targetTime && <p className="text-red-500 text-xs mt-1">{errors.targetTime.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="coolingTime">Cooling Time</Label>
-                        <Input id="coolingTime" type="number" {...register("coolingTime", { valueAsNumber: true })} placeholder="Cooling time" />
-                        {errors.coolingTime && <p className="text-red-500 text-xs mt-1">{errors.coolingTime.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="chargingTime">Charging Time</Label>
-                        <Input id="chargingTime" type="number" {...register("chargingTime", { valueAsNumber: true })} placeholder="Charging time" />
-                        {errors.chargingTime && <p className="text-red-500 text-xs mt-1">{errors.chargingTime.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="cavity">Cavity</Label>
-                        <Input id="cavity" type="number" {...register("cavity", { valueAsNumber: true })} placeholder="Cavity" />
-                        {errors.cavity && <p className="text-red-500 text-xs mt-1">{errors.cavity.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="configuration">Configuration</Label>
-                        <Input id="configuration" {...register("configuration")} placeholder="Configuration" />
-                        {errors.configuration && <p className="text-red-500 text-xs mt-1">{errors.configuration.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="configQTY">Config Quantity</Label>
-                        <Input id="configQTY" type="number" {...register("configQTY", { valueAsNumber: true })} placeholder="Config quantity" />
-                        {errors.configQTY && <p className="text-red-500 text-xs mt-1">{errors.configQTY.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="palletQty">Pallet Quantity</Label>
-                        <Input id="palletQty" type="number" {...register("palletQty", { valueAsNumber: true })} placeholder="Pallet quantity" />
-                        {errors.palletQty && <p className="text-red-500 text-xs mt-1">{errors.palletQty.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="testMachine">Test Machine</Label>
-                        <Input id="testMachine" {...register("testMachine")} placeholder="Test machine" />
-                        {errors.testMachine && <p className="text-red-500 text-xs mt-1">{errors.testMachine.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="masterBatch">Master Batch</Label>
-                        <Input id="masterBatch" type="number" {...register("masterBatch", { valueAsNumber: true })} placeholder="Master batch" />
-                        {errors.masterBatch && <p className="text-red-500 text-xs mt-1">{errors.masterBatch.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor="status">Status</Label>
-                        <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select a status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="Active">
-                                    <span className="flex items-center gap-2">
-                                        <Activity className="stroke-success" strokeWidth={1} size={18} />
-                                        Active
-                                    </span>
-                                </SelectItem>
-                                <SelectItem value="Inactive">
-                                    <span className="flex items-center gap-2">
-                                        <Activity className="stroke-destructive" strokeWidth={1} size={18} />
-                                        In Active
-                                    </span>
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                        {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
-                    </div>
-                </div>
-                <Button type="submit" className="w-10/12 mx-auto flex" disabled>{component ? 'Update Component' : 'Create Component'}</Button>
+                    <Button type="submit" className="w-11/12 mx-auto flex mt-4" >{component ? 'Update Component' : 'Create Component'}</Button>
+                </ScrollArea>
             </form>
         )
     }
@@ -445,14 +452,17 @@ export default function ComponentManager() {
                     </Select>
                 </div>
                 <Dialog open={isCreating} onOpenChange={setIsCreating}>
-                    <DialogTrigger asChild disabled>
-                        <div className='w-full flex items-end justify-end lg:w-64'>
-                            <Button className="w-full">
-                                <Component className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
-                                Add A Component
-                            </Button>
-                        </div>
-                    </DialogTrigger>
+                    {
+                        !['User', 'Guest', 'Operator'].includes(user?.role || '') &&
+                        <DialogTrigger asChild disabled>
+                            <div className='w-full flex items-end justify-end lg:w-64'>
+                                <Button className="w-full">
+                                    <Component className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
+                                    Add A Component {user?.role}
+                                </Button>
+                            </div>
+                        </DialogTrigger>
+                    }
                     <DialogContent className="sm:max-w-[700px] bg-card" aria-describedby="create-component">
                         <DialogHeader>
                             <DialogTitle>Create New Component</DialogTitle>

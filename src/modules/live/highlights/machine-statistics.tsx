@@ -79,7 +79,7 @@ export function MachineStatistics({ data }: MachineStatisticsProps) {
                             data={chartData}
                             dataKey="visitors"
                             nameKey="browser"
-                            innerRadius={75}
+                            innerRadius={87}
                             outerRadius={100}
                             cornerRadius={5}
                             strokeWidth={5}>

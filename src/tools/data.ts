@@ -91,7 +91,7 @@ export const navigationTour: DriveStep[] = [
         element: '#tour-example',
         popover: {
             title: 'Welcome to WareSense!',
-            description: 'Empower your warehouse operations with real-time monitoring, actionable insights, and performance tracking. Let’s get started on optimizing your workflows for smarter decision-making!',
+            description: 'Discover how WareSense can help you improve your warehouse operations with real-time monitoring and smart insights.',
             side: "left",
             align: 'start'
         }
@@ -100,7 +100,7 @@ export const navigationTour: DriveStep[] = [
         element: '.live',
         popover: {
             title: 'Live Overview',
-            description: 'Here, you can see real-time updates about your activities.',
+            description: 'See what\'s happening in real time across your warehouse, right here.',
             side: "right",
             align: 'start'
         }
@@ -109,7 +109,7 @@ export const navigationTour: DriveStep[] = [
         element: '.management',
         popover: {
             title: 'Asset Management',
-            description: 'Manage your machines, staff, and moulds from this section.',
+            description: 'Manage your machines, staff, and tools all in one place.',
             side: "bottom",
             align: 'start'
         }
@@ -118,7 +118,7 @@ export const navigationTour: DriveStep[] = [
         element: '.theme',
         popover: {
             title: 'Theme Preferences',
-            description: 'Personalize your app experience by choosing a theme that you like.',
+            description: 'Personalize the look of WareSense to fit your style.',
             side: "top",
             align: 'center'
         }
@@ -127,7 +127,7 @@ export const navigationTour: DriveStep[] = [
         element: '.factory',
         popover: {
             title: 'Factory Management',
-            description: 'Choose a factory to manage its operations easily.',
+            description: 'Pick a factory to start managing its activities and performance.',
             side: "top",
             align: 'start'
         }
@@ -136,17 +136,22 @@ export const navigationTour: DriveStep[] = [
         element: '.signout',
         popover: {
             title: 'Logout',
-            description: 'When you are done, click here to safely log out of your account.',
+            description: 'Ready to leave? Click here to log out safely.',
             side: "top",
             align: 'start'
         }
     },
-    { popover: { title: 'Next Steps', description: 'You are now going to the next steps, which will help you understand how to read charts and understand the live run view.' } },
+    {
+        popover: {
+            title: 'Next Steps',
+            description: 'Up next: learn how to read charts and explore the live production view.'
+        }
+    },
     {
         element: '.highlights',
         popover: {
             title: 'Machine Highlights',
-            description: 'This section showcases the highlights of machine runs, displaying status indicators and quick summaries.',
+            description: 'Get a quick summary of key machine statuses and recent activities.',
             side: "top",
             align: 'start'
         }
@@ -155,7 +160,7 @@ export const navigationTour: DriveStep[] = [
         element: '.machines',
         popover: {
             title: 'Machines Overview',
-            description: 'Explore the list of registered machines to see which are running, stopped, or idle at a glance.',
+            description: 'Check the current status of all your machines at a glance.',
             side: "right",
             align: 'start'
         }
@@ -164,7 +169,7 @@ export const navigationTour: DriveStep[] = [
         element: '.machine-utilization',
         popover: {
             title: 'Machine Utilization',
-            description: 'Get insights into machine performance and utilization rates, ensuring optimal productivity.',
+            description: 'See how well each machine is performing to keep things productive.',
             side: "right",
             align: 'start'
         }
@@ -173,7 +178,7 @@ export const navigationTour: DriveStep[] = [
         element: '.devices',
         popover: {
             title: 'Device Management',
-            description: 'View all registered devices and monitor which are actively in use and which are currently idle.',
+            description: 'View and monitor which devices are in use or on standby.',
             side: "left",
             align: 'center'
         }
@@ -182,7 +187,7 @@ export const navigationTour: DriveStep[] = [
         element: '.device-utilization',
         popover: {
             title: 'Device Utilization',
-            description: 'Track device usage over time to make sure you’re maximizing resource availability.',
+            description: 'Check device usage stats to maximize efficiency.',
             side: "left",
             align: 'center'
         }
@@ -191,7 +196,7 @@ export const navigationTour: DriveStep[] = [
         element: '.reports',
         popover: {
             title: 'Shift Reports',
-            description: 'Download reports from the last four shifts to stay up-to-date with the latest factory insights.',
+            description: 'Download reports from recent shifts to stay updated on factory progress.',
             side: "bottom",
             align: 'center'
         }
@@ -200,7 +205,7 @@ export const navigationTour: DriveStep[] = [
         element: '.live-run',
         popover: {
             title: 'Live Production',
-            description: 'Monitor real-time production metrics for machines currently active in the factory.',
+            description: 'Monitor real-time production stats for active machines.',
             side: "right",
             align: 'start'
         }
@@ -209,7 +214,7 @@ export const navigationTour: DriveStep[] = [
         element: '.search-live',
         popover: {
             title: 'Search Live Run',
-            description: 'Quickly locate specific machines or components in your live run. Just type in the machine name or component code to zero in on the exact information you need without scrolling through the list.',
+            description: 'Quickly find specific machines or parts by name or code.',
             side: "top",
             align: 'start'
         }
@@ -218,7 +223,7 @@ export const navigationTour: DriveStep[] = [
         element: '.filter',
         popover: {
             title: 'Filter the Live Run View',
-            description: 'Easily narrow down your live run view by selecting specific machine statuses, like “Running” or “Stopped.” This filter lets you focus on what’s important right now, making it simple to monitor the machines that need the most attention.',
+            description: 'Narrow down your live view to see machines that need attention.',
             side: "top",
             align: 'start'
         }
@@ -227,7 +232,7 @@ export const navigationTour: DriveStep[] = [
         element: '.pagination',
         popover: {
             title: 'View More Machines',
-            description: 'See more of your machines at a glance! Use the pagination feature to scroll through your list, viewing additional machines as needed. It’s an easy way to navigate through larger setups without overwhelming your screen.',
+            description: 'Scroll through all your machines with easy-to-use pagination.',
             side: "top",
             align: 'start'
         }
@@ -236,7 +241,7 @@ export const navigationTour: DriveStep[] = [
         element: '.production-machine',
         popover: {
             title: 'Production Machine',
-            description: 'This card represents a machine actively engaged in the production line, showcasing its current state.',
+            description: 'View key info about machines actively producing.',
             side: "top",
             align: 'start'
         }
@@ -245,7 +250,7 @@ export const navigationTour: DriveStep[] = [
         element: '.component-image',
         popover: {
             title: 'Component Image',
-            description: 'Here, you can see the image of the component being produced, providing a visual reference for identification.',
+            description: 'Get a visual of the part currently being produced for easy reference.',
             side: "right",
             align: 'start'
         }
@@ -254,7 +259,7 @@ export const navigationTour: DriveStep[] = [
         element: '.machine-name',
         popover: {
             title: 'Machine Name',
-            description: 'The name of the machine helps you identify which equipment is in operation.',
+            description: 'Identify which machine is in action by its name.',
             side: "bottom",
             align: 'center'
         }
@@ -263,7 +268,7 @@ export const navigationTour: DriveStep[] = [
         element: '.record-age',
         popover: {
             title: 'Record Age',
-            description: 'This shows how long ago the machine last sent a status update, helping you monitor its activity frequency.',
+            description: 'See how recently each machine sent a status update.',
             side: "left",
             align: 'center'
         }
@@ -272,7 +277,7 @@ export const navigationTour: DriveStep[] = [
         element: '.component-code',
         popover: {
             title: 'Component Code',
-            description: 'Each component is assigned a unique code for easy tracking and reference during production.',
+            description: 'Check the unique code for each component to stay organized.',
             side: "left",
             align: 'center'
         }
@@ -281,7 +286,7 @@ export const navigationTour: DriveStep[] = [
         element: '.act-time',
         popover: {
             title: 'Actual Cycle Time',
-            description: 'Monitor the latest cycle time from the machine to gauge its current production efficiency.',
+            description: 'Track the latest cycle time to measure production speed.',
             side: "top",
             align: 'start'
         }
@@ -290,7 +295,7 @@ export const navigationTour: DriveStep[] = [
         element: '.std-time',
         popover: {
             title: 'Standard Cycle Time',
-            description: 'This represents the target time for completing a production cycle for the component.',
+            description: 'See the ideal target time for each production cycle.',
             side: "top",
             align: 'start'
         }
@@ -299,7 +304,7 @@ export const navigationTour: DriveStep[] = [
         element: '.signal',
         popover: {
             title: 'Signal Strength',
-            description: 'Check the signal strength of the device installed on the machine to ensure connectivity and data transmission.',
+            description: 'Monitor the signal to make sure your machines stay connected.',
             side: "bottom",
             align: 'center'
         }
@@ -308,7 +313,7 @@ export const navigationTour: DriveStep[] = [
         element: '.first-check',
         popover: {
             title: 'First Check Status',
-            description: 'This is the initial status report indicating production health or status, represented with relevant icons.',
+            description: 'See the initial health status for production with helpful icons.',
             side: "right",
             align: 'start'
         }
@@ -317,7 +322,7 @@ export const navigationTour: DriveStep[] = [
         element: '.progress',
         popover: {
             title: 'Production Progress',
-            description: 'This progress bar shows current production levels compared to the expected target for the current shift.',
+            description: 'Check the progress bar to see how production is tracking toward the goal.',
             side: "bottom",
             align: 'center'
         }
@@ -326,7 +331,7 @@ export const navigationTour: DriveStep[] = [
         element: '.production-machine',
         popover: {
             title: 'View Production Metrics',
-            description: 'Click here to open a modal displaying detailed production metrics, including cycle times, variances, warnings, performance, and materials usage. You can also manage live runs and add notes for your reference.',
+            description: 'Open a detailed view for cycle times, performance, and more.',
             side: "top",
             align: 'start'
         }
@@ -334,7 +339,7 @@ export const navigationTour: DriveStep[] = [
     {
         popover: {
             title: 'Enjoy WareSense!',
-            description: 'You are now equipped with the knowledge to navigate WareSense effectively. Explore the features, monitor your operations in real-time, and leverage insights to enhance your warehouse performance. If you have any questions, feel free to reach out to our support team. Happy optimizing!',
+            description: 'Now you\'re ready to explore WareSense! Dive into the features, track operations, and reach out if you need help. Happy optimizing!',
             side: "top",
             align: 'center'
         }
