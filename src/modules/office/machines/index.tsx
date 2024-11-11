@@ -140,7 +140,7 @@ export default function MachineManager() {
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-11/12 mx-auto flex">{machine ? 'Update Machine' : 'Create Machine'}</Button>
+                <Button type="submit" className="w-11/12 mx-auto flex" disabled>{machine ? 'Update Machine' : 'Create Machine'}</Button>
             </form>
         )
     }
