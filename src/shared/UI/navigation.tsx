@@ -47,7 +47,11 @@ export const Navigation = () => {
 }
 
 export const MobileNavigation = () => {
-    const signOut = useSessionStore(state => state.signOut)
+    const { user, signOut } = useSessionStore()
+
+    if (!user) return;
+
+    const { role } = user || {}
 
     return (
         <div className="flex w-full xl:hidden items-center justify-between py-6">
@@ -68,14 +72,16 @@ export const MobileNavigation = () => {
                                         </Link>
                                     </li>
                                 </ul>
-                                <ul className="flex w-full flex-col gap-5">
-                                    <li className="flex items-center justify-center cursor-pointer">
-                                        <Link href="/office" className="flex items-center justify-center gap-2" aria-label="Office">
-                                            <FolderKanban strokeWidth={1} size={18} className="stroke-card-foreground" />
-                                            <p>Office</p>
-                                        </Link>
-                                    </li>
-                                </ul>
+                                {!['User', 'Guest', 'Operator'].includes(role) &&
+                                    <ul className="flex w-full flex-col gap-5">
+                                        <li className="flex items-center justify-center cursor-pointer">
+                                            <Link href="/office" className="flex items-center justify-center gap-2" aria-label="Office">
+                                                <FolderKanban strokeWidth={1} size={18} className="stroke-card-foreground" />
+                                                <p>Office</p>
+                                            </Link>
+                                        </li>
+                                    </ul>
+                                }
                                 <Button className="w-full" variant="destructive" onClick={signOut}>
                                     <p>Logout</p>
                                 </Button>
@@ -90,19 +96,20 @@ export const MobileNavigation = () => {
 
 export const DesktopNavigation = () => {
     const pathname = usePathname()
-    const signOut = useSessionStore(state => state?.signOut)
+    const { user, signOut } = useSessionStore()
 
     const driverObj = driver({
         showProgress: true,
         steps: navigationTour,
-        stageRadius: 3,
+        stageRadius: 2,
+        stagePadding: 5,
         allowKeyboardControl: true,
-
+        disableActiveInteraction: true,
     });
 
     useEffect(() => {
         const screenSize = { width: window.innerWidth, height: window.innerHeight };
-        
+
         if (pathname === '/' && screenSize?.width > 768) {
             const timeoutId = setTimeout(() => {
                 driverObj.drive();
@@ -112,6 +119,10 @@ export const DesktopNavigation = () => {
         }
     }, [driverObj, pathname]);
 
+    if (!user) return;
+
+    const { role } = user || {}
+
     return (
         <div className="xl:flex w-full flex-col justify-between h-full hidden">
             <ul className="flex w-full flex-col gap-5 h-1/2 pt-2">
@@ -120,11 +131,13 @@ export const DesktopNavigation = () => {
                         <TrendingUpDown strokeWidth={1} size={18} className={pathname === "/" ? "stroke-primary" : "stroke-card-foreground"} />
                     </Link>
                 </li>
-                <li className="flex items-center justify-center cursor-pointer rounded management">
-                    <Link href="/office" aria-label="Office">
-                        <FolderKanban strokeWidth={1} size={18} className={pathname === "/office" ? "stroke-primary" : "stroke-card-foreground"} />
-                    </Link>
-                </li>
+                {!['User', 'Guest', 'Operator'].includes(role) && (
+                    <li className="flex items-center justify-center cursor-pointer rounded management">
+                        <Link href="/office" aria-label="Office">
+                            <FolderKanban strokeWidth={1} size={18} className={pathname === "/office" ? "stroke-primary" : "stroke-card-foreground"} />
+                        </Link>
+                    </li>
+                )}
             </ul>
             <ul className="flex w-full flex-col gap-0 relative justify-end items-center h-1/2">
                 <li className="flex items-center justify-center cursor-pointer rounded theme">

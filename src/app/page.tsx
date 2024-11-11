@@ -1,7 +1,7 @@
 'use client'
 
 import LiveRunCards from "@/modules/live";
-import { Radio, Rss } from "lucide-react";
+import { Radio, TrendingUpDown } from "lucide-react";
 import LiveRunHighlights from "@/modules/live/highlights";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
             <div className="flex flex-col items-start justify-start gap-2 w-full highlights">
                 <div className="flex flex-row items-center justify-start gap-2 px-1 w-full start">
                     <p className="text-lg font-medium uppercase">Highlights</p>
-                    <Rss className="stroke-card-foreground" strokeWidth={1} size={18} />
+                    <TrendingUpDown className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <LiveRunHighlights />
             </div>

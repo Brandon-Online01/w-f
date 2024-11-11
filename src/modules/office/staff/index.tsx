@@ -65,6 +65,7 @@ import { isEmpty } from 'lodash'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 type UserFormData = z.infer<typeof newUserSchema>
 
@@ -110,7 +111,7 @@ export default function StaffManagement() {
         staleTime: 60000,
     });
 
-    const handleCreateUser: SubmitHandler<NewUserType> = async (data) => console.log(data)
+    const handleCreateUser: SubmitHandler<NewUserType> = async (data) => console.log(data,)
 
     const handleEditUser: SubmitHandler<UserFormData> = (data) => console.log(data, 'as updated user data')
 
@@ -224,11 +225,11 @@ export default function StaffManagement() {
                             <div className="p-4 w-full">
                                 <div className="flex items-center justify-start gap-2">
                                     <IdCard className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                    <h3 className="font-semibold text-card-foreground">{name} {lastName}</h3>
+                                    <h3 className="font-semibold text-card-foreground text-xs md:text-sm">{name} {lastName}</h3>
                                 </div>
-                                <div className="flex items-center justify-start gap-2">
+                                <div className="sm:flex items-center justify-start gap-2 hidden">
                                     <Mail className="stroke-card-foreground" strokeWidth={1} size={17} />
-                                    <p className="text-sm text-card-foreground">{email}</p>
+                                    <p className="text-xs md:text-sm text-card-foreground ">{email}</p>
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center justify-start gap-2">
@@ -241,7 +242,7 @@ export default function StaffManagement() {
                                                 <MoreVertical className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
+                                        <DropdownMenuContent align="end" aria-describedby="user-actions">
                                             <DropdownMenuItem onSelect={() => {
                                                 setUserInFocus(user)
                                                 setIsEditing(true)
@@ -341,138 +342,133 @@ export default function StaffManagement() {
             defaultValues: user || {},
         })
 
-        const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
-
         return (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-card">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2 col-span-full">
-                        <Label htmlFor="photoURL">User Image</Label>
-                        <div className="flex items-center space-x-4">
-                            <Avatar className="h-20 w-20">
-                                <AvatarImage src={fullPhotoURL} alt="User avatar" />
-                                <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
-                            </Avatar>
-                            <Input
-                                id="photoURL"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={(e) => handleImageUpload(e, setImagePreview)}
-                                ref={fileInputRef}
-                            />
-                            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                                <Upload className="mr-2 h-4 w-4" /> Upload Image
-                            </Button>
+                <ScrollArea className="h-[80vh] md:h-full w-full flex flex-col justify-start gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2 col-span-full">
+                            <Label htmlFor="photoURL">Profile Photo</Label>
+                            <div className="gap-2 flex items-center justify-center md:justify-start">
+                                <Avatar className="h-20 w-20 border border-gray-300 cursor-pointer">
+                                    <AvatarImage src={imagePreview} alt="User avatar" />
+                                    <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+                                </Avatar>
+                                <Input
+                                    className="hidden"
+                                    type="file"
+                                    id="photoURL"
+                                    accept="image/*"
+                                    ref={fileInputRef}
+                                    onChange={(e) => handleImageUpload(e, setImagePreview)}
+                                />
+                                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                    <Upload className="mr-2 h-4 w-4" /> Upload Image
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="name">First Name</Label>
+                                <Input id="name" {...register("name")} placeholder="John" />
+                            </div>
+                            {errors?.name && <p className="text-red-500 text-xs mt-1">{errors?.name?.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="lastName">Last Name</Label>
+                                <Input id="lastName" {...register("lastName")} placeholder="Doe" />
+                            </div>
+                            {errors?.lastName && <p className="text-red-500 text-xs mt-1">{errors?.lastName?.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="email">Email</Label>
+                                <Input id="email" type="email" {...register("email")} placeholder="john.doe@example.com" />
+                            </div>
+                            {errors?.email && <p className="text-red-500 text-xs mt-1">{errors?.email?.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="username">Username</Label>
+                                <Input id="username" {...register("username")} placeholder="johndoe" />
+                            </div>
+                            {errors?.username && <p className="text-red-500 text-xs mt-1">{errors?.username?.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="password">Password</Label>
+                                <Input id="password" {...register("password")} placeholder="********" />
+                            </div>
+                            {errors?.password && <p className="text-red-500 text-xs mt-1">{errors?.password?.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="role">Role</Label>
+                                <Select onValueChange={(value) => register("role").onChange({ target: { value } })}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a role" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Admin">
+                                            <span className="flex items-center gap-2">
+                                                <Shield className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                                Admin
+                                            </span>
+                                        </SelectItem>
+                                        <SelectItem value="User">
+                                            <span className="flex items-center gap-2">
+                                                <User className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                                User
+                                            </span>
+                                        </SelectItem>
+                                        <SelectItem value="Editor">
+                                            <span className="flex items-center gap-2">
+                                                <Edit className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                                Editor
+                                            </span>
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {errors?.role && <p className="text-red-500 text-xs mt-1">{errors?.role?.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="phoneNumber">Phone Number</Label>
+                                <Input id="phoneNumber" {...register("phoneNumber")} placeholder="+1234567890" />
+                            </div>
+                            {errors?.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors?.phoneNumber?.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="status">Status</Label>
+                                <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Active">
+                                            <span className="flex items-center gap-2">
+                                                <Activity className="stroke-success" strokeWidth={1} size={18} />
+                                                Active
+                                            </span>
+                                        </SelectItem>
+                                        <SelectItem value="Inactive">
+                                            <span className="flex items-center gap-2">
+                                                <Activity className="stroke-destructive" strokeWidth={1} size={18} />
+                                                In Active
+                                            </span>
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {errors?.status && <p className="text-red-500 text-xs mt-1">{errors?.status?.message}</p>}
                         </div>
                     </div>
-                    <div className="space-y-1">
-                        <div className='flex flex-col justify-start gap-1'>
-                            <Label htmlFor="name">First Name</Label>
-                            <Input id="name" {...register("name")} placeholder="John" />
-                        </div>
-                        {errors?.name && <p className="text-red-500 text-xs mt-1">{errors?.name?.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <div className='flex flex-col justify-start gap-1'>
-                            <Label htmlFor="lastName">Last Name</Label>
-                            <Input id="lastName" {...register("lastName")} placeholder="Doe" />
-                        </div>
-                        {errors?.lastName && <p className="text-red-500 text-xs mt-1">{errors?.lastName?.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <div className='flex flex-col justify-start gap-1'>
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" {...register("email")} placeholder="john.doe@example.com" />
-                        </div>
-                        {errors?.email && <p className="text-red-500 text-xs mt-1">{errors?.email?.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <div className='flex flex-col justify-start gap-1'>
-                            <Label htmlFor="username">Username</Label>
-                            <Input id="username" {...register("username")} placeholder="johndoe" />
-                        </div>
-                        {errors?.username && <p className="text-red-500 text-xs mt-1">{errors?.username?.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <div className='flex flex-col justify-start gap-1'>
-                            <Label htmlFor="password">Password</Label>
-                            <Input id="password" {...register("password")} placeholder="********" />
-                        </div>
-                        {errors?.password && <p className="text-red-500 text-xs mt-1">{errors?.password?.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <div className='flex flex-col justify-start gap-1'>
-                            <Label htmlFor="role">Role</Label>
-                            <Select onValueChange={(value) => register("role").onChange({ target: { value } })}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a role" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Admin">
-                                        <span className="flex items-center gap-2">
-                                            <Shield className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                            Admin
-                                        </span>
-                                    </SelectItem>
-                                    <SelectItem value="User">
-                                        <span className="flex items-center gap-2">
-                                            <User className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                            User
-                                        </span>
-                                    </SelectItem>
-                                    <SelectItem value="Editor">
-                                        <span className="flex items-center gap-2">
-                                            <Edit className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                            Editor
-                                        </span>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        {errors?.role && <p className="text-red-500 text-xs mt-1">{errors?.role?.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <div className='flex flex-col justify-start gap-1'>
-                            <Label htmlFor="phoneNumber">Phone Number</Label>
-                            <Input id="phoneNumber" {...register("phoneNumber")} placeholder="+1234567890" />
-                        </div>
-                        {errors?.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors?.phoneNumber?.message}</p>}
-                    </div>
-                    <div className="space-y-1">
-                        <div className='flex flex-col justify-start gap-1'>
-                            <Label htmlFor="status">Status</Label>
-                            <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Active">
-                                        <span className="flex items-center gap-2">
-                                            <Activity className="stroke-success" strokeWidth={1} size={18} />
-                                            Active
-                                        </span>
-                                    </SelectItem>
-                                    <SelectItem value="Inactive">
-                                        <span className="flex items-center gap-2">
-                                            <Activity className="stroke-destructive" strokeWidth={1} size={18} />
-                                            In Active
-                                        </span>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        {errors?.status && <p className="text-red-500 text-xs mt-1">{errors?.status?.message}</p>}
-                    </div>
-                </div>
-                <Button type="submit" className="w-10/12 mx-auto flex" disabled>
-                    {
-                        isLoading ? <Loader2 className="mr-2 animate-spin stroke-white" strokeWidth={1.5} size={18} /> :
-                            <>
-                                {user ? 'Update User' : 'Create User'}
-                            </>
-                    }
-                </Button>
+                    <Button type="submit" className="w-11/12 mx-auto flex mt-4">
+                        {isLoading ? <Loader2 className="mr-2 animate-spin stroke-white" strokeWidth={1.5} size={18} /> : <>{user ? 'Update User' : 'Create User'}</>}
+                    </Button>
+                </ScrollArea>
             </form >
         )
     }

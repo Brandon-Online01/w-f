@@ -25,7 +25,6 @@ import FactoryManagement from "@/modules/office/factory";
 import ToolRoomManager from "@/modules/office/toolroom";
 
 export default function Home() {
-
     const tabVariants = {
         hidden: { opacity: 0, x: -20 },
         visible: (index: number) => ({
@@ -92,7 +91,7 @@ export default function Home() {
 
     return (
         <div className="flex flex-col items-start justify-start gap-4 h-full w-full overflow-y-scroll outline-none">
-            <ScrollArea className="h-full w-full pr-3 flex flex-col justify-start gap-3">
+            <ScrollArea className="h-full w-full flex flex-col justify-start gap-3">
                 <div className="flex flex-row items-center justify-start gap-2 px-1 w-full mb-3">
                     <p className="text-lg font-medium uppercase">Management</p>
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
