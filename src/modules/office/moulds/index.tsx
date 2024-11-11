@@ -192,7 +192,7 @@ export default function MouldManager() {
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-11/12 mx-auto flex">{mould ? 'Update Mould' : 'Create Mould'}</Button>
+                <Button type="submit" className="w-11/12 mx-auto flex" disabled>{mould ? 'Update Mould' : 'Create Mould'}</Button>
             </form>
         )
     }

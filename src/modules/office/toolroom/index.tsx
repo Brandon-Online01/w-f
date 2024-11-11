@@ -250,7 +250,7 @@ export default function ToolRoomManager() {
 						<Button type="button" onClick={() => append({ name: '', quantity: 0, unit: '' })}>Add Material</Button>
 					</div>
 					<div className="flex justify-center gap-4 mt-6">
-						<Button type="submit" className="w-11/12 mx-auto flex">Update Report</Button>
+						<Button type="submit" className="w-11/12 mx-auto flex" disabled>Update Report</Button>
 						{record && record?.status !== 'Completed' && <Button type="button" className="w-1/2" variant="default" disabled onClick={() => handleCheckOut(record)}>Check Out</Button>}
 					</div>
 				</ScrollArea>

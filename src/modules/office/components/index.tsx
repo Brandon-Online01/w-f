@@ -286,7 +286,7 @@ export default function ComponentManager() {
                             {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                         </div>
                     </div>
-                    <Button type="submit" className="w-11/12 mx-auto flex mt-4" >{component ? 'Update Component' : 'Create Component'}</Button>
+                    <Button type="submit" className="w-11/12 mx-auto flex mt-4" disabled>{component ? 'Update Component' : 'Create Component'}</Button>
                 </ScrollArea>
             </form>
         )
