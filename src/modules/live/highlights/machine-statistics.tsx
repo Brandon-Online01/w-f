@@ -95,14 +95,14 @@ export function MachineStatistics({ data }: MachineStatisticsProps) {
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={viewBox.cy}
-                                                    className="fill-foreground text-3xl">
+                                                    className="fill-foreground text-[20px] lg:text-[30px]">
                                                     {data.totalReporters}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 18}
                                                     className="fill-card-foreground text-[12px]">
-                                                    Reporting Machines
+                                                    Reporting
                                                 </tspan>
                                             </text>
                                         )
@@ -114,7 +114,7 @@ export function MachineStatistics({ data }: MachineStatisticsProps) {
                 </ChartContainer>
             </CardContent>
             <CardFooter className="flex-col gap-1 text-sm p-2">
-                <div className="flex items-center gap-5 font-medium leading-none mb-6 w-full justify-center">
+                <div className="flex items-center gap-5 font-medium leading-none mb-6 w-full justify-center flex-wrap">
                     <div className="flex items-center gap-1 justify-center">
                         <p className="flex items-center gap-1">
                             <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1))" }}></span>

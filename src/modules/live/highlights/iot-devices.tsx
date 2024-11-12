@@ -3,7 +3,6 @@
 import * as React from "react"
 import { CpuIcon } from "lucide-react"
 import { Label, Pie, PieChart } from "recharts"
-
 import {
     Card,
     CardContent,
@@ -52,7 +51,6 @@ interface DeviceStatisticsProps {
 }
 
 export function DeviceStatistics({ data }: DeviceStatisticsProps) {
-
     const { registeredMachines, machinesNotInUse } = data;
 
     const chartData = [
@@ -95,7 +93,7 @@ export function DeviceStatistics({ data }: DeviceStatisticsProps) {
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={viewBox.cy}
-                                                    className="fill-foreground text-3xl">
+                                                    className="fill-foreground text-[20px] lg:text-[30px]">
                                                     {registeredMachines}
                                                 </tspan>
                                                 <tspan

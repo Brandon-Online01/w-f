@@ -110,7 +110,7 @@ export const DesktopNavigation = () => {
     useEffect(() => {
         const screenSize = { width: window.innerWidth, height: window.innerHeight };
 
-        if (pathname === '/' && screenSize?.width > 768) {
+        if (pathname === '/' && screenSize?.width > 576) {
             const timeoutId = setTimeout(() => {
                 driverObj.drive();
             }, 100);
