@@ -2,7 +2,6 @@
 
 import { ChartSpline } from "lucide-react"
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts"
-
 import {
     Card,
     CardContent,
@@ -33,6 +32,7 @@ export function FactoryUtilization({ data }: { data: string | null }) {
     const chartValue = Number(data?.replace('%', ''))
     const chartDifference = Number((100 - chartValue)?.toFixed(2))
 
+
     const chartData = [{ month: "january", desktop: chartDifference, mobile: chartValue }]
 
     return (
@@ -49,8 +49,9 @@ export function FactoryUtilization({ data }: { data: string | null }) {
                     <RadialBarChart
                         data={chartData}
                         endAngle={180}
-                        innerRadius={100}
-                        outerRadius={130}>
+                        innerRadius={90}
+                        outerRadius={110}
+                        >
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent hideLabel />}
@@ -64,14 +65,14 @@ export function FactoryUtilization({ data }: { data: string | null }) {
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) - 16}
-                                                    className="fill-foreground text-[30px]">
+                                                    className="fill-foreground text-[20px] lg:text-[30px]">
                                                     {chartValue}%
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 2}
                                                     className="fill-card-foreground text-[12px] -mt-8">
-                                                    Machine Utilization
+                                                    Utilization
                                                 </tspan>
                                             </text>
                                         )
@@ -99,7 +100,7 @@ export function FactoryUtilization({ data }: { data: string | null }) {
                 </ChartContainer>
             </CardContent>
             <CardFooter className="flex-col gap-1 text-sm">
-                <div className="flex items-center gap-2 font-medium leading-none mb-6">
+                <div className="flex items-center gap-2 font-medium leading-none mb-6 flex-wrap justify-center">
                     <p className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1))" }}></span>
                         <span className="text-card-foreground text-[10px] uppercase">In Use</span>
