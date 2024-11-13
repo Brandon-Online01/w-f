@@ -496,42 +496,44 @@ export default function FactoryManagement() {
                                 <MapPin className="stroke-card-foreground" strokeWidth={1} size={18} />
                                 <span>{city}, {country}</span>
                             </div>
-                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                                <Users className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <span>{numberOfEmployees}</span>
-                            </div>
-                            <div className="flex justify-end">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        {/* <DropdownMenuItem onSelect={() => {
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                    <Users className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <span>{numberOfEmployees}</span>
+                                </div>
+                                <div className="flex justify-end">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreVertical className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {/* <DropdownMenuItem onSelect={() => {
                                             setFactoryInFocus(factory)
                                             setIsEditing(true)
                                         }}>
                                             <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem> */}
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onSelect={() => {
-                                                setFactoryInFocus(factory)
-                                            setIsViewing(true)
-                                        }}>
-                                            <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
-                                            View
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onSelect={() => handleDeleteFactory(uid)}>
-                                            <FactoryIcon className="mr-2 stroke-destructive" strokeWidth={1} size={18} />
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => {
+                                                    setFactoryInFocus(factory)
+                                                    setIsViewing(true)
+                                                }}>
+                                                <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
+                                                View
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => handleDeleteFactory(uid)}>
+                                                <FactoryIcon className="mr-2 stroke-destructive" strokeWidth={1} size={18} />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
                         </div>
                     </CardContent>

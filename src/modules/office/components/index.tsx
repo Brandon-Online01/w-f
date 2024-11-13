@@ -109,8 +109,8 @@ export default function ComponentManager() {
             id: components.length + 1,
             ...data,
             photoURL: data.photoURL || '/placeholder.svg?height=100&width=100',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: `${new Date()}`,
+            updatedAt: `${new Date()}`,
         }
 
         console.log('new component ', newComponent)
@@ -150,7 +150,7 @@ export default function ComponentManager() {
 
         const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
 
-        console.log('component ', imagePreview)
+        console.log('image preview ', imagePreview)
 
         return (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-card">
@@ -286,7 +286,7 @@ export default function ComponentManager() {
                             {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                         </div>
                     </div>
-                    <Button type="submit" className="w-11/12 mx-auto flex mt-4" disabled>{component ? 'Update Component' : 'Create Component'}</Button>
+                    <Button type="submit" className="w-11/12 mx-auto flex mt-4" >{component ? 'Update Component' : 'Create Component'}</Button>
                 </ScrollArea>
             </form>
         )
@@ -324,57 +324,57 @@ export default function ComponentManager() {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Package className="h-4 w-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-500">Name</Label>
+                            <Package className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Name</Label>
                         </div>
                         <p className="text-sm font-semibold">{name}</p>
                     </div>
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-500">Cycle Time</Label>
+                            <Clock className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Cycle Time</Label>
                         </div>
-                        <p className="text-sm font-semibold">{cycleTime}</p>
+                        <p className="text-sm font-semibold">{cycleTime}s</p>
                     </div>
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Zap className="h-4 w-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-500">Target Time</Label>
+                            <Zap className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Target Time</Label>
                         </div>
-                        <p className="text-sm font-semibold">{targetTime}</p>
+                        <p className="text-sm font-semibold">{targetTime}s</p>
                     </div>
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Thermometer className="h-4 w-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-500">Cooling Time</Label>
+                            <Thermometer className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Cooling Time</Label>
                         </div>
-                        <p className="text-sm font-semibold">{coolingTime}</p>
+                        <p className="text-sm font-semibold">{coolingTime}s</p>
                     </div>
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Battery className="h-4 w-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-500">Charging Time</Label>
+                            <Battery className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Charging Time</Label>
                         </div>
-                        <p className="text-sm font-semibold">{chargingTime}</p>
+                        <p className="text-sm font-semibold">{chargingTime}s</p>
                     </div>
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Grid className="h-4 w-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-500">Cavity</Label>
+                            <Grid className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Cavity</Label>
                         </div>
                         <p className="text-sm font-semibold">{cavity}</p>
                     </div>
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Palette className="h-4 w-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-500">Color</Label>
+                            <Palette className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Color</Label>
                         </div>
                         <p className="text-sm font-semibold">{color}</p>
                     </div>
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
-                            <Activity className="h-4 w-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-500">Status</Label>
+                            <Activity className="stroke-card-foreground" strokeWidth={1} size={18} />
+                            <Label className="text-sm font-medium text-card-foreground">Status</Label>
                         </div>
                         <p className="text-sm font-semibold">{status}</p>
                     </div>
@@ -382,31 +382,6 @@ export default function ComponentManager() {
             </div>
         )
     }
-
-    const handleEditClick = (component: ComponentFormData) => {
-        const editableComponent: ComponentFormData = {
-            name: component.name,
-            description: component.description,
-            weight: component.weight,
-            volume: component.volume,
-            code: component.code,
-            color: component.color,
-            cycleTime: component.cycleTime,
-            targetTime: component.targetTime,
-            coolingTime: component.coolingTime,
-            chargingTime: component.chargingTime,
-            cavity: component.cavity,
-            configuration: component.configuration,
-            configQTY: component.configQTY,
-            palletQty: component.palletQty,
-            testMachine: component.testMachine,
-            masterBatch: component.masterBatch,
-            status: component.status as "Active" | "Inactive",
-            photoURL: component.photoURL
-        };
-        setComponentInFocus(editableComponent);
-        setIsEditing(true);
-    };
 
     const PageHeader = () => {
         return (
@@ -545,38 +520,42 @@ export default function ComponentManager() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onSelect={() => handleEditClick(component)}>
-                                                <Component className="stroke-success mr-2" strokeWidth={1} size={18} />
+                                            {/* <DropdownMenuItem onSelect={() => handleEditClick(component)}>
+                                                <Component className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                                 Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => {
-                                                const typedComponent: ComponentFormData = {
-                                                    name: component.name,
-                                                    description: description,
-                                                    weight: weight,
-                                                    volume: volume,
-                                                    code: code,
-                                                    color: color,
-                                                    cycleTime: cycleTime,
-                                                    targetTime: targetTime,
-                                                    coolingTime: coolingTime,
-                                                    chargingTime: chargingTime,
-                                                    cavity: cavity,
-                                                    configuration: configuration,
-                                                    configQTY: configQTY,
-                                                    palletQty: palletQty,
-                                                    testMachine: testMachine,
-                                                    masterBatch: masterBatch,
-                                                    status: status as "Active" | "Inactive",
-                                                    photoURL: photoURL
-                                                };
-                                                setComponentInFocus(typedComponent);
-                                                setIsViewing(true);
-                                            }}>
+                                            </DropdownMenuItem> */}
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => {
+                                                    const typedComponent: ComponentFormData = {
+                                                        name: component.name,
+                                                        description: description,
+                                                        weight: weight,
+                                                        volume: volume,
+                                                        code: code,
+                                                        color: color,
+                                                        cycleTime: cycleTime,
+                                                        targetTime: targetTime,
+                                                        coolingTime: coolingTime,
+                                                        chargingTime: chargingTime,
+                                                        cavity: cavity,
+                                                        configuration: configuration,
+                                                        configQTY: configQTY,
+                                                        palletQty: palletQty,
+                                                        testMachine: testMachine,
+                                                        masterBatch: masterBatch,
+                                                        status: status as "Active" | "Inactive",
+                                                        photoURL: photoURL
+                                                    };
+                                                    setComponentInFocus(typedComponent);
+                                                    setIsViewing(true);
+                                                }}>
                                                 <Component className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                                 View
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => handleDeleteComponent(Number(component?.code))}>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => handleDeleteComponent(Number(component?.code))}>
                                                 <Component className="stroke-destructive mr-2" strokeWidth={1} size={18} />
                                                 Delete
                                             </DropdownMenuItem>

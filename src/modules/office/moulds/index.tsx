@@ -427,19 +427,20 @@ export default function MouldManager() {
                                 <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
                                 <span>{serialNumber}</span>
                             </div>
-                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                                <Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <span>Mileage: {mileage}</span>
-                            </div>
-                            <div className="flex justify-end">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        {/* <DropdownMenuItem onSelect={() => {
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                    <Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <span>Mileage: {mileage}</span>
+                                </div>
+                                <div className="flex justify-end">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreVertical className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {/* <DropdownMenuItem onSelect={() => {
                                             setMouldInFocus({
                                                 ...mould,
                                                 uid: Number(serialNumber),
@@ -450,28 +451,29 @@ export default function MouldManager() {
                                             <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem> */}
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onSelect={() => {
-                                                setMouldInFocus({
-                                                    ...mould,
-                                                uid: Number(serialNumber),
-                                                creationDate: new Date().toISOString(),
-                                                status: status as "Active" | "Inactive" | "Maintenance"
-                                            })
-                                            setIsViewing(true)
-                                        }}>
-                                            <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                            View
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onSelect={() => handleDeleteMould(serialNumber)}>
-                                            <Puzzle className="stroke-destructive mr-2" strokeWidth={1} size={18} />
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => {
+                                                    setMouldInFocus({
+                                                        ...mould,
+                                                        uid: Number(serialNumber),
+                                                        creationDate: new Date().toISOString(),
+                                                        status: status as "Active" | "Inactive" | "Maintenance"
+                                                    })
+                                                    setIsViewing(true)
+                                                }}>
+                                                <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                                View
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => handleDeleteMould(serialNumber)}>
+                                                <Puzzle className="stroke-destructive mr-2" strokeWidth={1} size={18} />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
                         </div>
                     </CardContent>
