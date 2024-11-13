@@ -149,7 +149,6 @@ export default function FactoryManagement() {
         }
     }
 
-
     const FactoryForm = ({
         factory = null,
         onSubmit
@@ -516,14 +515,18 @@ export default function FactoryManagement() {
                                             <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem> */}
-                                        <DropdownMenuItem onSelect={() => {
-                                            setFactoryInFocus(factory)
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onSelect={() => {
+                                                setFactoryInFocus(factory)
                                             setIsViewing(true)
                                         }}>
                                             <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
                                             View
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => handleDeleteFactory(uid)}>
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            onSelect={() => handleDeleteFactory(uid)}>
                                             <FactoryIcon className="mr-2 stroke-destructive" strokeWidth={1} size={18} />
                                             Delete
                                         </DropdownMenuItem>

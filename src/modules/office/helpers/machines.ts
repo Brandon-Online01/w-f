@@ -14,7 +14,7 @@ export const createMachine = async (newMachine: NewMachine, config: RequestConfi
     }
 }
 
-export const removeMachine = async (referenceID: number, config: RequestConfig) => {
+export const removeMachine = async (referenceID: string, config: RequestConfig) => {
     try {
         const url = `${process.env.NEXT_PUBLIC_API_URL}/machines/${referenceID}`
         const { data: { message } } = await axios.delete(url, config)

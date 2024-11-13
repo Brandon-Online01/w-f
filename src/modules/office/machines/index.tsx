@@ -108,7 +108,7 @@ export default function MachineManager() {
 
     const handleEditMachine: SubmitHandler<MachineFormData> = (data) => console.log('edit machine with data ', data)
 
-    const handleDeleteMachine = async (referenceID: number) => {
+    const handleDeleteMachine = async (referenceID: string) => {
         if (!session) return
 
         const sessionData = JSON.parse(session)
@@ -369,14 +369,18 @@ export default function MachineManager() {
                                             <ServerCog className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
                                         </DropdownMenuItem> */}
-                                            <DropdownMenuItem onSelect={() => {
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => {
                                                 setMachineInFocus(machine)
                                                 setIsViewing(true)
                                             }}>
                                                 <ServerCrash className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                                 View
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.machineNumber))}>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => handleDeleteMachine(machine?.machineNumber)}>
                                                 <ServerOff className="stroke-destructive mr-2" strokeWidth={1} size={18} />
                                                 Delete
                                             </DropdownMenuItem>
