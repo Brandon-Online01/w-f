@@ -107,6 +107,7 @@ export default function FactoryManagement() {
             createdAt: `${new Date()}`,
             updatedAt: `${new Date()}`,
         }
+        
         const message = await createFactory(newFactory as Factory, config)
 
         if (message) {

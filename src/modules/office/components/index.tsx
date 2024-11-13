@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import toast from 'react-hot-toast';
 import {
     Search,
     ChevronLeft,
@@ -57,6 +58,8 @@ import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
 import { useSessionStore } from '@/providers/session.provider'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { NewComponent } from '@/types/component';
+import { createComponent, removeComponent } from '../helpers/components';
 
 type ComponentFormData = z.infer<typeof componentSchema>
 
@@ -104,7 +107,12 @@ export default function ComponentManager() {
         staleTime: 60000,
     });
 
-    const handleCreateComponent: SubmitHandler<ComponentFormData> = (data) => {
+    const handleCreateComponent: SubmitHandler<ComponentFormData> = async (data) => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
         const newComponent = {
             id: components.length + 1,
             ...data,
@@ -113,12 +121,47 @@ export default function ComponentManager() {
             updatedAt: `${new Date()}`,
         }
 
-        console.log('new component ', newComponent)
+        const message = await createComponent(newComponent as NewComponent, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+
+            setIsCreating(false)
+        }
     }
 
     const handleEditComponent: SubmitHandler<ComponentFormData> = (data) => console.log('edit component with data ', data)
 
-    const handleDeleteComponent = (referenceID: number) => console.log('delete component with reference ID ', referenceID)
+    const handleDeleteComponent = async (referenceID: string) => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const message = await removeComponent(referenceID, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+    }
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, setImagePreview: (preview: string) => void) => {
         if (!event.target.files) return
@@ -140,17 +183,13 @@ export default function ComponentManager() {
         component?: ComponentFormData | null,
         onSubmit: SubmitHandler<ComponentFormData>
     }) => {
-        const [imagePreview, setImagePreview] = useState(component?.photoURL || '/placeholder.svg?height=100&width=100')
+        const [imagePreview, setImagePreview] = useState(component?.photoURL || '')
         const { register, handleSubmit, formState: { errors } } = useForm<ComponentFormData>({
             resolver: zodResolver(componentSchema),
             defaultValues: component || {},
         })
 
         const screenSize = { width: window.innerWidth, height: window.innerHeight }
-
-        const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${imagePreview}`
-
-        console.log('image preview ', imagePreview)
 
         return (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-card">
@@ -160,14 +199,19 @@ export default function ComponentManager() {
                             <Label htmlFor="photoURL">Component Image</Label>
                             <div className="flex items-center space-x-4">
                                 <div className="flex items-center justify-center rounded h-40 w-40 border">
-                                    <Image
-                                        src={fullPhotoURL}
-                                        alt={'Existing Preview Image'}
-                                        width={screenSize.width > 768 ? 30 : 20}
-                                        height={screenSize.width > 768 ? 30 : 20}
-                                        priority
-                                        quality={100}
-                                        className="rounded object-contain w-auto h-auto" />
+                                    {
+                                        imagePreview ?
+                                            <Image
+                                                src={imagePreview}
+                                                alt={'Existing Preview Image'}
+                                                width={screenSize.width > 768 ? 30 : 20}
+                                                height={screenSize.width > 768 ? 30 : 20}
+                                                priority
+                                                quality={100}
+                                                className="rounded object-contain w-auto h-auto" />
+                                            :
+                                            <p className="text-[10px] uppercase">No Image</p>
+                                    }
                                 </div>
                                 <Input
                                     id="photoURL"
@@ -261,6 +305,13 @@ export default function ComponentManager() {
                             <Label htmlFor="masterBatch">Master Batch</Label>
                             <Input id="masterBatch" type="number" {...register("masterBatch", { valueAsNumber: true })} placeholder="Master batch" />
                             {errors.masterBatch && <p className="text-red-500 text-xs mt-1">{errors.masterBatch.message}</p>}
+                        </div>
+                        <div className="space-y-1">
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="factoryReferenceID">Factory Reference ID</Label>
+                                <Input id="factoryReferenceID" {...register("factoryReferenceID")} placeholder="FACT-2024-001" />
+                            </div>
+                            {errors.factoryReferenceID && <p className="text-red-500 text-xs mt-1">{errors.factoryReferenceID.message}</p>}
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="status">Status</Label>
@@ -470,7 +521,8 @@ export default function ComponentManager() {
             configQTY,
             palletQty,
             testMachine,
-            masterBatch
+            masterBatch,
+            factoryReferenceID
         } = component
 
         const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
@@ -545,7 +597,8 @@ export default function ComponentManager() {
                                                         testMachine: testMachine,
                                                         masterBatch: masterBatch,
                                                         status: status as "Active" | "Inactive",
-                                                        photoURL: photoURL
+                                                        photoURL: photoURL,
+                                                        factoryReferenceID: factoryReferenceID
                                                     };
                                                     setComponentInFocus(typedComponent);
                                                     setIsViewing(true);
@@ -555,7 +608,7 @@ export default function ComponentManager() {
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
                                                 className="cursor-pointer"
-                                                onSelect={() => handleDeleteComponent(Number(component?.code))}>
+                                                onSelect={() => handleDeleteComponent(String(component?.code))}>
                                                 <Component className="stroke-destructive mr-2" strokeWidth={1} size={18} />
                                                 Delete
                                             </DropdownMenuItem>
