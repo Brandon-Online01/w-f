@@ -760,7 +760,7 @@ export default function LiveRunCards() {
 					</div>
 					:
 					<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'} -mt-4`}>
-						{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
+						{currentMachines?.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
 					</div>
 			}
 			{!isEmpty(currentMachines) && <TablePagination />}

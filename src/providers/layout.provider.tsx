@@ -11,6 +11,7 @@ import { Navigation } from "@/shared/UI/navigation";
 
 const useAuth = () => {
     const router = useRouter();
+    const pathname = usePathname();
     const { status, token, signOut } = useSessionStore();
 
     const redirectIfUnauthenticated = () => {
@@ -24,7 +25,9 @@ const useAuth = () => {
             try {
                 const decodedToken = jwtDecode(token);
                 if (decodedToken.exp && decodedToken.exp > Date.now() / 1000) {
-                    router.push('/');
+                    if (pathname === '/sign-in') {
+                        router.push('/');
+                    }
                 } else {
                     signOut();
                     router.push('/sign-in');
@@ -63,6 +66,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
             setIsLoading(true);
             redirectIfUnauthenticated();
             redirectIfAuthenticated();
+
             setIsLoading(false);
         };
 
@@ -100,29 +104,28 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
         )
     }
 
-const pageVariants = {
-    initial: {
-        opacity: 0,
-        y: 20
-    },
-    animate: {
-        opacity: 1,
-        y: 0
-    },
-    transition: {
-        type: "spring",
-        stiffness: 260,
-        damping: 20
-    }
-};
+    const pageVariants = {
+        initial: {
+            opacity: 0,
+            z: -50
+        },
+        animate: {
+            opacity: 1,
+            z: 0
+        },
+        transition: {
+            type: "spring",
+            stiffness: 260,
+            damping: 20
+        }
+    };
 
-
-return (
-    <QueryClientProvider client={queryClient}>
-        <div className={`w-full h-screen flex flex-col xl:flex-row items-center justify-center xl:gap-2 gap-1 relative ${pathname === '/sign-in' ? '' : 'p-1 xl:p-2'} outline-none`}>
-            {isLoading ? <PageLoader /> : <MainApp />}
-        </div>
-        <Toaster position="bottom-center" reverseOrder={false} />
-    </QueryClientProvider>
-);
+    return (
+        <QueryClientProvider client={queryClient}>
+            <div className={`w-full h-screen flex flex-col xl:flex-row items-center justify-center xl:gap-2 gap-1 relative ${pathname === '/sign-in' ? '' : 'p-1 xl:p-2'} outline-none`}>
+                {isLoading ? <PageLoader /> : <MainApp />}
+            </div>
+            <Toaster position="bottom-center" reverseOrder={false} />
+        </QueryClientProvider>
+    );
 };
