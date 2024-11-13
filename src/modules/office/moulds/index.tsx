@@ -12,7 +12,8 @@ import {
     Component,
     Puzzle,
     ChartNoAxesGantt
-} from 'lucide-react'
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -47,13 +48,14 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { mouldSchema } from '@/schemas/mould'
-import { Mould } from '@/types/mould'
+import { Mould, NewMould } from '@/types/mould'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
 import { useQuery } from '@tanstack/react-query'
 import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
 import axios from 'axios'
+import { createMould, removeMould } from '../helpers/mould'
 
 type MouldFormData = z.infer<typeof mouldSchema>
 
@@ -97,11 +99,60 @@ export default function MouldManager() {
         staleTime: 60000,
     });
 
-    const handleCreateMould: SubmitHandler<MouldFormData> = (data) => console.log('create mould with data ', data)
+    const handleCreateMould: SubmitHandler<MouldFormData> = async (data) => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const mould = {
+            ...data,
+            creationDate: `${new Date()}`,
+        }
+
+        const message = await createMould(mould as NewMould, config)
+
+        console.log(message)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+
+            setIsCreating(false)
+        }
+    }
 
     const handleEditMould: SubmitHandler<MouldFormData> = (data) => console.log('edit mould with data ', data)
 
-    const handleDeleteMould = (referenceID: number) => console.log('delete mould with reference ID ', referenceID)
+    const handleDeleteMould = async (referenceID: string) => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const message = await removeMould(referenceID, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+    }
 
     const MouldForm = ({ mould = null, onSubmit }: { mould?: MouldFormData | null, onSubmit: SubmitHandler<MouldFormData> }) => {
         const { register, handleSubmit, formState: { errors } } = useForm<MouldFormData>({
@@ -142,7 +193,7 @@ export default function MouldManager() {
                     </div>
                     <div className="space-y-1">
                         <div className='flex flex-col justify-start gap-0'>
-                            <Label htmlFor="servicingMileage">Servicing Mileage</Label>
+                            <Label htmlFor="servicingMileage">Servicing Mileage <span className="text-xs text-muted-foreground">(optional)</span></Label>
                             <Input id="servicingMileage" {...register("servicingMileage", { valueAsNumber: true })} type="number" placeholder="1500" />
                         </div>
                         {errors.servicingMileage && <p className="text-red-500 text-xs mt-1">{errors.servicingMileage.message}</p>}
@@ -153,6 +204,13 @@ export default function MouldManager() {
                             <Input id="component" {...register("component", { valueAsNumber: true })} type="number" placeholder="1" />
                         </div>
                         {errors.component && <p className="text-red-500 text-xs mt-1">{errors.component.message}</p>}
+                    </div>
+                    <div className="space-y-1">
+                        <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="factoryReferenceID">Factory Reference ID</Label>
+                            <Input id="factoryReferenceID" {...register("factoryReferenceID")} placeholder="FACT-2024-001" />
+                        </div>
+                        {errors.factoryReferenceID && <p className="text-red-500 text-xs mt-1">{errors.factoryReferenceID.message}</p>}
                     </div>
                     <div className="space-y-1">
                         <div className='flex flex-col justify-start gap-0'>
@@ -192,7 +250,7 @@ export default function MouldManager() {
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-11/12 mx-auto flex" disabled>{mould ? 'Update Mould' : 'Create Mould'}</Button>
+                <Button type="submit" className="w-11/12 mx-auto flex">{mould ? 'Update Mould' : 'Create Mould'}</Button>
             </form>
         )
     }
@@ -230,7 +288,7 @@ export default function MouldManager() {
                             <Wrench className="h-4 w-4 text-card-foreground" />
                             <Label className="text-sm font-medium text-card-foreground">Last Repair Date</Label>
                         </div>
-                        <p className="text-sm font-semibold">{new Date(lastRepairDate).toLocaleString()}</p>
+                        <p className="text-sm font-semibold">{lastRepairDate ? new Date(lastRepairDate).toLocaleString() : 'N/A'}</p>
                     </div>
                     <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-1">
@@ -369,19 +427,20 @@ export default function MouldManager() {
                                 <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
                                 <span>{serialNumber}</span>
                             </div>
-                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                                <Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <span>Mileage: {mileage}</span>
-                            </div>
-                            <div className="flex justify-end">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => {
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                    <Gauge className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <span>Mileage: {mileage}</span>
+                                </div>
+                                <div className="flex justify-end">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreVertical className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {/* <DropdownMenuItem onSelect={() => {
                                             setMouldInFocus({
                                                 ...mould,
                                                 uid: Number(serialNumber),
@@ -391,25 +450,30 @@ export default function MouldManager() {
                                         }}>
                                             <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => {
-                                            setMouldInFocus({
-                                                ...mould,
-                                                uid: Number(serialNumber),
-                                                creationDate: new Date().toISOString(),
-                                                status: status as "Active" | "Inactive" | "Maintenance"
-                                            })
-                                            setIsViewing(true)
-                                        }}>
-                                            <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                            View
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => handleDeleteMould(Number(serialNumber))}>
-                                            <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                        </DropdownMenuItem> */}
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => {
+                                                    setMouldInFocus({
+                                                        ...mould,
+                                                        uid: Number(serialNumber),
+                                                        creationDate: new Date().toISOString(),
+                                                        status: status as "Active" | "Inactive" | "Maintenance"
+                                                    })
+                                                    setIsViewing(true)
+                                                }}>
+                                                <Puzzle className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                                View
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onSelect={() => handleDeleteMould(serialNumber)}>
+                                                <Puzzle className="stroke-destructive mr-2" strokeWidth={1} size={18} />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
                         </div>
                     </CardContent>

@@ -19,7 +19,9 @@ export type Factory = {
     contactEmail: string;
     contactPhone: string;
     isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
+    createdAt?: string;
+    updatedAt?: string;
     factoryReferenceID: string;
 };
+
+
