@@ -14,6 +14,7 @@ import {
     ServerCog,
     ChartNoAxesGanttIcon,
 } from 'lucide-react'
+import toast from 'react-hot-toast';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -24,7 +25,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useForm, SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Machine } from '@/types/machine'
+import { NewMachine, Machine } from '@/types/machine'
 import { motion } from 'framer-motion'
 import { useOfficeStore } from '../state/state'
 import { isEmpty } from 'lodash'
@@ -32,6 +33,7 @@ import axios from 'axios'
 import { useQuery } from '@tanstack/react-query'
 import { generateFactoryEndpoint } from '@/hooks/factory-endpoint'
 import { machineSchema } from '@/schemas/machine'
+import { createMachine, removeMachine } from '../helpers/machines'
 
 type MachineFormData = z.infer<typeof machineSchema>
 
@@ -75,11 +77,58 @@ export default function MachineManager() {
         staleTime: 60000,
     });
 
-    const handleCreateMachine: SubmitHandler<MachineFormData> = (data) => console.log('create machine with data ', data)
+    const handleCreateMachine: SubmitHandler<MachineFormData> = async (data) => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const machine = {
+            ...data,
+            creationDate: `${new Date()}`,
+        }
+
+        const message = await createMachine(machine as NewMachine, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+
+            setIsCreating(false)
+        }
+    }
 
     const handleEditMachine: SubmitHandler<MachineFormData> = (data) => console.log('edit machine with data ', data)
 
-    const handleDeleteMachine = (referenceID: number) => console.log('delete machine with reference ID ', referenceID)
+    const handleDeleteMachine = async (referenceID: number) => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const message = await removeMachine(referenceID, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+    }
 
     const MachineForm = ({
         machine = null,
@@ -126,6 +175,13 @@ export default function MachineManager() {
                     </div>
                     <div className="space-y-1">
                         <div className='flex flex-col justify-start gap-0'>
+                            <Label htmlFor="factoryReferenceID">Factory Reference ID</Label>
+                            <Input id="factoryReferenceID" {...register("factoryReferenceID")} placeholder="FACT-2024-001" />
+                        </div>
+                        {errors.factoryReferenceID && <p className="text-red-500 text-xs mt-1">{errors.factoryReferenceID.message}</p>}
+                    </div>
+                    <div className="space-y-1">
+                        <div className='flex flex-col justify-start gap-0'>
                             <Label htmlFor="status">Status</Label>
                             <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
                                 <SelectTrigger>
@@ -140,7 +196,7 @@ export default function MachineManager() {
                         {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                     </div>
                 </div>
-                <Button type="submit" className="w-11/12 mx-auto flex" disabled>{machine ? 'Update Machine' : 'Create Machine'}</Button>
+                <Button type="submit" className="w-11/12 mx-auto flex">{machine ? 'Update Machine' : 'Create Machine'}</Button>
             </form>
         )
     }
@@ -265,6 +321,9 @@ export default function MachineManager() {
             macAddress,
             status,
         } = machine
+
+        console.log(machine, 'machine')
+
         return (
             <motion.div
                 className="bg-card rounded shadow-md cursor-pointer"
@@ -290,38 +349,40 @@ export default function MachineManager() {
                                 <Hash className="stroke-card-foreground" strokeWidth={1} size={18} />
                                 <span>{machineNumber}</span>
                             </div>
-                            <div className="flex items-center space-x-2 text-sm text-card-foreground">
-                                <Wifi className="stroke-card-foreground" strokeWidth={1} size={18} />
-                                <span>{macAddress}</span>
-                            </div>
-                            <div className="flex justify-end">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                            <MoreVertical className="stroke-card-foreground" strokeWidth={1.5} size={18} />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => {
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-2 text-sm text-card-foreground">
+                                    <Wifi className="stroke-card-foreground" strokeWidth={1} size={18} />
+                                    <span>{macAddress}</span>
+                                </div>
+                                <div className="flex justify-end">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <MoreVertical className="stroke-card-foreground" strokeWidth={1.5} size={18} />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {/* <DropdownMenuItem onSelect={() => {
                                             setMachineInFocus(machine)
                                             setIsEditing(true)
                                         }}>
                                             <ServerCog className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                             Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => {
-                                            setMachineInFocus(machine)
-                                            setIsViewing(true)
-                                        }}>
-                                            <ServerCrash className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
-                                            View
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.machineNumber))}>
-                                            <ServerOff className="stroke-destructive mr-2" strokeWidth={1} size={18} />
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                        </DropdownMenuItem> */}
+                                            <DropdownMenuItem onSelect={() => {
+                                                setMachineInFocus(machine)
+                                                setIsViewing(true)
+                                            }}>
+                                                <ServerCrash className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
+                                                View
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => handleDeleteMachine(Number(machine?.machineNumber))}>
+                                                <ServerOff className="stroke-destructive mr-2" strokeWidth={1} size={18} />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
                             </div>
                         </div>
                     </CardContent>
@@ -420,7 +481,7 @@ export default function MachineManager() {
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
                 {paginatedMachines?.map((machine: Machine, index: number) => <MachineCard machine={machine} key={index} index={index} />)}
             </div>
-            {paginatedMachines?.length >= 8 && <PageControls />}
+            <PageControls />
             <EditMachineModal />
             <ViewMachineDetailModal />
         </div>

@@ -116,6 +116,8 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
 
+	console.log(machine, 'as machine')
+	
 	const DialogSectionHeader = () => {
 		return (
 			<div className="flex flex-col gap-1">
@@ -315,7 +317,18 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 									<>
 										<Cell
 											key={`cell-${index}`}
-											fill={parseFloat(entry?.cycleTime) > targetTime ? 'hsl(var(--chart-3))' : 'hsl(var(--success))'}
+											fill={(() => {
+												const cycleTime = parseFloat(entry?.cycleTime);
+												const tenPercentAboveTarget = targetTime * 1.1;
+												
+												if (cycleTime <= targetTime) {
+													return 'hsl(var(--success))'; // Green for below or at target
+												} else if (cycleTime <= tenPercentAboveTarget) {
+													return 'hsl(var(--warning))'; // Yellow for up to 10% above target
+												} else {
+													return 'hsl(var(--chart-3))'; // Red for more than 10% above target
+												}
+											})()}
 										/>
 										<LabelList
 											dataKey="cycleTime"

@@ -52,7 +52,7 @@ import { Factory } from '@/types/factory'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { createFactory } from '../helpers/factory'
+import { createFactory, removeFactory } from '../helpers/factory'
 
 type FactoryFormData = z.infer<typeof factorySchema>
 
@@ -120,12 +120,35 @@ export default function FactoryManagement() {
                     },
                 }
             );
+
+            setIsCreating(false)
         }
     }
 
     const handleEditFactory: SubmitHandler<FactoryFormData> = (data) => console.log(data, 'as updated factory data')
 
-    const handleDeleteFactory = (uid: number) => console.log(uid, 'delete the factory with this uid')
+    const handleDeleteFactory = async (referenceID: number) => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const message = await removeFactory(referenceID, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+    }
+
 
     const FactoryForm = ({
         factory = null,
