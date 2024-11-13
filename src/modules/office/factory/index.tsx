@@ -1,5 +1,6 @@
 'use client'
 
+import toast from 'react-hot-toast';
 import {
     Search,
     ChevronLeft,
@@ -51,6 +52,7 @@ import { Factory } from '@/types/factory'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { createFactory } from '../helpers/factory'
 
 type FactoryFormData = z.infer<typeof factorySchema>
 
@@ -94,7 +96,32 @@ export default function FactoryManagement() {
         staleTime: 60000,
     });
 
-    const handleCreateFactory: SubmitHandler<FactoryFormData> = (data) => console.log(data, 'as new factory data')
+    const handleCreateFactory: SubmitHandler<FactoryFormData> = async (data) => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const newFactory = {
+            ...data,
+            createdAt: `${new Date()}`,
+            updatedAt: `${new Date()}`,
+        }
+        const message = await createFactory(newFactory as Factory, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+    }
 
     const handleEditFactory: SubmitHandler<FactoryFormData> = (data) => console.log(data, 'as updated factory data')
 
@@ -204,13 +231,13 @@ export default function FactoryManagement() {
                             <div className='flex flex-col justify-start gap-0'>
                                 <Label htmlFor="status">Status</Label>
                                 <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Active">Active</SelectItem>
-                                    <SelectItem value="Inactive">Inactive</SelectItem>
-                                    <SelectItem value="Maintenance">Maintenance</SelectItem>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Active">Active</SelectItem>
+                                        <SelectItem value="Inactive">In Active</SelectItem>
+                                        <SelectItem value="Maintenance">Maintenance</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -256,10 +283,10 @@ export default function FactoryManagement() {
                                 <Label htmlFor="isActive">Is Active</Label>
                                 <Select onValueChange={(value) => register("isActive").onChange({ target: { value: value === 'true' } })}>
                                     <SelectTrigger>
-                                    <SelectValue placeholder="Select active status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="true">Yes</SelectItem>
+                                        <SelectValue placeholder="Select active status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="true">Yes</SelectItem>
                                         <SelectItem value="false">No</SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -274,7 +301,7 @@ export default function FactoryManagement() {
                             {errors.factoryReferenceID && <p className="text-red-500 text-xs mt-1">{errors.factoryReferenceID.message}</p>}
                         </div>
                     </div>
-                    <Button type="submit" className="w-11/12 mx-auto flex mt-4" disabled>{factory ? 'Update Factory' : 'Create Factory'}</Button>
+                    <Button type="submit" className="w-11/12 mx-auto flex mt-4">{factory ? 'Update Factory' : 'Create Factory'}</Button>
                 </ScrollArea>
             </form>
         )
@@ -459,13 +486,13 @@ export default function FactoryManagement() {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onSelect={() => {
+                                        {/* <DropdownMenuItem onSelect={() => {
                                             setFactoryInFocus(factory)
                                             setIsEditing(true)
                                         }}>
                                             <FactoryIcon className="mr-2 stroke-card-foreground" strokeWidth={1} size={18} />
                                             Edit
-                                        </DropdownMenuItem>
+                                        </DropdownMenuItem> */}
                                         <DropdownMenuItem onSelect={() => {
                                             setFactoryInFocus(factory)
                                             setIsViewing(true)
