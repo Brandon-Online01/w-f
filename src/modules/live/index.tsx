@@ -116,8 +116,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 
 	const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
 
-	console.log(machine, 'as machine')
-	
 	const DialogSectionHeader = () => {
 		return (
 			<div className="flex flex-col gap-1">
@@ -464,7 +462,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 								<div className="flex items-center justify-between gap-2 w-full">
 									<div className="flex items-center gap-0 flex-col act-time">
 										<p className="text-card-foreground text-[10px] uppercase">ACT Time</p>
-										<p className="text-card-foreground text-[14px]">{cycleTime}<span className="text-card-foreground text-[12px]">s</span></p>
+										<p className="text-card-foreground text-[14px]">{insertHistory?.at(-1)?.cycleTime}<span className="text-card-foreground text-[12px]">s</span></p>
 									</div>
 									<div className="flex items-center gap-0 flex-col std-time">
 										<p className="text-card-foreground text-[10px] uppercase">STD Time</p>
@@ -760,7 +758,7 @@ export default function LiveRunCards() {
 					</div>
 					:
 					<div className={`grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 ${filteredMachines.length >= 16 ? '' : 'mb-4'} -mt-4`}>
-						{currentMachines.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
+						{currentMachines?.map((machine, index) => <MachineCard key={index} machine={machine} index={index} />)}
 					</div>
 			}
 			{!isEmpty(currentMachines) && <TablePagination />}
