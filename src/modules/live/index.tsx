@@ -82,7 +82,6 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 	const {
 		status,
 		signalQuality,
-		cycleTime,
 		currentProduction,
 		targetProduction,
 		machine: machineInUse,
@@ -216,7 +215,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					</div>
 					<div>
 						<h4 className="text-md uppercase text-card-foreground">Cycle Time</h4>
-						<p className="text-xs">{cycleTime}s / {targetTime}s</p>
+						<p className="text-xs">{insertHistory?.at(-1)?.cycleTime}s / {targetTime}s</p>
 					</div>
 					<div>
 						<h4 className="text-md uppercase text-card-foreground">Efficiency</h4>
