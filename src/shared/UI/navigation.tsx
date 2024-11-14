@@ -113,7 +113,7 @@ export const DesktopNavigation = () => {
         if (pathname === '/' && screenSize?.width > 576) {
             const timeoutId = setTimeout(() => {
                 driverObj.drive();
-            }, 100);
+            }, 5000);
 
             return () => clearTimeout(timeoutId);
         }

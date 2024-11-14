@@ -74,7 +74,8 @@ const itemVariants = {
         opacity: 1,
         y: 0,
         transition: {
-            duration: 0.4
+            duration: 0.4,
+            delay: 0.2
         }
     }
 };
@@ -339,23 +340,22 @@ export default function LiveRunHighlights() {
             className="flex gap-1 w-full flex-wrap lg:flex-nowrap flex-col md:flex-row md:justify-between p-1 lg:p-0 gap-y-4"
             variants={containerVariants}
             initial="hidden"
-            animate="show"
-        >
-            <motion.div variants={itemVariants} className="flex flex-col xl:flex-row items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            animate="show">
+            <div className="flex flex-col xl:flex-row items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <MachineStatistics data={machineStats} />
-            </motion.div>
-            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            </div>
+            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <ShiftUtilization data={currentShiftMachineUtilization} />
-            </motion.div>
-            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            </div>
+            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <DeviceStatistics data={deviceStats} />
-            </motion.div>
-            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            </div>
+            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <FactoryUtilization data={totalFactoryMachineUtilization} />
-            </motion.div>
-            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
+            </div>
+            <div className="flex flex-col items-center justify-center gap-1 w-full md:w-[49%] lg:w-1/5">
                 <ProductionReportCard />
-            </motion.div>
+            </div>
         </motion.div>
     )
 }
