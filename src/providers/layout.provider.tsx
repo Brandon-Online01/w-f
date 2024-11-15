@@ -71,7 +71,7 @@ export const LayoutProvider = ({ children }: LayoutProviderProps) => {
         };
 
         validateSession();
-    }, [redirectIfUnauthenticated, redirectIfAuthenticated]);
+    }, [redirectIfUnauthenticated, redirectIfAuthenticated, pathname]);
 
     const PageLoader = () => {
         return (

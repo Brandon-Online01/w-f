@@ -18,7 +18,7 @@ import axios from "axios"
 import { useEffect } from "react"
 
 export const FactorySelector = () => {
-    const { token } = useSessionStore()
+    const { token, user } = useSessionStore()
     const { factoryReferenceID, setFactoryReferenceID } = useFactoryToggler()
 
     const fetchFactories = async () => {
@@ -38,8 +38,11 @@ export const FactorySelector = () => {
     });
 
     useEffect(() => {
-        setFactoryReferenceID(factories?.data?.[0]?.factoryReferenceID)
-    }, [setFactoryReferenceID, factories])
+        if (!user) return;
+
+        const { factoryReferenceID: userFactoryReferenceID } = user
+        setFactoryReferenceID(factories?.data?.[0]?.factoryReferenceID || userFactoryReferenceID)
+    }, [setFactoryReferenceID, factories, user])
 
     if (isError || !factories || isEmpty(factories?.data)) return;
 
