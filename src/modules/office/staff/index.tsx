@@ -9,7 +9,6 @@ import {
     Edit,
     User,
     Shield,
-    UserPlus,
     Upload,
     Mail,
     Activity,
@@ -19,6 +18,7 @@ import {
     UserX,
     Loader2,
     ChartNoAxesGantt,
+    Plus,
 } from 'lucide-react'
 import { Phone, UserCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -183,8 +183,9 @@ export default function StaffManagement() {
                 <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
-                            <Button className="w-full ">
-                                <UserPlus className="mr-2 h-4 w-4" /> Add A User
+                            <Button className="w-full uppercase">
+                                <Plus className="mr-2 stroke-white" strokeWidth={1} size={18} />
+                                Staff
                             </Button>
                         </div>
                     </DialogTrigger>
@@ -213,7 +214,7 @@ export default function StaffManagement() {
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.02, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
                 transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
-                <Card key={uid} className="overflow-hidden w-full border">
+                <Card key={uid} className="overflow-hidden w-full border h-full">
                     <CardContent className="p-0">
                         <div className="flex flex-col items-center">
                             <div className="w-full h-32 flex items-center justify-center bg-gray-100">
@@ -315,19 +316,21 @@ export default function StaffManagement() {
                 </Select>
                 <div className="flex items-center space-x-2">
                     <Button
-                        variant="ghost"
+                        className="bg-card"
+                        variant="outline"
                         size="icon"
                         onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                         disabled={currentPage === 1}>
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="stroke-card-foreground" strokeWidth={1} size={18} />
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
-                        variant="ghost"
+                        className="bg-card"
+                        variant="outline"
                         size="icon"
                         onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
                         disabled={currentPage === pageCount}>
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="stroke-card-foreground" strokeWidth={1} size={18} />
                     </Button>
                 </div>
             </div>
@@ -557,7 +560,7 @@ export default function StaffManagement() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full overflow-y-scroll">
                 {paginatedUsers?.map((user: UserType, index: number) => <UserCard key={index} user={user} index={index} />)}
             </div>
             {paginatedUsers && paginatedUsers?.length >= 8 && <PaginationControls />}

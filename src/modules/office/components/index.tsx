@@ -17,6 +17,7 @@ import {
     Activity,
     ChartNoAxesGantt,
     Component,
+    Plus,
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -196,114 +197,148 @@ export default function ComponentManager() {
                 <ScrollArea className="h-[80vh] md:h-full w-full flex flex-col justify-start gap-3">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2 col-span-full">
-                            <Label htmlFor="photoURL">Component Image</Label>
-                            <div className="flex items-center space-x-4">
-                                <div className="flex items-center justify-center rounded h-40 w-40 border">
-                                    {
-                                        imagePreview ?
-                                            <Image
-                                                src={imagePreview}
-                                                alt={'Existing Preview Image'}
-                                                width={screenSize.width > 768 ? 30 : 20}
-                                                height={screenSize.width > 768 ? 30 : 20}
-                                                priority
-                                                quality={100}
-                                                className="rounded object-contain w-auto h-auto" />
-                                            :
-                                            <p className="text-[10px] uppercase">No Image</p>
-                                    }
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="photoURL">Component Image</Label>
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex items-center justify-center rounded h-40 w-40 border p-2">
+                                        {
+                                            imagePreview ?
+                                                <Image
+                                                    src={imagePreview}
+                                                    alt={'Existing Preview Image'}
+                                                    width={screenSize.width > 768 ? 30 : 20}
+                                                    height={screenSize.width > 768 ? 30 : 20}
+                                                    priority
+                                                    quality={100}
+                                                    className="rounded object-contain w-auto h-auto" />
+                                                :
+                                                <p className="text-[10px] uppercase">No Image</p>
+                                        }
+                                    </div>
+                                    <Input
+                                        id="photoURL"
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={(e) => handleImageUpload(e, setImagePreview)}
+                                        ref={fileInputRef}
+                                    />
+                                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                        Upload Image
+                                    </Button>
                                 </div>
-                                <Input
-                                    id="photoURL"
-                                    type="file"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={(e) => handleImageUpload(e, setImagePreview)}
-                                    ref={fileInputRef}
-                                />
-                                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                                    Upload Image
-                                </Button>
                             </div>
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="name">Name</Label>
-                            <Input id="name" {...register("name")} placeholder="Component name" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="name">Name</Label>
+                                <Input id="name" {...register("name")} placeholder="Component name" />
+                            </div>
                             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="description">Description</Label>
-                            <Input id="description" {...register("description")} placeholder="Component description" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="description">Description</Label>
+                                <Input id="description" {...register("description")} placeholder="Component description" />
+                            </div>
                             {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="weight">Weight</Label>
-                            <Input id="weight" type="number" {...register("weight", { valueAsNumber: true })} placeholder="Weight" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="weight">Weight</Label>
+                                <Input id="weight" type="number" {...register("weight", { valueAsNumber: true })} placeholder="Weight" />
+                            </div>
                             {errors.weight && <p className="text-red-500 text-xs mt-1">{errors.weight.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="volume">Volume</Label>
-                            <Input id="volume" type="number" {...register("volume", { valueAsNumber: true })} placeholder="Volume" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="volume">Volume</Label>
+                                <Input id="volume" type="number" {...register("volume", { valueAsNumber: true })} placeholder="Volume" />
+                            </div>
                             {errors.volume && <p className="text-red-500 text-xs mt-1">{errors.volume.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="code">Code</Label>
-                            <Input id="code" {...register("code")} placeholder="Component code" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="code">Code</Label>
+                                <Input id="code" {...register("code")} placeholder="Component code" />
+                            </div>
                             {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="color">Color</Label>
-                            <Input id="color" {...register("color")} placeholder="Component color" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="color">Color</Label>
+                                <Input id="color" {...register("color")} placeholder="Component color" />
+                            </div>
                             {errors.color && <p className="text-red-500 text-xs mt-1">{errors.color.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="cycleTime">Cycle Time</Label>
-                            <Input id="cycleTime" type="number" {...register("cycleTime", { valueAsNumber: true })} placeholder="Cycle time" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="cycleTime">Cycle Time</Label>
+                                <Input id="cycleTime" type="number" {...register("cycleTime", { valueAsNumber: true })} placeholder="Cycle time" />
+                            </div>
                             {errors.cycleTime && <p className="text-red-500 text-xs mt-1">{errors.cycleTime.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="targetTime">Target Time</Label>
-                            <Input id="targetTime" type="number" {...register("targetTime", { valueAsNumber: true })} placeholder="Target time" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="targetTime">Target Time</Label>
+                                <Input id="targetTime" type="number" {...register("targetTime", { valueAsNumber: true })} placeholder="Target time" />
+                            </div>
                             {errors.targetTime && <p className="text-red-500 text-xs mt-1">{errors.targetTime.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="coolingTime">Cooling Time</Label>
-                            <Input id="coolingTime" type="number" {...register("coolingTime", { valueAsNumber: true })} placeholder="Cooling time" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="coolingTime">Cooling Time</Label>
+                                <Input id="coolingTime" type="number" {...register("coolingTime", { valueAsNumber: true })} placeholder="Cooling time" />
+                            </div>
                             {errors.coolingTime && <p className="text-red-500 text-xs mt-1">{errors.coolingTime.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="chargingTime">Charging Time</Label>
-                            <Input id="chargingTime" type="number" {...register("chargingTime", { valueAsNumber: true })} placeholder="Charging time" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="chargingTime">Charging Time</Label>
+                                <Input id="chargingTime" type="number" {...register("chargingTime", { valueAsNumber: true })} placeholder="Charging time" />
+                            </div>
                             {errors.chargingTime && <p className="text-red-500 text-xs mt-1">{errors.chargingTime.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="cavity">Cavity</Label>
-                            <Input id="cavity" type="number" {...register("cavity", { valueAsNumber: true })} placeholder="Cavity" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="cavity">Cavity</Label>
+                                <Input id="cavity" type="number" {...register("cavity", { valueAsNumber: true })} placeholder="Cavity" />
+                            </div>
                             {errors.cavity && <p className="text-red-500 text-xs mt-1">{errors.cavity.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="configuration">Configuration</Label>
-                            <Input id="configuration" {...register("configuration")} placeholder="Configuration" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="configuration">Configuration</Label>
+                                <Input id="configuration" {...register("configuration")} placeholder="Configuration" />
+                            </div>
                             {errors.configuration && <p className="text-red-500 text-xs mt-1">{errors.configuration.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="configQTY">Config Quantity</Label>
-                            <Input id="configQTY" type="number" {...register("configQTY", { valueAsNumber: true })} placeholder="Config quantity" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="configQTY">Config Quantity</Label>
+                                <Input id="configQTY" type="number" {...register("configQTY", { valueAsNumber: true })} placeholder="Config quantity" />
+                            </div>
                             {errors.configQTY && <p className="text-red-500 text-xs mt-1">{errors.configQTY.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="palletQty">Pallet Quantity</Label>
-                            <Input id="palletQty" type="number" {...register("palletQty", { valueAsNumber: true })} placeholder="Pallet quantity" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="palletQty">Pallet Quantity</Label>
+                                <Input id="palletQty" type="number" {...register("palletQty", { valueAsNumber: true })} placeholder="Pallet quantity" />
+                            </div>
                             {errors.palletQty && <p className="text-red-500 text-xs mt-1">{errors.palletQty.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="testMachine">Test Machine</Label>
-                            <Input id="testMachine" {...register("testMachine")} placeholder="Test machine" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="testMachine">Test Machine</Label>
+                                <Input id="testMachine" {...register("testMachine")} placeholder="Test machine" />
+                            </div>
                             {errors.testMachine && <p className="text-red-500 text-xs mt-1">{errors.testMachine.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="masterBatch">Master Batch</Label>
-                            <Input id="masterBatch" type="number" {...register("masterBatch", { valueAsNumber: true })} placeholder="Master batch" />
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="masterBatch">Master Batch</Label>
+                                <Input id="masterBatch" type="number" {...register("masterBatch", { valueAsNumber: true })} placeholder="Master batch" />
+                            </div>
                             {errors.masterBatch && <p className="text-red-500 text-xs mt-1">{errors.masterBatch.message}</p>}
                         </div>
                         <div className="space-y-1">
@@ -314,26 +349,28 @@ export default function ComponentManager() {
                             {errors.factoryReferenceID && <p className="text-red-500 text-xs mt-1">{errors.factoryReferenceID.message}</p>}
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="status">Status</Label>
-                            <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="Active">
-                                        <span className="flex items-center gap-2">
-                                            <Activity className="stroke-success" strokeWidth={1} size={18} />
-                                            Active
-                                        </span>
-                                    </SelectItem>
-                                    <SelectItem value="Inactive">
-                                        <span className="flex items-center gap-2">
-                                            <Activity className="stroke-destructive" strokeWidth={1} size={18} />
-                                            In Active
-                                        </span>
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className='flex flex-col justify-start gap-0'>
+                                <Label htmlFor="status">Status</Label>
+                                <Select onValueChange={(value) => register("status").onChange({ target: { value } })}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Active">
+                                            <span className="flex items-center gap-2">
+                                                <Activity className="stroke-success" strokeWidth={1} size={18} />
+                                                Active
+                                            </span>
+                                        </SelectItem>
+                                        <SelectItem value="Inactive">
+                                            <span className="flex items-center gap-2">
+                                                <Activity className="stroke-destructive" strokeWidth={1} size={18} />
+                                                In Active
+                                            </span>
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
                         </div>
                     </div>
@@ -482,9 +519,9 @@ export default function ComponentManager() {
                         !['User', 'Guest', 'Operator'].includes(user?.role || '') &&
                         <DialogTrigger asChild disabled>
                             <div className='w-full flex items-end justify-end lg:w-64'>
-                                <Button className="w-full">
-                                    <Component className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
-                                    Add A Component {user?.role}
+                                <Button className="w-full uppercase">
+                                    <Plus className="mr-2 stroke-white" strokeWidth={1} size={18} />
+                                    Component {user?.role}
                                 </Button>
                             </div>
                         </DialogTrigger>
@@ -527,7 +564,6 @@ export default function ComponentManager() {
 
         const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
 
-
         return (
             <motion.div
                 className="bg-card rounded shadow-md cursor-pointer"
@@ -536,7 +572,7 @@ export default function ComponentManager() {
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.01, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
                 transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
-                <Card key={component.code} className="overflow-hidden bg-card">
+                <Card key={component.code} className="overflow-hidden bg-card h-full">
                     <CardContent className="p-0">
                         <div className="flex flex-col items-center">
                             <div className="w-full h-40 flex items-center justify-center bg-gray-100">
@@ -640,19 +676,21 @@ export default function ComponentManager() {
                 </Select>
                 <div className="flex items-center space-x-2">
                     <Button
-                        variant="ghost"
+                        className="bg-card"
+                        variant="outline"
                         size="icon"
                         onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                         disabled={currentPage === 1}>
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="stroke-card-foreground" strokeWidth={1} size={18} />
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
-                        variant="ghost"
+                        className="bg-card"
+                        variant="outline"
                         size="icon"
                         onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
                         disabled={currentPage === pageCount}>
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="stroke-card-foreground" strokeWidth={1} size={18} />
                     </Button>
                 </div>
             </div>
@@ -711,7 +749,7 @@ export default function ComponentManager() {
     return (
         <div className="w-full flex flex-col justify-start gap-2">
             <PageHeader />
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full h-full overflow-y-scroll">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full overflow-y-scroll">
                 {paginatedComponents?.map((component: ComponentFormData, index: number) => <ComponentCard key={index} component={component} index={index} />)}
             </div>
             {paginatedComponents?.length >= 8 && <PageControls />}

@@ -101,16 +101,16 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 	} = machine
 
 	const {
-		name: componentName,
-		code: componentCode,
 		photoURL,
 		targetTime,
+		name: componentName,
+		code: componentCode,
 	} = componentInProduction
 
 	const {
-		name: machineName,
+		macAddress,
 		machineNumber,
-		macAddress
+		name: machineName,
 	} = machineInUse
 
 	const fullPhotoURL = `${process.env.NEXT_PUBLIC_API_URL_FILE_ENDPOINT}${photoURL}`
@@ -241,9 +241,14 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 							<AlertTriangle className="h-4 w-4" />
 							<AlertTitle className="uppercase">Cycle Time Status</AlertTitle>
 							<AlertDescription>
-								<p className="text-xs uppercase">{cycleTimeVariancePercentage === 'Low'
-									? "Cycle times are within normal range."
-									: "Cycle times are showing high variance. Machine may need inspection."}</p>
+								<p className="text-xs uppercase">
+									{cycleTimeVariancePercentage === 'Low'
+										? "Cycle times are within normal range."
+										: cycleTimeVariancePercentage === 'Medium'
+											? "Cycle times are showing moderate variance. Consider preventative maintenance check."
+											: "Cycle times are showing high variance. Machine may need immediate inspection."
+									}
+								</p>
 							</AlertDescription>
 						</Alert>
 					}
@@ -276,11 +281,17 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 		)
 	}
 
+	const sortedHistory = [...insertHistory].sort((a, b) =>
+		new Date(b.eventTimeStamp).getTime() - new Date(a.eventTimeStamp).getTime()
+	);
+
 	const PerformanceTab = () => {
 		return (
 			<div className="space-y-4 flex flex-col justify-start gap-3 w-full">
 				<div className='w-full flex flex-col gap-2 justify-start'>
 					<h4 className="text-sm uppercase mb-2 text-card-foreground text-center">Last 10 Cycle Times</h4>
+					<div>
+					</div>
 					<ResponsiveContainer width="100%" height={300}>
 						<BarChart
 							barGap={width > 768 ? 5 : 0}
@@ -310,20 +321,20 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 								radius={5}
 								name="time (s)"
 								dataKey="cycleTime">
-								{insertHistory.map((entry, index) => (
+								{sortedHistory?.map((entry, index) => (
 									<>
 										<Cell
 											key={`cell-${index}`}
 											fill={(() => {
 												const cycleTime = parseFloat(entry?.cycleTime);
 												const tenPercentAboveTarget = targetTime * 1.1;
-												
+
 												if (cycleTime <= targetTime) {
-													return 'hsl(var(--success))'; // Green for below or at target
+													return 'hsl(var(--success))';
 												} else if (cycleTime <= tenPercentAboveTarget) {
-													return 'hsl(var(--warning))'; // Yellow for up to 10% above target
+													return 'hsl(var(--warning))';
 												} else {
-													return 'hsl(var(--chart-3))'; // Red for more than 10% above target
+													return 'hsl(var(--chart-3))';
 												}
 											})()}
 										/>
@@ -347,6 +358,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 					<AlertDescription>
 						<ul className="list-disc list-inside">
 							<li>Efficiency: {efficiency}%</li>
+							<li>Target Time: {targetTime}s</li>
 							<li>Average Cycle Time: {averageCycleTime}s</li>
 							<li>Cycle Time Variance: {cycleTimeVariance}s</li>
 						</ul>
@@ -365,7 +377,7 @@ const MachineCard = React.memo(({ machine, index }: { machine: MachineLiveRun, i
 						<BarChart
 							barGap={5}
 							barSize={width > 768 ? 50 : 30}
-							margin={{ top: 10, right: 10, left: 10 }}
+							margin={{ top: 50, right: 10, left: 10 }}
 							data={[{ name: 'Virgin Material', value: virginMaterial }, { name: 'Master Batch', value: masterBatchMaterial }]}>
 							<XAxis dataKey="name" />
 							<YAxis
@@ -572,8 +584,8 @@ export default function LiveRunCards() {
 		setCurrentPage,
 		setItemsPerPage,
 		setSocketStatus,
-		setSearchQuery,
 		searchQuery,
+		setSearchQuery,
 	} = liveRunStore();
 
 	useEffect(() => {
@@ -585,7 +597,7 @@ export default function LiveRunCards() {
 			});
 
 			socket.on('connect', () => {
-				setSocketStatus('Connected to live stream');
+				setSocketStatus('Connected to live stream server');
 			});
 
 			socket.on('live-run', (data) => {
@@ -595,12 +607,12 @@ export default function LiveRunCards() {
 
 			socket.on('disconnect', () => {
 				setIsLoading(false);
-				setSocketStatus('Live stream disconnected');
+				setSocketStatus('Live stream disconnected by the server');
 			});
 
 			socket.on('error', () => {
 				setIsLoading(false);
-				setSocketStatus('Live stream ended');
+				setSocketStatus('Live stream ended by the server');
 			});
 
 			return () => {
@@ -609,22 +621,26 @@ export default function LiveRunCards() {
 		};
 
 		fetchLiveRunData();
-	}, [setMachineData, setIsLoading, setSocketStatus]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []); // this is to connect to the live stream only once
+
+	const handleFilterInput = (searchParams: string) => setSearchQuery(searchParams);
 
 	const SectionHeader = () => {
 		return (
 			<div className="mb-4 flex justify-between items-center flex-wrap md:flex-nowrap">
 				<div className="flex items-center gap-2 w-full lg:w-1/2">
 					<div className="relative flex-grow w-full">
-						<Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" strokeWidth={1.5} size={18} />
+						<Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" strokeWidth={1} size={15} />
 						<Input
-							type="text"
-							placeholder="search staff..."
 							className="pl-8 w-full search-live"
+							type="text"
+							placeholder="Search by machine or component name..."
 							value={searchQuery}
-							onChange={(e) =>
-								setSearchQuery(e.target.value)}
-							disabled
+							onChange={(e) => {
+								handleFilterInput(e.target.value.toLowerCase());
+								setCurrentPage(1);
+							}}
 						/>
 					</div>
 					<Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -676,19 +692,21 @@ export default function LiveRunCards() {
 	}
 
 	const filteredMachines = useMemo(() => {
-		return machineData?.filter(machine =>
-			(machine?.machine?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-				machine?.component?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase())) &&
-			(statusFilter === 'all' || machine?.status?.toLowerCase() === statusFilter)
-		);
-	}, [machineData, searchQuery, statusFilter]);
+		if (!machineData) return [];
+
+		return machineData?.filter(machine => {
+			const matchesStatus = statusFilter === 'all' || machine?.status?.toLowerCase() === statusFilter;
+
+			return matchesStatus;
+		});
+	}, [machineData, statusFilter]);
 
 	const indexOfLastItem = currentPage * itemsPerPage
 	const indexOfFirstItem = indexOfLastItem - itemsPerPage
-	const currentMachines = filteredMachines.slice(indexOfFirstItem, indexOfLastItem)
+	const currentMachines = filteredMachines?.slice(indexOfFirstItem, indexOfLastItem)
 	const totalPages = Math.ceil(filteredMachines?.length / itemsPerPage)
 
-	const paginate = (pageNumber: number) => setCurrentPage(pageNumber)
+	const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
 	const TablePagination = () => {
 		return (
@@ -731,7 +749,6 @@ export default function LiveRunCards() {
 	if (isLoading) {
 		return (
 			<div className="w-full h-screen">
-				<SectionHeader />
 				<MachineCardsLoader />
 			</div>
 		)
@@ -741,7 +758,6 @@ export default function LiveRunCards() {
 	if (isEmpty(machineData)) {
 		return (
 			<div className="w-full h-screen">
-				<SectionHeader />
 				<MachineCardsPlaceholder />
 			</div>
 		)
@@ -807,7 +823,7 @@ const MachineCardsLoader = () => {
 							<div className="h-4 bg-gray-200 rounded w-2/12" />
 						</div>
 						<div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-muted-foreground">
-							<div className={`w-2 h-2 rounded-full ${socketStatus === 'Connected to live stream' ? 'bg-success' : 'bg-destructive'} animate-pulse`} />
+							<div className={`w-2 h-2 rounded-full ${socketStatus === 'Connected to live stream server' ? 'bg-success' : 'bg-destructive'} animate-pulse`} />
 							{socketStatus}
 						</div>
 					</motion.div>

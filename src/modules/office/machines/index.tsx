@@ -11,8 +11,8 @@ import {
     Wifi,
     ServerCrash,
     ServerOff,
-    ServerCog,
     ChartNoAxesGanttIcon,
+    Plus,
 } from 'lucide-react'
 import toast from 'react-hot-toast';
 import { Button } from "@/components/ui/button"
@@ -297,9 +297,9 @@ export default function MachineManager() {
                 <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
-                            <Button className="w-full ">
-                                <ServerCog className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
-                                Add A Machine
+                        <Button className="w-full uppercase">
+                                <Plus className="mr-2 stroke-white" strokeWidth={1} size={18} />
+                                Machine
                             </Button>
                         </div>
                     </DialogTrigger>
@@ -321,8 +321,6 @@ export default function MachineManager() {
             macAddress,
             status,
         } = machine
-
-        console.log(machine, 'machine')
 
         return (
             <motion.div
@@ -372,9 +370,9 @@ export default function MachineManager() {
                                             <DropdownMenuItem
                                                 className="cursor-pointer"
                                                 onSelect={() => {
-                                                setMachineInFocus(machine)
-                                                setIsViewing(true)
-                                            }}>
+                                                    setMachineInFocus(machine)
+                                                    setIsViewing(true)
+                                                }}>
                                                 <ServerCrash className="stroke-card-foreground mr-2" strokeWidth={1} size={18} />
                                                 View
                                             </DropdownMenuItem>
@@ -413,19 +411,21 @@ export default function MachineManager() {
                 </Select>
                 <div className="flex items-center space-x-2">
                     <Button
-                        variant="ghost"
+                        className="bg-card"
+                        variant="outline"
                         size="icon"
                         onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                         disabled={currentPage === 1}>
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="stroke-card-foreground" strokeWidth={1} size={18} />
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
-                        variant="ghost"
+                        className="bg-card"
+                        variant="outline"
                         size="icon"
                         onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
                         disabled={currentPage === pageCount}>
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="stroke-card-foreground" strokeWidth={1} size={18} />
                     </Button>
                 </div>
             </div>

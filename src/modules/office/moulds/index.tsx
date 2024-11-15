@@ -11,7 +11,8 @@ import {
     Gauge,
     Component,
     Puzzle,
-    ChartNoAxesGantt
+    ChartNoAxesGantt,
+    Plus
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from "@/components/ui/button"
@@ -376,9 +377,9 @@ export default function MouldManager() {
                 <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                         <div className='w-full flex items-end justify-end lg:w-64'>
-                            <Button className="w-full ">
-                                <Puzzle className="mr-2 stroke-white" strokeWidth={1.5} size={18} />
-                                Add A Mould
+                            <Button className="w-full uppercase">
+                                <Plus className="mr-2 stroke-white" strokeWidth={1} size={18} />
+                                Mould
                             </Button>
                         </div>
                     </DialogTrigger>
@@ -409,7 +410,7 @@ export default function MouldManager() {
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.02, boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.2)" }}
                 transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut", bounce: 0.3 }}>
-                <Card key={serialNumber} className="overflow-hidden">
+                <Card key={serialNumber} className="overflow-hidden h-full">
                     <CardContent className="p-4">
                         <div className="flex flex-col space-y-2">
                             <div className="flex items-center justify-between">
@@ -500,19 +501,21 @@ export default function MouldManager() {
                 </Select>
                 <div className="flex items-center space-x-2">
                     <Button
-                        variant="ghost"
+                        className="bg-card"
+                        variant="outline"
                         size="icon"
                         onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                         disabled={currentPage === 1}>
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="stroke-card-foreground" strokeWidth={1} size={18} />
                     </Button>
                     <span>{currentPage} of {pageCount}</span>
                     <Button
-                        variant="ghost"
+                        className="bg-card"
+                        variant="outline"
                         size="icon"
                         onClick={() => setCurrentPage(Math.min(currentPage + 1, pageCount))}
                         disabled={currentPage === pageCount}>
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="stroke-card-foreground" strokeWidth={1} size={18} />
                     </Button>
                 </div>
             </div>
