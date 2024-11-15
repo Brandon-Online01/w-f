@@ -331,7 +331,7 @@ export const navigationTour: DriveStep[] = [
         element: '.production-machine',
         popover: {
             title: 'View Production Metrics',
-            description: 'Open a detailed view for cycle times, performance, and more.',
+            description: 'Open a detailed view for cycle times, performance, and more by clicking on this card.',
             side: "top",
             align: 'start'
         }
