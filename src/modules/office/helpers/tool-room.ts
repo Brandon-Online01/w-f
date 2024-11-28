@@ -4,7 +4,6 @@ import { BookingFormData } from "@/types/tool-room";
 
 export const createBooking = async (newBooking: BookingFormData, config: RequestConfig) => {
     try {
-        console.log("newBooking", newBooking)
         const url = `${process.env.NEXT_PUBLIC_API_URL}/toolroom`
         const { data: { message } } = await axios.post(url, newBooking, config)
         return message;

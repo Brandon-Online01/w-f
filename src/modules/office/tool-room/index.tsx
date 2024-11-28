@@ -51,7 +51,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { BookingFormData, FactoryReference } from "@/types/tool-room"
+import { BookingFormData, FactoryReference, ToolRoomCardProps } from "@/types/tool-room"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { bookingFormSchema } from "@/schemas/toolroom"
 import { useForm, useFieldArray } from "react-hook-form"
@@ -64,12 +64,12 @@ import { generateFactoryEndpoint } from "@/hooks/factory-endpoint"
 import axios from "axios"
 import { isEmpty } from "lodash"
 import { motion } from "framer-motion"
+import { materials } from "@/tools/data"
+import { mouldList } from "@/data/moulds"
+import { staffList } from "@/data/staff"
 
 // Mock data for dropdowns
-const moulds = ["Mould A", "Mould B", "Mould C", "Mould D"]
-const users = ["John Doe", "Jane Smith", "Alice Johnson", "Bob Williams"]
-const statuses = ["Ready", "In Repair", "In Use"]
-const materials = ["Steel Plate", "Rubber Gasket", "Plastic Cover", "Copper Wire"]
+const statuses = ["In Repair"]
 const materialUnits = ["cm", "kg", "pcs", "m"]
 
 export const generateRandomFactoryData = (id: number): FactoryReference => ({
@@ -104,6 +104,24 @@ export default function FactoryComponents() {
 
     const session = sessionStorage.getItem('waresense');
 
+    const fetchUsers = async () => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+        const users = await staffList(config)
+        return users
+    }
+
+    const fetchMoulds = async () => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+        const moulds = await mouldList(config)
+        return moulds
+    }
+
     const fetchBookings = async () => {
         if (!session) return
 
@@ -123,6 +141,30 @@ export default function FactoryComponents() {
         refetchOnWindowFocus: true,
         staleTime: 60000,
     });
+
+    console.log(bookings, '- bookings')
+
+    const { data: mouldsList } = useQuery({
+        queryKey: ['moulds'],
+        queryFn: fetchMoulds,
+        staleTime: 60000,
+    });
+
+    const { data: usersList } = useQuery({
+        queryKey: ['users'],
+        queryFn: fetchUsers,
+        staleTime: 60000,
+    });
+
+    const availableMould = mouldsList?.data?.map((mould: { name: string, uid: string }) => ({
+        name: mould.name,
+        uid: `${mould.uid}`
+    }))
+
+    const availableUsers = usersList?.data?.map((user: { name: string, uid: string }) => ({
+        name: user.name,
+        uid: `${user.uid}`
+    }))
 
     const form = useForm<z.infer<typeof bookingFormSchema>>({
         resolver: zodResolver(bookingFormSchema),
@@ -164,7 +206,6 @@ export default function FactoryComponents() {
 
         const newBooking: BookingFormData = {
             ...restOfValues,
-            selectMould,
             peopleNeeded: parseInt(peopleNeeded),
             damageRating: parseInt(damageRating),
             factoryReferenceID: `${sessionData?.state?.user?.factoryReferenceID}`,
@@ -259,8 +300,10 @@ export default function FactoryComponents() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {moulds.map((mould) => (
-                                                            <SelectItem key={mould} value={mould}>{mould}</SelectItem>
+                                                        {availableMould?.map((mould: { name: string, uid: string }) => (
+                                                            <SelectItem key={mould.uid} value={mould.uid}>
+                                                                {mould.name}
+                                                            </SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
@@ -281,8 +324,10 @@ export default function FactoryComponents() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {users.map((user) => (
-                                                            <SelectItem key={user} value={user}>{user}</SelectItem>
+                                                        {availableUsers?.map((user: { name: string, uid: string }) => (
+                                                            <SelectItem key={user.uid} value={user.uid}>
+                                                                {user.name}
+                                                            </SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
@@ -492,15 +537,15 @@ export default function FactoryComponents() {
     }
 
     const ToolRoomCard = ({ component, index }: { component: ToolRoomCardProps, index: number }) => {
-        const { factoryReferenceID, status, damageRating, eta, selectMould, peopleNeeded, materialsUsed, checkedInBy, checkInComments, checkInDate } = component
+        const { factoryReferenceID, status, damageRating, eta, peopleNeeded, materialsUsed, checkedInBy, checkInComments, checkInDate, itemReferenceCode } = component
 
-        console.log(checkInDate)
+        const { name } = itemReferenceCode
 
         return (
             <Card key={index} className="relative group bg-card">
                 <CardContent className="p-3">
                     <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold">{selectMould}</h3>
+                        <h3 className="font-semibold">{name}</h3>
                         <Badge variant="secondary" className="bg-green-100 text-green-800">
                             {status}
                         </Badge>
@@ -648,8 +693,10 @@ export default function FactoryComponents() {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {users.map((user) => (
-                                                        <SelectItem key={user} value={user}>{user}</SelectItem>
+                                                    {availableUsers?.map((user: { name: string, uid: string }) => (
+                                                        <SelectItem key={user.uid} value={user.uid}>
+                                                            {user.name}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -964,28 +1011,3 @@ const ToolRoomCardsLoader = () => {
         </div>
     );
 };
-
-interface ToolRoomCardProps {
-    uid: number,
-    factoryReferenceID: string,
-    itemReferenceCode: string,
-    checkedInBy: string,
-    checkedOutBy: string | null,
-    checkInDate: string,
-    checkOutDate: string | null,
-    checkInComments: string,
-    checkOutComments: string | null,
-    repairComments: string | null,
-    damageRating: number,
-    turnaroundTime: string | null,
-    status: string,
-    selectMould: string,
-    eta: string,
-    peopleNeeded: number,
-    materialsUsed: {
-        uid: number,
-        materialName: string,
-        quantityUsed: number,
-        unit: string
-    }[]
-}
