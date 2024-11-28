@@ -57,7 +57,7 @@ import { bookingFormSchema } from "@/schemas/toolroom"
 import { useForm, useFieldArray } from "react-hook-form"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { createBooking } from "../helpers/tool-room"
+import { createBooking, updateBooking } from "../helpers/tool-room"
 import toast from "react-hot-toast"
 import { useQuery } from "@tanstack/react-query"
 import { generateFactoryEndpoint } from "@/hooks/factory-endpoint"
@@ -69,27 +69,8 @@ import { mouldList } from "@/data/moulds"
 import { staffList } from "@/data/staff"
 
 // Mock data for dropdowns
-const statuses = ["In Repair"]
+const statuses = ["In Repair", 'Ready']
 const materialUnits = ["cm", "kg", "pcs", "m"]
-
-export const generateRandomFactoryData = (id: number): FactoryReference => ({
-    factoryReferenceID: `FAC-2024-${id.toString().padStart(3, '0')}`,
-    checkedInBy: ["John Doe", "Jane Smith", "Alice Johnson", "Bob Williams"][Math.floor(Math.random() * 4)],
-    checkedOutBy: ["John Doe", "Jane Smith", "Alice Johnson", "Bob Williams"][Math.floor(Math.random() * 4)],
-    checkInComments: ["Good condition", "Minor wear", "Needs inspection", "Ready for use"][Math.floor(Math.random() * 4)],
-    checkOutComments: ["No issues", "Minor wear observed", "Needs cleaning", "Handle with care"][Math.floor(Math.random() * 4)],
-    repairComments: ["No repairs needed", "Minor fixes applied", "Major overhaul required", "Replaced worn parts"][Math.floor(Math.random() * 4)],
-    damageRating: Math.floor(Math.random() * 5) + 1,
-    turnaroundTime: Math.floor(Math.random() * 72) + 24,
-    status: ["Ready", "In Repair", "In Use"][Math.floor(Math.random() * 3)],
-    materialsUsed: [
-        {
-            materialName: ["Steel Plate", "Rubber Gasket", "Plastic Cover", "Copper Wire"][Math.floor(Math.random() * 4)],
-            quantityUsed: Math.floor(Math.random() * 10) + 1,
-            unit: ["kg", "m", "pcs"][Math.floor(Math.random() * 3)]
-        }
-    ],
-})
 
 export default function FactoryComponents() {
     const [searchQuery, setSearchQuery] = useState("")
@@ -141,8 +122,6 @@ export default function FactoryComponents() {
         refetchOnWindowFocus: true,
         staleTime: 60000,
     });
-
-    console.log(bookings, '- bookings')
 
     const { data: mouldsList } = useQuery({
         queryKey: ['moulds'],
@@ -229,16 +208,48 @@ export default function FactoryComponents() {
         }
     }
 
-    const handleUpdate = (values: z.infer<typeof bookingFormSchema>) => {
-        console.log("Updated data:", values)
-        setIsUpdateModalOpen(false)
-        // updateFormHook.reset()
-    }
+    const handleCheckout = async () => {
+        if (!session || !selectedComponent) return
 
-    const handleCheckout = () => {
-        console.log("Checking out component:", selectedComponent)
-        setIsUpdateModalOpen(false)
-    }
+        setIsAddBookingOpen(false)
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const values = updateFormHook.getValues();
+        const status = values.status || 'Ready';
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { selectMould, peopleNeeded, damageRating, ...restOfValues } = values
+
+        const updatedBooking = {
+            ...restOfValues,
+            status: status,
+            peopleNeeded: parseInt(peopleNeeded),
+            damageRating: parseInt(damageRating),
+            factoryReferenceID: selectedComponent?.factoryReferenceID,
+            checkedOutBy: `${sessionData?.state?.user?.uid}`,
+            checkOutDate: `${new Date()}`,
+        };
+
+        const referenceID = selectedComponent?.uid
+
+        const message = await updateBooking(referenceID, updatedBooking, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+
+    };
 
     const PageHeader = () => {
         return (
@@ -537,7 +548,7 @@ export default function FactoryComponents() {
     }
 
     const ToolRoomCard = ({ component, index }: { component: ToolRoomCardProps, index: number }) => {
-        const { factoryReferenceID, status, damageRating, eta, peopleNeeded, materialsUsed, checkedInBy, checkInComments, checkInDate, itemReferenceCode } = component
+        const { factoryReferenceID, status, damageRating, eta, peopleNeeded, materialsUsed, checkedInBy, checkInComments, checkInDate, itemReferenceCode, checkedOutBy } = component
 
         const { name } = itemReferenceCode
 
@@ -585,6 +596,7 @@ export default function FactoryComponents() {
                                     setUpdateForm({
                                         selectMould: factoryReferenceID.split('-')[2],
                                         checkedInBy: checkedInBy,
+                                        checkedOutBy: checkedOutBy ?? '',
                                         status: status,
                                         checkInComments: checkInComments,
                                         damageRating: damageRating.toString(),
@@ -619,15 +631,15 @@ export default function FactoryComponents() {
                         <div className="grid gap-4">
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Factory Reference:</Label>
-                                <span>{selectedComponent.factoryReferenceID}</span>
+                                <span>{selectedComponent.factoryReferenceID || 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Checked In By:</Label>
-                                <span>{selectedComponent.checkedInBy}</span>
+                                <span>{selectedComponent.checkedInBy || 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Checked Out By:</Label>
-                                <span>{selectedComponent.checkedOutBy}</span>
+                                <span>{selectedComponent.checkedOutBy ?? 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Check In Comments:</Label>
@@ -635,11 +647,11 @@ export default function FactoryComponents() {
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Check Out Comments:</Label>
-                                <span>{selectedComponent.checkOutComments}</span>
+                                <span>{selectedComponent.checkOutComments ?? 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Repair Comments:</Label>
-                                <span>{selectedComponent.repairComments}</span>
+                                <span>{selectedComponent.repairComments ?? 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Damage Rating:</Label>
@@ -647,19 +659,19 @@ export default function FactoryComponents() {
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Turnaround Time:</Label>
-                                <span>{selectedComponent.turnaroundTime} hours</span>
+                                <span>{selectedComponent.turnaroundTime ?? 'N/A'} hours</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Status:</Label>
                                 <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                    {selectedComponent.status}
+                                    {selectedComponent.status ?? 'N/A'}
                                 </Badge>
                             </div>
                             <div>
                                 <Label className="mb-2 block">Materials Used:</Label>
                                 {selectedComponent.materialsUsed.map((material, index) => (
                                     <div key={index} className="text-sm">
-                                        {material.materialName}: {material.quantityUsed} {material.unit}
+                                        {material.materialName ?? 'N/A'}: {material.quantityUsed ?? 'N/A'} {material.unit ?? 'N/A'}
                                     </div>
                                 ))}
                             </div>
@@ -678,18 +690,18 @@ export default function FactoryComponents() {
                         <DialogTitle>Update Booking</DialogTitle>
                     </DialogHeader>
                     <Form {...updateFormHook}>
-                        <form onSubmit={updateFormHook.handleSubmit(handleUpdate)} className="space-y-6">
+                        <form className="space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField
                                     control={updateFormHook.control}
-                                    name="checkedInBy"
+                                    name="checkedOutBy"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
-                                            <FormLabel>Checked In By</FormLabel>
+                                            <FormLabel>Checked Out By</FormLabel>
                                             <Select onValueChange={field.onChange} value={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select a user" />
+                                                        <SelectValue />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
@@ -713,7 +725,7 @@ export default function FactoryComponents() {
                                             <Select onValueChange={field.onChange} value={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select a status" />
+                                                        <SelectValue />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
@@ -726,90 +738,15 @@ export default function FactoryComponents() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={updateFormHook.control}
-                                    name="damageRating"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>Damage Rating</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select damage rating" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="1">1 - Minor Wear</SelectItem>
-                                                    <SelectItem value="2">2 - Slight Damage</SelectItem>
-                                                    <SelectItem value="3">3 - Moderate Damage</SelectItem>
-                                                    <SelectItem value="4">4 - Significant Damage</SelectItem>
-                                                    <SelectItem value="5">5 - Severe Damage</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={updateFormHook.control}
-                                    name="eta"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>ETA</FormLabel>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                                        >
-                                                            {field.value ? (
-                                                                format(field.value, "PPP")
-                                                            ) : (
-                                                                <span>Pick a date</span>
-                                                            )}
-                                                            <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
-                                                    <CalendarComponent
-                                                        mode="single"
-                                                        selected={field.value}
-                                                        onSelect={field.onChange}
-                                                        disabled={(date) =>
-                                                            date < new Date() || date < new Date("1900-01-01")
-                                                        }
-                                                        initialFocus
-                                                    />
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={updateFormHook.control}
-                                    name="peopleNeeded"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>People Needed</FormLabel>
-                                            <FormControl>
-                                                <Input type="number" min="1" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
                             </div>
                             <FormField
                                 control={updateFormHook.control}
-                                name="checkInComments"
+                                name="checkOutComments"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Check In Comments</FormLabel>
+                                        <FormLabel>Check Out Comments</FormLabel>
                                         <FormControl>
-                                            <Textarea {...field} />
+                                            <Textarea {...field} placeholder="" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -897,14 +834,13 @@ export default function FactoryComponents() {
                             </div>
                             <DialogFooter>
                                 <div className="flex w-full gap-4">
-                                    <Button type="submit" className="flex-1" variant="default">Update</Button>
                                     <Button type="button" variant="default" onClick={handleCheckout} className="flex-1">Check Out</Button>
                                 </div>
                             </DialogFooter>
                         </form>
                     </Form>
                 </DialogContent>
-            </Dialog>
+            </Dialog >
         )
     }
 

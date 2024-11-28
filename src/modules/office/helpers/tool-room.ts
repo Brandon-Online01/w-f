@@ -14,10 +14,10 @@ export const createBooking = async (newBooking: BookingFormData, config: Request
     }
 }
 
-export const updateBooking = async (referenceID: string, updatedBooking: BookingFormData, config: RequestConfig) => {
+export const updateBooking = async (referenceID: number, updatedBooking: any, config: RequestConfig) => {
     try {
         const url = `${process.env.NEXT_PUBLIC_API_URL}/toolroom/${referenceID}`
-        const { data: { message } } = await axios.put(url, updatedBooking, config)
+        const { data: { message } } = await axios.patch(url, updatedBooking, config)
         return message;
     } catch (error) {
         console.log(error)

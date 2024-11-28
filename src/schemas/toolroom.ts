@@ -18,4 +18,6 @@ export const bookingFormSchema = z.object({
 			unit: z.string().min(1, "Please select a unit"),
 		})
 	),
+	checkedOutBy: z.string().min(1, "Please select who checked out the item"),
+	checkOutComments: z.string().optional(),
 })

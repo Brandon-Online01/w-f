@@ -47,10 +47,13 @@ export interface FactoryReference {
     turnaroundTime: number
     status: string
     materialsUsed: MaterialUsed[]
+    checkInDate: string
+    checkOutDate: string
 }
 
 export type BookingFormData = {
     checkedInBy: string;
+    checkedOutBy: string;
     status: string;
     checkInComments: string;
     damageRating: number;
@@ -89,3 +92,17 @@ export interface ToolRoomCardProps {
         unit: string
     }[]
 }
+
+export interface BookingUpdate {
+    checkInComments: string;
+    checkOutComments: string | undefined;
+    checkOutDate: string;
+    checkedInBy: string;
+    checkedOutBy: string;
+    damageRating: number;
+    eta: string;
+    factoryReferenceID: string;
+    materialsUsed: MaterialUsed[];
+    peopleNeeded: number;
+    status: string;
+} 
