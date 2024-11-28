@@ -97,7 +97,7 @@ export default function Home() {
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <div className="w-full h-[98vh] bg-card p-1 rounded overflow-y-scroll mt-4">
-                    <Tabs defaultValue="factory" className="w-full overflow-hidden h-full">
+                    <Tabs defaultValue="tool-room" className="w-full overflow-hidden h-full">
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>

@@ -9,7 +9,8 @@ import {
     X,
     ChartNoAxesGantt,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Calendar1Icon
 } from 'lucide-react'
 import {
     Select,
@@ -39,7 +40,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { format } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -50,48 +51,99 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { BookingFormData, FactoryReference } from "@/types/tool-room"
+import { BookingFormData, FactoryReference, ToolRoomCardProps } from "@/types/tool-room"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { bookingFormSchema } from "@/schemas/toolroom"
 import { useForm, useFieldArray } from "react-hook-form"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { createBooking } from "../helpers/tool-room"
+import { createBooking, updateBooking } from "../helpers/tool-room"
 import toast from "react-hot-toast"
+import { useQuery } from "@tanstack/react-query"
+import { generateFactoryEndpoint } from "@/hooks/factory-endpoint"
+import axios from "axios"
+import { isEmpty } from "lodash"
+import { motion } from "framer-motion"
+import { materials } from "@/tools/data"
+import { mouldList } from "@/data/moulds"
+import { staffList } from "@/data/staff"
 
-export const generateRandomFactoryData = (id: number): FactoryReference => ({
-    factoryReferenceID: `FAC-2024-${id.toString().padStart(3, '0')}`,
-    checkedInBy: ["John Doe", "Jane Smith", "Alice Johnson", "Bob Williams"][Math.floor(Math.random() * 4)],
-    checkedOutBy: ["John Doe", "Jane Smith", "Alice Johnson", "Bob Williams"][Math.floor(Math.random() * 4)],
-    checkInComments: ["Good condition", "Minor wear", "Needs inspection", "Ready for use"][Math.floor(Math.random() * 4)],
-    checkOutComments: ["No issues", "Minor wear observed", "Needs cleaning", "Handle with care"][Math.floor(Math.random() * 4)],
-    repairComments: ["No repairs needed", "Minor fixes applied", "Major overhaul required", "Replaced worn parts"][Math.floor(Math.random() * 4)],
-    damageRating: Math.floor(Math.random() * 5) + 1,
-    turnaroundTime: Math.floor(Math.random() * 72) + 24,
-    status: ["Ready", "In Repair", "In Use"][Math.floor(Math.random() * 3)],
-    materialsUsed: [
-        {
-            materialName: ["Steel Plate", "Rubber Gasket", "Plastic Cover", "Copper Wire"][Math.floor(Math.random() * 4)],
-            quantityUsed: Math.floor(Math.random() * 10) + 1,
-            unit: ["kg", "m", "pcs"][Math.floor(Math.random() * 3)]
-        }
-    ],
-})
-
-const components = Array.from({ length: 10 }, (_, i) => generateRandomFactoryData(i + 1))
+// Mock data for dropdowns
+const statuses = ["In Repair", 'Ready']
+const materialUnits = ["cm", "kg", "pcs", "m"]
 
 export default function FactoryComponents() {
     const [searchQuery, setSearchQuery] = useState("")
     const [currentPage, setCurrentPage] = useState(1)
     const [isAddBookingOpen, setIsAddBookingOpen] = useState(false)
     const [filter, setFilter] = useState("all")
-    const [selectedComponent, setSelectedComponent] = useState<FactoryReference | null>(null)
+    const [selectedComponent, setSelectedComponent] = useState<ToolRoomCardProps | null>(null)
     const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false)
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
     const [updateForm, setUpdateForm] = useState<z.infer<typeof bookingFormSchema> | null>(null)
     const totalPages = 2
 
     const session = sessionStorage.getItem('waresense');
+
+    const fetchUsers = async () => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+        const users = await staffList(config)
+        return users
+    }
+
+    const fetchMoulds = async () => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+        const moulds = await mouldList(config)
+        return moulds
+    }
+
+    const fetchBookings = async () => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const url = generateFactoryEndpoint('toolroom')
+        const { data } = await axios.get(url, config)
+        return data;
+    }
+
+    const { data: bookings, isLoading, isError } = useQuery({
+        queryKey: ['allBookings'],
+        queryFn: fetchBookings,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60000,
+    });
+
+    const { data: mouldsList } = useQuery({
+        queryKey: ['moulds'],
+        queryFn: fetchMoulds,
+        staleTime: 60000,
+    });
+
+    const { data: usersList } = useQuery({
+        queryKey: ['users'],
+        queryFn: fetchUsers,
+        staleTime: 60000,
+    });
+
+    const availableMould = mouldsList?.data?.map((mould: { name: string, uid: string }) => ({
+        name: mould.name,
+        uid: `${mould.uid}`
+    }))
+
+    const availableUsers = usersList?.data?.map((user: { name: string, uid: string }) => ({
+        name: user.name,
+        uid: `${user.uid}`
+    }))
 
     const form = useForm<z.infer<typeof bookingFormSchema>>({
         resolver: zodResolver(bookingFormSchema),
@@ -102,7 +154,7 @@ export default function FactoryComponents() {
             checkInComments: "",
             damageRating: "",
             peopleNeeded: "",
-            parts: [{ partType: "", quantity: 1, unit: "" }],
+            materialsUsed: [{ materialName: "", quantityUsed: 1, unit: "" }],
         },
     })
 
@@ -113,32 +165,31 @@ export default function FactoryComponents() {
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
-        name: "parts",
+        name: "materialsUsed",
     })
 
     const { fields: updateFields, append: updateAppend, remove: updateRemove } = useFieldArray({
         control: updateFormHook.control,
-        name: "parts",
+        name: "materialsUsed",
     })
 
     const handleAddBooking = async (values: z.infer<typeof bookingFormSchema>) => {
-        // console.log("Booking data:", values)
-        // setIsAddBookingOpen(false)
-        // // form.reset()
-
         if (!session) return
+
+        setIsAddBookingOpen(false)
 
         const sessionData = JSON.parse(session)
         const config = { headers: { 'token': sessionData?.state?.token } };
 
-        const { damageRating, selectMould, ...restOfValues } = values
+        const { damageRating, selectMould, peopleNeeded, ...restOfValues } = values
 
         const newBooking: BookingFormData = {
             ...restOfValues,
-            selectMould,
+            peopleNeeded: parseInt(peopleNeeded),
             damageRating: parseInt(damageRating),
-            factoryReferenceID: `${sessionData?.state?.factoryReferenceID}`,
-            itemReferenceCode: `${selectMould}`
+            factoryReferenceID: `${sessionData?.state?.user?.factoryReferenceID}`,
+            itemReferenceCode: `${selectMould}`,
+            checkInDate: `${new Date()}`,
         }
 
         const message = await createBooking(newBooking, config)
@@ -157,29 +208,48 @@ export default function FactoryComponents() {
         }
     }
 
-    const handleUpdate = (values: z.infer<typeof bookingFormSchema>) => {
-        console.log("Updated data:", values)
-        setIsUpdateModalOpen(false)
-        // updateFormHook.reset()
-    }
+    const handleCheckout = async () => {
+        if (!session || !selectedComponent) return
 
-    const handleCheckout = () => {
-        console.log("Checking out component:", selectedComponent)
-        setIsUpdateModalOpen(false)
-    }
+        setIsAddBookingOpen(false)
 
-    // Mock data for dropdowns
-    const moulds = ["Mould A", "Mould B", "Mould C", "Mould D"]
-    const users = ["John Doe", "Jane Smith", "Alice Johnson", "Bob Williams"]
-    const statuses = ["Ready", "In Repair", "In Use"]
-    const partTypes = ["Steel Plate", "Rubber Gasket", "Plastic Cover", "Copper Wire"]
-    const partUnits = ["cm", "kg", "pcs", "m"]
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
 
-    const filteredComponents = components.filter(component => {
-        const matchesSearch = component.factoryReferenceID.toLowerCase().includes(searchQuery.toLowerCase())
-        const matchesFilter = filter === "all" || component.status === statuses[statuses.indexOf(filter)]
-        return matchesSearch && matchesFilter
-    })
+        const values = updateFormHook.getValues();
+        const status = values.status || 'Ready';
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { selectMould, peopleNeeded, damageRating, ...restOfValues } = values
+
+        const updatedBooking = {
+            ...restOfValues,
+            status: status,
+            peopleNeeded: parseInt(peopleNeeded),
+            damageRating: parseInt(damageRating),
+            factoryReferenceID: selectedComponent?.factoryReferenceID,
+            checkedOutBy: `${sessionData?.state?.user?.uid}`,
+            checkOutDate: `${new Date()}`,
+        };
+
+        const referenceID = selectedComponent?.uid
+
+        const message = await updateBooking(referenceID, updatedBooking, config)
+
+        if (message) {
+            toast(`${message}`,
+                {
+                    icon: '🎉',
+                    style: {
+                        borderRadius: '5px',
+                        background: '#333',
+                        color: '#fff',
+                    },
+                }
+            );
+        }
+
+    };
 
     const PageHeader = () => {
         return (
@@ -241,8 +311,10 @@ export default function FactoryComponents() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {moulds.map((mould) => (
-                                                            <SelectItem key={mould} value={mould}>{mould}</SelectItem>
+                                                        {availableMould?.map((mould: { name: string, uid: string }) => (
+                                                            <SelectItem key={mould.uid} value={mould.uid}>
+                                                                {mould.name}
+                                                            </SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
@@ -263,8 +335,10 @@ export default function FactoryComponents() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {users.map((user) => (
-                                                            <SelectItem key={user} value={user}>{user}</SelectItem>
+                                                        {availableUsers?.map((user: { name: string, uid: string }) => (
+                                                            <SelectItem key={user.uid} value={user.uid}>
+                                                                {user.name}
+                                                            </SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
@@ -329,8 +403,7 @@ export default function FactoryComponents() {
                                                         <FormControl>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                                            >
+                                                                className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}>
                                                                 {field.value ? (
                                                                     format(field.value, "PPP")
                                                                 ) : (
@@ -389,19 +462,19 @@ export default function FactoryComponents() {
                                         <div key={field.id} className="flex items-center justify-center space-x-2 mb-4">
                                             <FormField
                                                 control={form.control}
-                                                name={`parts.${index}.partType`}
+                                                name={`materialsUsed.${index}.materialName`}
                                                 render={({ field }) => (
                                                     <FormItem className="flex-1">
-                                                        <FormLabel>Part Type</FormLabel>
+                                                        <FormLabel>Material Name</FormLabel>
                                                         <Select onValueChange={field.onChange} value={field.value}>
                                                             <FormControl>
                                                                 <SelectTrigger>
-                                                                    <SelectValue placeholder="Select part type" />
+                                                                    <SelectValue placeholder="Select material name" />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                {partTypes.map((type) => (
-                                                                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                                                                {materials.map((material) => (
+                                                                    <SelectItem key={material} value={material}>{material}</SelectItem>
                                                                 ))}
                                                             </SelectContent>
                                                         </Select>
@@ -411,7 +484,7 @@ export default function FactoryComponents() {
                                             />
                                             <FormField
                                                 control={form.control}
-                                                name={`parts.${index}.quantity`}
+                                                name={`materialsUsed.${index}.quantityUsed`}
                                                 render={({ field }) => (
                                                     <FormItem className="flex-1">
                                                         <FormLabel>Quantity</FormLabel>
@@ -424,7 +497,7 @@ export default function FactoryComponents() {
                                             />
                                             <FormField
                                                 control={form.control}
-                                                name={`parts.${index}.unit`}
+                                                name={`materialsUsed.${index}.unit`}
                                                 render={({ field }) => (
                                                     <FormItem className="flex-1">
                                                         <FormLabel>Unit</FormLabel>
@@ -435,7 +508,7 @@ export default function FactoryComponents() {
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                {partUnits.map((unit) => (
+                                                                {materialUnits.map((unit) => (
                                                                     <SelectItem key={unit} value={unit}>{unit}</SelectItem>
                                                                 ))}
                                                             </SelectContent>
@@ -459,8 +532,7 @@ export default function FactoryComponents() {
                                         variant="outline"
                                         size="sm"
                                         className="mt-2"
-                                        onClick={() => append({ partType: "", quantity: 1, unit: "" })}
-                                    >
+                                        onClick={() => append({ materialName: "", quantityUsed: 1, unit: "" })}>
                                         Add Item
                                     </Button>
                                 </div>
@@ -475,20 +547,36 @@ export default function FactoryComponents() {
         )
     }
 
-    const ToolRoomCard = ({ component, index }: { component: FactoryReference, index: number }) => {
+    const ToolRoomCard = ({ component, index }: { component: ToolRoomCardProps, index: number }) => {
+        const { factoryReferenceID, status, damageRating, eta, peopleNeeded, materialsUsed, checkedInBy, checkInComments, checkInDate, itemReferenceCode, checkedOutBy } = component
+
+        const { name } = itemReferenceCode
+
         return (
             <Card key={index} className="relative group bg-card">
                 <CardContent className="p-3">
                     <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold">{component.factoryReferenceID}</h3>
+                        <h3 className="font-semibold">{name}</h3>
                         <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            {component.status}
+                            {status}
                         </Badge>
                     </div>
                     <div className="flex justify-between items-center text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <Timer className="h-4 w-4" />
-                            <span>Damage: {component.damageRating}/5</span>
+                            <span className="text-card-foreground">Damage: {damageRating}/5</span>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                            <Timer className="h-4 w-4" />
+                            <span className="text-card-foreground">Elapsed Time: ~ {formatDistanceToNow(new Date(checkInDate), { addSuffix: true })}</span>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                            <Calendar1Icon className="h-4 w-4" />
+                            <span className="text-card-foreground">Ready By: {format(new Date(eta), "PPP")}</span>
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -506,17 +594,18 @@ export default function FactoryComponents() {
                                 <DropdownMenuItem onSelect={() => {
                                     setSelectedComponent(component)
                                     setUpdateForm({
-                                        selectMould: component.factoryReferenceID.split('-')[2],
-                                        checkedInBy: component.checkedInBy,
-                                        status: component.status,
-                                        checkInComments: component.checkInComments,
-                                        damageRating: component.damageRating.toString(),
+                                        selectMould: factoryReferenceID.split('-')[2],
+                                        checkedInBy: checkedInBy,
+                                        checkedOutBy: checkedOutBy ?? '',
+                                        status: status,
+                                        checkInComments: checkInComments,
+                                        damageRating: damageRating.toString(),
                                         eta: new Date(),
-                                        peopleNeeded: "1",
-                                        parts: component.materialsUsed.map(m => ({
-                                            partType: m.materialName,
-                                            quantity: m.quantityUsed,
-                                            unit: m.unit
+                                        peopleNeeded: peopleNeeded.toString(),
+                                        materialsUsed: materialsUsed?.map(m => ({
+                                            materialName: m?.materialName,
+                                            quantityUsed: m?.quantityUsed,
+                                            unit: m?.unit
                                         }))
                                     })
                                     setIsUpdateModalOpen(true)
@@ -542,15 +631,15 @@ export default function FactoryComponents() {
                         <div className="grid gap-4">
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Factory Reference:</Label>
-                                <span>{selectedComponent.factoryReferenceID}</span>
+                                <span>{selectedComponent.factoryReferenceID || 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Checked In By:</Label>
-                                <span>{selectedComponent.checkedInBy}</span>
+                                <span>{selectedComponent.checkedInBy || 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Checked Out By:</Label>
-                                <span>{selectedComponent.checkedOutBy}</span>
+                                <span>{selectedComponent.checkedOutBy ?? 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Check In Comments:</Label>
@@ -558,11 +647,11 @@ export default function FactoryComponents() {
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Check Out Comments:</Label>
-                                <span>{selectedComponent.checkOutComments}</span>
+                                <span>{selectedComponent.checkOutComments ?? 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Repair Comments:</Label>
-                                <span>{selectedComponent.repairComments}</span>
+                                <span>{selectedComponent.repairComments ?? 'N/A'}</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Damage Rating:</Label>
@@ -570,19 +659,19 @@ export default function FactoryComponents() {
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Turnaround Time:</Label>
-                                <span>{selectedComponent.turnaroundTime} hours</span>
+                                <span>{selectedComponent.turnaroundTime ?? 'N/A'} hours</span>
                             </div>
                             <div className="grid grid-cols-2 items-center gap-4">
                                 <Label>Status:</Label>
                                 <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                    {selectedComponent.status}
+                                    {selectedComponent.status ?? 'N/A'}
                                 </Badge>
                             </div>
                             <div>
                                 <Label className="mb-2 block">Materials Used:</Label>
                                 {selectedComponent.materialsUsed.map((material, index) => (
                                     <div key={index} className="text-sm">
-                                        {material.materialName}: {material.quantityUsed} {material.unit}
+                                        {material.materialName ?? 'N/A'}: {material.quantityUsed ?? 'N/A'} {material.unit ?? 'N/A'}
                                     </div>
                                 ))}
                             </div>
@@ -601,23 +690,25 @@ export default function FactoryComponents() {
                         <DialogTitle>Update Booking</DialogTitle>
                     </DialogHeader>
                     <Form {...updateFormHook}>
-                        <form onSubmit={updateFormHook.handleSubmit(handleUpdate)} className="space-y-6">
+                        <form className="space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField
                                     control={updateFormHook.control}
-                                    name="checkedInBy"
+                                    name="checkedOutBy"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
-                                            <FormLabel>Checked In By</FormLabel>
+                                            <FormLabel>Checked Out By</FormLabel>
                                             <Select onValueChange={field.onChange} value={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select a user" />
+                                                        <SelectValue />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {users.map((user) => (
-                                                        <SelectItem key={user} value={user}>{user}</SelectItem>
+                                                    {availableUsers?.map((user: { name: string, uid: string }) => (
+                                                        <SelectItem key={user.uid} value={user.uid}>
+                                                            {user.name}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -634,7 +725,7 @@ export default function FactoryComponents() {
                                             <Select onValueChange={field.onChange} value={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select a status" />
+                                                        <SelectValue />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
@@ -647,102 +738,27 @@ export default function FactoryComponents() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={updateFormHook.control}
-                                    name="damageRating"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>Damage Rating</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select damage rating" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="1">1 - Minor Wear</SelectItem>
-                                                    <SelectItem value="2">2 - Slight Damage</SelectItem>
-                                                    <SelectItem value="3">3 - Moderate Damage</SelectItem>
-                                                    <SelectItem value="4">4 - Significant Damage</SelectItem>
-                                                    <SelectItem value="5">5 - Severe Damage</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={updateFormHook.control}
-                                    name="eta"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>ETA</FormLabel>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                                        >
-                                                            {field.value ? (
-                                                                format(field.value, "PPP")
-                                                            ) : (
-                                                                <span>Pick a date</span>
-                                                            )}
-                                                            <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
-                                                    <CalendarComponent
-                                                        mode="single"
-                                                        selected={field.value}
-                                                        onSelect={field.onChange}
-                                                        disabled={(date) =>
-                                                            date < new Date() || date < new Date("1900-01-01")
-                                                        }
-                                                        initialFocus
-                                                    />
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={updateFormHook.control}
-                                    name="peopleNeeded"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>People Needed</FormLabel>
-                                            <FormControl>
-                                                <Input type="number" min="1" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
                             </div>
                             <FormField
                                 control={updateFormHook.control}
-                                name="checkInComments"
+                                name="checkOutComments"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Check In Comments</FormLabel>
+                                        <FormLabel>Check Out Comments</FormLabel>
                                         <FormControl>
-                                            <Textarea {...field} />
+                                            <Textarea {...field} placeholder="" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                             <div>
-                                <h3 className="text-lg font-semibold mb-2">Parts Needed</h3>
+                                <h3 className="text-lg font-semibold mb-2">Parts Used</h3>
                                 {updateFields.map((field, index) => (
                                     <div key={field.id} className="flex items-center justify-center space-x-2 mb-4">
                                         <FormField
                                             control={updateFormHook.control}
-                                            name={`parts.${index}.partType`}
+                                            name={`materialsUsed.${index}.materialName`}
                                             render={({ field }) => (
                                                 <FormItem className="flex-1">
                                                     <FormLabel>Part Type</FormLabel>
@@ -753,8 +769,8 @@ export default function FactoryComponents() {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {partTypes.map((type) => (
-                                                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                                            {materials.map((material) => (
+                                                                <SelectItem key={material} value={material}>{material}</SelectItem>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
@@ -764,7 +780,7 @@ export default function FactoryComponents() {
                                         />
                                         <FormField
                                             control={updateFormHook.control}
-                                            name={`parts.${index}.quantity`}
+                                            name={`materialsUsed.${index}.quantityUsed`}
                                             render={({ field }) => (
                                                 <FormItem className="flex-1">
                                                     <FormLabel>Quantity</FormLabel>
@@ -777,7 +793,7 @@ export default function FactoryComponents() {
                                         />
                                         <FormField
                                             control={updateFormHook.control}
-                                            name={`parts.${index}.unit`}
+                                            name={`materialsUsed.${index}.unit`}
                                             render={({ field }) => (
                                                 <FormItem className="flex-1">
                                                     <FormLabel>Unit</FormLabel>
@@ -788,7 +804,7 @@ export default function FactoryComponents() {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {partUnits.map((unit) => (
+                                                            {materialUnits.map((unit) => (
                                                                 <SelectItem key={unit} value={unit}>{unit}</SelectItem>
                                                             ))}
                                                         </SelectContent>
@@ -812,20 +828,19 @@ export default function FactoryComponents() {
                                     variant="default"
                                     size="sm"
                                     className="mt-2 w-[300px]"
-                                    onClick={() => updateAppend({ partType: "", quantity: 1, unit: "" })}>
+                                    onClick={() => updateAppend({ materialName: "", quantityUsed: 1, unit: "" })}>
                                     Add Item
                                 </Button>
                             </div>
                             <DialogFooter>
                                 <div className="flex w-full gap-4">
-                                    <Button type="submit" className="flex-1" variant="default">Update</Button>
-                                    <Button type="button" variant="default" onClick={handleCheckout} className="flex-1">Check Out</Button>
+                                    <Button type="button" variant="default" onClick={handleCheckout} className="flex-1">Update Booking</Button>
                                 </div>
                             </DialogFooter>
                         </form>
                     </Form>
                 </DialogContent>
-            </Dialog>
+            </Dialog >
         )
     }
 
@@ -865,11 +880,26 @@ export default function FactoryComponents() {
         )
     }
 
+    if (isLoading || isEmpty(bookings?.data) || isError) {
+        return (
+            <div className="w-full h-screen flex flex-col justify-start gap-2">
+                <PageHeader />
+                <ToolRoomCardsLoader />
+            </div>
+        )
+    }
+
+    const filteredComponents = bookings?.data?.filter((booking: FactoryReference) => {
+        const matchesSearch = booking.factoryReferenceID.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesFilter = filter === "all" || booking.status === statuses[statuses.indexOf(filter)]
+        return matchesSearch && matchesFilter
+    })
+
     return (
         <div className="w-full flex flex-col gap-2">
             <PageHeader />
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full overflow-y-scroll">
-                {filteredComponents.map((component, index: number) => <ToolRoomCard key={index} component={component} index={index} />)}
+                {filteredComponents?.map((component: ToolRoomCardProps, index: number) => <ToolRoomCard key={index} component={component} index={index} />)}
             </div>
             <DetailModal />
             <UpdateModal />
@@ -877,3 +907,43 @@ export default function FactoryComponents() {
         </div>
     )
 }
+
+const ToolRoomCardsLoader = () => {
+    return (
+        <div className="w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {Array.from({ length: 8 }).map((_, index) => (
+                    <motion.div
+                        key={index}
+                        className="relative bg-card rounded p-4 h-36 border shadow animate-pulse flex flex-col justify-start gap-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}>
+                        <div className="aspect-video w-full rounded mb-4 h-full flex items-center justify-center absolute top-0 left-0 right-0 bottom-0 bg-background/50" >
+                            <div className="loading">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-5 bg-gray-200 rounded w-1/2" />
+                            <div className="h-5 bg-gray-200 rounded w-2/12" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="h-4 bg-gray-200 rounded w-2/12" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-start">
+                            <div className="h-3 bg-gray-200 rounded w-1/2" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-end">
+                            <div className="h-5 bg-gray-200 rounded w-1/12" />
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+};

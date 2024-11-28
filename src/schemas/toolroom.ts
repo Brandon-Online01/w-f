@@ -11,11 +11,13 @@ export const bookingFormSchema = z.object({
 		invalid_type_error: "That's not a valid date",
 	}),
 	peopleNeeded: z.string().min(1, "Please enter the number of people needed"),
-	parts: z.array(
+	materialsUsed: z.array(
 		z.object({
-			partType: z.string().min(1, "Please select a part type"),
-			quantity: z.number().min(1, "Quantity must be at least 1"),
+			materialName: z.string().min(1, "Please select a material name"),
+			quantityUsed: z.number().min(1, "Quantity must be at least 1"),
 			unit: z.string().min(1, "Please select a unit"),
 		})
 	),
+	checkedOutBy: z.string().min(1, "Please select who checked out the item"),
+	checkOutComments: z.string().optional(),
 })

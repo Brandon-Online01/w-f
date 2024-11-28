@@ -1,3 +1,5 @@
+import { Mould } from "./mould";
+
 export interface ToolRoom {
     checkInComments: string;
     checkInDate: string;
@@ -45,21 +47,68 @@ export interface FactoryReference {
     turnaroundTime: number
     status: string
     materialsUsed: MaterialUsed[]
+    checkInDate: string
+    checkOutDate: string
 }
 
 export type BookingFormData = {
-    selectMould: string;
     checkedInBy: string;
+    checkedOutBy: string;
     status: string;
     checkInComments: string;
     damageRating: number;
     eta: string | Date;
-    peopleNeeded: string;
-    parts: {
-        partType: string;
-        quantity: number;
+    peopleNeeded: number;
+    materialsUsed: {
+        materialName: string;
+        quantityUsed: number;
         unit: string;
     }[];
     factoryReferenceID: string;
+    checkInDate: string;
     itemReferenceCode: string;
 }
+
+export interface ToolRoomCardProps {
+    uid: number,
+    factoryReferenceID: string,
+    itemReferenceCode: Mould,
+    checkedInBy: string,
+    checkedOutBy: string | null,
+    checkInDate: string,
+    checkOutDate: string | null,
+    checkInComments: string,
+    checkOutComments: string | null,
+    repairComments: string | null,
+    damageRating: number,
+    turnaroundTime: string | null,
+    status: string,
+    eta: string,
+    peopleNeeded: number,
+    materialsUsed: {
+        uid: number,
+        materialName: string,
+        quantityUsed: number,
+        unit: string
+    }[]
+}
+
+export interface BookingUpdate {
+    checkInComments: string,
+    checkOutComments: string | undefined,
+    checkOutDate: string,
+    checkedInBy: string,
+    checkedOutBy: string,
+    damageRating: number,
+    eta: string,
+    factoryReferenceID: string,
+    materialsUsed: {
+        materialName: string,
+        quantityUsed: number,
+        unit: string
+    }[],
+    peopleNeeded: number,
+    status: string,
+}
+
+
