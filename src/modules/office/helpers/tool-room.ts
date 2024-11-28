@@ -4,6 +4,7 @@ import { BookingFormData } from "@/types/tool-room";
 
 export const createBooking = async (newBooking: BookingFormData, config: RequestConfig) => {
     try {
+        console.log("newBooking", newBooking)
         const url = `${process.env.NEXT_PUBLIC_API_URL}/toolroom`
         const { data: { message } } = await axios.post(url, newBooking, config)
         return message;
@@ -16,8 +17,7 @@ export const createBooking = async (newBooking: BookingFormData, config: Request
 
 export const updateBooking = async (referenceID: string, updatedBooking: BookingFormData, config: RequestConfig) => {
     try {
-        console.log("referenceID", referenceID)
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/components/${referenceID}`
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/toolroom/${referenceID}`
         const { data: { message } } = await axios.put(url, updatedBooking, config)
         return message;
     } catch (error) {

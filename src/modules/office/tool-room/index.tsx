@@ -9,7 +9,8 @@ import {
     X,
     ChartNoAxesGantt,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Calendar1Icon
 } from 'lucide-react'
 import {
     Select,
@@ -58,6 +59,18 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { createBooking } from "../helpers/tool-room"
 import toast from "react-hot-toast"
+import { useQuery } from "@tanstack/react-query"
+import { generateFactoryEndpoint } from "@/hooks/factory-endpoint"
+import axios from "axios"
+import { isEmpty } from "lodash"
+import { motion } from "framer-motion"
+
+// Mock data for dropdowns
+const moulds = ["Mould A", "Mould B", "Mould C", "Mould D"]
+const users = ["John Doe", "Jane Smith", "Alice Johnson", "Bob Williams"]
+const statuses = ["Ready", "In Repair", "In Use"]
+const materials = ["Steel Plate", "Rubber Gasket", "Plastic Cover", "Copper Wire"]
+const materialUnits = ["cm", "kg", "pcs", "m"]
 
 export const generateRandomFactoryData = (id: number): FactoryReference => ({
     factoryReferenceID: `FAC-2024-${id.toString().padStart(3, '0')}`,
@@ -78,8 +91,6 @@ export const generateRandomFactoryData = (id: number): FactoryReference => ({
     ],
 })
 
-const components = Array.from({ length: 10 }, (_, i) => generateRandomFactoryData(i + 1))
-
 export default function FactoryComponents() {
     const [searchQuery, setSearchQuery] = useState("")
     const [currentPage, setCurrentPage] = useState(1)
@@ -93,6 +104,26 @@ export default function FactoryComponents() {
 
     const session = sessionStorage.getItem('waresense');
 
+    const fetchBookings = async () => {
+        if (!session) return
+
+        const sessionData = JSON.parse(session)
+        const config = { headers: { 'token': sessionData?.state?.token } };
+
+        const url = generateFactoryEndpoint('toolroom')
+        const { data } = await axios.get(url, config)
+        return data;
+    }
+
+    const { data: bookings, isLoading, isError } = useQuery({
+        queryKey: ['allBookings'],
+        queryFn: fetchBookings,
+        refetchInterval: 1000,
+        refetchIntervalInBackground: true,
+        refetchOnWindowFocus: true,
+        staleTime: 60000,
+    });
+
     const form = useForm<z.infer<typeof bookingFormSchema>>({
         resolver: zodResolver(bookingFormSchema),
         defaultValues: {
@@ -102,7 +133,7 @@ export default function FactoryComponents() {
             checkInComments: "",
             damageRating: "",
             peopleNeeded: "",
-            parts: [{ partType: "", quantity: 1, unit: "" }],
+            materialsUsed: [{ materialName: "", quantityUsed: 1, unit: "" }],
         },
     })
 
@@ -113,31 +144,28 @@ export default function FactoryComponents() {
 
     const { fields, append, remove } = useFieldArray({
         control: form.control,
-        name: "parts",
+        name: "materialsUsed",
     })
 
     const { fields: updateFields, append: updateAppend, remove: updateRemove } = useFieldArray({
         control: updateFormHook.control,
-        name: "parts",
+        name: "materialsUsed",
     })
 
     const handleAddBooking = async (values: z.infer<typeof bookingFormSchema>) => {
-        // console.log("Booking data:", values)
-        // setIsAddBookingOpen(false)
-        // // form.reset()
-
         if (!session) return
 
         const sessionData = JSON.parse(session)
         const config = { headers: { 'token': sessionData?.state?.token } };
 
-        const { damageRating, selectMould, ...restOfValues } = values
+        const { damageRating, selectMould, peopleNeeded, ...restOfValues } = values
 
         const newBooking: BookingFormData = {
             ...restOfValues,
             selectMould,
+            peopleNeeded: parseInt(peopleNeeded),
             damageRating: parseInt(damageRating),
-            factoryReferenceID: `${sessionData?.state?.factoryReferenceID}`,
+            factoryReferenceID: `${sessionData?.state?.user?.factoryReferenceID}`,
             itemReferenceCode: `${selectMould}`
         }
 
@@ -154,6 +182,9 @@ export default function FactoryComponents() {
                     },
                 }
             );
+
+            setIsAddBookingOpen(false)
+            form.reset()
         }
     }
 
@@ -167,19 +198,6 @@ export default function FactoryComponents() {
         console.log("Checking out component:", selectedComponent)
         setIsUpdateModalOpen(false)
     }
-
-    // Mock data for dropdowns
-    const moulds = ["Mould A", "Mould B", "Mould C", "Mould D"]
-    const users = ["John Doe", "Jane Smith", "Alice Johnson", "Bob Williams"]
-    const statuses = ["Ready", "In Repair", "In Use"]
-    const partTypes = ["Steel Plate", "Rubber Gasket", "Plastic Cover", "Copper Wire"]
-    const partUnits = ["cm", "kg", "pcs", "m"]
-
-    const filteredComponents = components.filter(component => {
-        const matchesSearch = component.factoryReferenceID.toLowerCase().includes(searchQuery.toLowerCase())
-        const matchesFilter = filter === "all" || component.status === statuses[statuses.indexOf(filter)]
-        return matchesSearch && matchesFilter
-    })
 
     const PageHeader = () => {
         return (
@@ -389,19 +407,19 @@ export default function FactoryComponents() {
                                         <div key={field.id} className="flex items-center justify-center space-x-2 mb-4">
                                             <FormField
                                                 control={form.control}
-                                                name={`parts.${index}.partType`}
+                                                name={`materialsUsed.${index}.materialName`}
                                                 render={({ field }) => (
                                                     <FormItem className="flex-1">
-                                                        <FormLabel>Part Type</FormLabel>
+                                                        <FormLabel>Material Name</FormLabel>
                                                         <Select onValueChange={field.onChange} value={field.value}>
                                                             <FormControl>
                                                                 <SelectTrigger>
-                                                                    <SelectValue placeholder="Select part type" />
+                                                                    <SelectValue placeholder="Select material name" />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                {partTypes.map((type) => (
-                                                                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                                                                {materials.map((material) => (
+                                                                    <SelectItem key={material} value={material}>{material}</SelectItem>
                                                                 ))}
                                                             </SelectContent>
                                                         </Select>
@@ -411,7 +429,7 @@ export default function FactoryComponents() {
                                             />
                                             <FormField
                                                 control={form.control}
-                                                name={`parts.${index}.quantity`}
+                                                name={`materialsUsed.${index}.quantityUsed`}
                                                 render={({ field }) => (
                                                     <FormItem className="flex-1">
                                                         <FormLabel>Quantity</FormLabel>
@@ -424,7 +442,7 @@ export default function FactoryComponents() {
                                             />
                                             <FormField
                                                 control={form.control}
-                                                name={`parts.${index}.unit`}
+                                                name={`materialsUsed.${index}.unit`}
                                                 render={({ field }) => (
                                                     <FormItem className="flex-1">
                                                         <FormLabel>Unit</FormLabel>
@@ -435,7 +453,7 @@ export default function FactoryComponents() {
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                {partUnits.map((unit) => (
+                                                                {materialUnits.map((unit) => (
                                                                     <SelectItem key={unit} value={unit}>{unit}</SelectItem>
                                                                 ))}
                                                             </SelectContent>
@@ -459,7 +477,7 @@ export default function FactoryComponents() {
                                         variant="outline"
                                         size="sm"
                                         className="mt-2"
-                                        onClick={() => append({ partType: "", quantity: 1, unit: "" })}
+                                        onClick={() => append({ materialName: "", quantityUsed: 1, unit: "" })}
                                     >
                                         Add Item
                                     </Button>
@@ -476,6 +494,9 @@ export default function FactoryComponents() {
     }
 
     const ToolRoomCard = ({ component, index }: { component: FactoryReference, index: number }) => {
+
+        console.log("component", component)
+
         return (
             <Card key={index} className="relative group bg-card">
                 <CardContent className="p-3">
@@ -488,7 +509,13 @@ export default function FactoryComponents() {
                     <div className="flex justify-between items-center text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <Timer className="h-4 w-4" />
-                            <span>Damage: {component.damageRating}/5</span>
+                            <span className="text-card-foreground">Damage: {component.damageRating}/5</span>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                            <Calendar1Icon className="h-4 w-4" />
+                            <span className="text-card-foreground">Ready By: {format(new Date(component.eta), "PPP")}</span>
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -513,9 +540,9 @@ export default function FactoryComponents() {
                                         damageRating: component.damageRating.toString(),
                                         eta: new Date(),
                                         peopleNeeded: "1",
-                                        parts: component.materialsUsed.map(m => ({
-                                            partType: m.materialName,
-                                            quantity: m.quantityUsed,
+                                        materialsUsed: component.materialsUsed.map(m => ({
+                                            materialName: m.materialName,
+                                            quantityUsed: m.quantityUsed,
                                             unit: m.unit
                                         }))
                                     })
@@ -742,7 +769,7 @@ export default function FactoryComponents() {
                                     <div key={field.id} className="flex items-center justify-center space-x-2 mb-4">
                                         <FormField
                                             control={updateFormHook.control}
-                                            name={`parts.${index}.partType`}
+                                            name={`materialsUsed.${index}.materialName`}
                                             render={({ field }) => (
                                                 <FormItem className="flex-1">
                                                     <FormLabel>Part Type</FormLabel>
@@ -753,8 +780,8 @@ export default function FactoryComponents() {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {partTypes.map((type) => (
-                                                                <SelectItem key={type} value={type}>{type}</SelectItem>
+                                                            {materials.map((material) => (
+                                                                <SelectItem key={material} value={material}>{material}</SelectItem>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
@@ -764,7 +791,7 @@ export default function FactoryComponents() {
                                         />
                                         <FormField
                                             control={updateFormHook.control}
-                                            name={`parts.${index}.quantity`}
+                                            name={`materialsUsed.${index}.quantityUsed`}
                                             render={({ field }) => (
                                                 <FormItem className="flex-1">
                                                     <FormLabel>Quantity</FormLabel>
@@ -777,7 +804,7 @@ export default function FactoryComponents() {
                                         />
                                         <FormField
                                             control={updateFormHook.control}
-                                            name={`parts.${index}.unit`}
+                                            name={`materialsUsed.${index}.unit`}
                                             render={({ field }) => (
                                                 <FormItem className="flex-1">
                                                     <FormLabel>Unit</FormLabel>
@@ -788,7 +815,7 @@ export default function FactoryComponents() {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {partUnits.map((unit) => (
+                                                            {materialUnits.map((unit) => (
                                                                 <SelectItem key={unit} value={unit}>{unit}</SelectItem>
                                                             ))}
                                                         </SelectContent>
@@ -812,7 +839,7 @@ export default function FactoryComponents() {
                                     variant="default"
                                     size="sm"
                                     className="mt-2 w-[300px]"
-                                    onClick={() => updateAppend({ partType: "", quantity: 1, unit: "" })}>
+                                    onClick={() => updateAppend({ materialName: "", quantityUsed: 1, unit: "" })}>
                                     Add Item
                                 </Button>
                             </div>
@@ -865,11 +892,28 @@ export default function FactoryComponents() {
         )
     }
 
+    if (isLoading || isEmpty(bookings?.data) || isError) {
+        return (
+            <div className="w-full h-screen flex flex-col justify-start gap-2">
+                <PageHeader />
+                <ToolRoomCardsLoader />
+            </div>
+        )
+    }
+
+    const filteredComponents = bookings?.data?.filter((booking: FactoryReference) => {
+        const matchesSearch = booking.factoryReferenceID.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesFilter = filter === "all" || booking.status === statuses[statuses.indexOf(filter)]
+        return matchesSearch && matchesFilter
+    })
+
+    console.log("filteredComponents", filteredComponents)
+
     return (
         <div className="w-full flex flex-col gap-2">
             <PageHeader />
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full overflow-y-scroll">
-                {filteredComponents.map((component, index: number) => <ToolRoomCard key={index} component={component} index={index} />)}
+                {filteredComponents?.map((component: FactoryReference, index: number) => <ToolRoomCard key={index} component={component} index={index} />)}
             </div>
             <DetailModal />
             <UpdateModal />
@@ -877,3 +921,42 @@ export default function FactoryComponents() {
         </div>
     )
 }
+
+const ToolRoomCardsLoader = () => {
+    return (
+        <div className="w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-1 w-full">
+                {Array.from({ length: 8 }).map((_, index) => (
+                    <motion.div
+                        key={index}
+                        className="relative bg-card rounded p-4 border shadow animate-pulse flex flex-col justify-start gap-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}>
+                        <div className="aspect-video w-full bg-gray-200 rounded mb-4 h-40 flex items-center justify-center" >
+                            <div className="w-full h-full flex items-center justify-center">
+                                <div className="loading">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-5 bg-gray-200 rounded w-1/2" />
+                        </div>
+                        <div className="space-y-3">
+                            <div className="h-4 bg-gray-200 rounded w-2/3" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-between">
+                            <div className="h-3 bg-gray-200 rounded w-1/4" />
+                            <div className="h-5 bg-gray-200 rounded w-1/12" />
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+};

@@ -54,10 +54,10 @@ export type BookingFormData = {
     checkInComments: string;
     damageRating: number;
     eta: string | Date;
-    peopleNeeded: string;
-    parts: {
-        partType: string;
-        quantity: number;
+    peopleNeeded: number;
+    materialsUsed: {
+        materialName: string;
+        quantityUsed: number;
         unit: string;
     }[];
     factoryReferenceID: string;
