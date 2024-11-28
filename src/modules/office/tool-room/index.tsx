@@ -753,7 +753,7 @@ export default function FactoryComponents() {
                                 )}
                             />
                             <div>
-                                <h3 className="text-lg font-semibold mb-2">Parts Needed</h3>
+                                <h3 className="text-lg font-semibold mb-2">Parts Used</h3>
                                 {updateFields.map((field, index) => (
                                     <div key={field.id} className="flex items-center justify-center space-x-2 mb-4">
                                         <FormField
@@ -834,7 +834,7 @@ export default function FactoryComponents() {
                             </div>
                             <DialogFooter>
                                 <div className="flex w-full gap-4">
-                                    <Button type="button" variant="default" onClick={handleCheckout} className="flex-1">Check Out</Button>
+                                    <Button type="button" variant="default" onClick={handleCheckout} className="flex-1">Update Booking</Button>
                                 </div>
                             </DialogFooter>
                         </form>

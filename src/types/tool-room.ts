@@ -94,15 +94,21 @@ export interface ToolRoomCardProps {
 }
 
 export interface BookingUpdate {
-    checkInComments: string;
-    checkOutComments: string | undefined;
-    checkOutDate: string;
-    checkedInBy: string;
-    checkedOutBy: string;
-    damageRating: number;
-    eta: string;
-    factoryReferenceID: string;
-    materialsUsed: MaterialUsed[];
-    peopleNeeded: number;
-    status: string;
-} 
+    checkInComments: string,
+    checkOutComments: string | undefined,
+    checkOutDate: string,
+    checkedInBy: string,
+    checkedOutBy: string,
+    damageRating: number,
+    eta: string,
+    factoryReferenceID: string,
+    materialsUsed: {
+        materialName: string,
+        quantityUsed: number,
+        unit: string
+    }[],
+    peopleNeeded: number,
+    status: string,
+}
+
+

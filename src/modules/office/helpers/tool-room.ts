@@ -14,8 +14,10 @@ export const createBooking = async (newBooking: BookingFormData, config: Request
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const updateBooking = async (referenceID: number, updatedBooking: any, config: RequestConfig) => {
     try {
+        console.log(updatedBooking, 'updated booking')
         const url = `${process.env.NEXT_PUBLIC_API_URL}/toolroom/${referenceID}`
         const { data: { message } } = await axios.patch(url, updatedBooking, config)
         return message;
