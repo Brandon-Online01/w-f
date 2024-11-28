@@ -345,3 +345,28 @@ export const navigationTour: DriveStep[] = [
         }
     }
 ];
+
+
+export const materials = [
+    // Metal Components
+    "Steel Plate", "Aluminum Sheet", "Copper Wire", "Brass Rod", "Stainless Steel Tube",
+
+    // Fasteners
+    "Hex Bolts", "Machine Screws", "Wood Screws", "Self-Tapping Screws",
+    "Lock Washers", "Flat Washers", "Spring Washers",
+    "Hex Nuts", "Lock Nuts", "Wing Nuts",
+    "Rivets", "Anchors", "Thread Inserts",
+
+    // Seals & Gaskets  
+    "Rubber Gasket", "O-Rings", "Silicone Seals", "Cork Gasket",
+
+    // Plastic Components
+    "Plastic Cover", "Nylon Spacers", "PVC Pipe", "Plastic Bushings",
+
+    // Electrical
+    "Wire Connectors", "Cable Ties", "Heat Shrink Tubing", "Electrical Tape",
+
+    // Tools & Consumables
+    "Cutting Fluid", "Machine Oil", "Grinding Wheels", "Drill Bits",
+    "Sanding Paper", "Welding Rod", "Safety Glasses", "Work Gloves"
+]

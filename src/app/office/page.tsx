@@ -7,6 +7,7 @@ import {
     ServerCog,
     Factory,
     Puzzle,
+    Bolt,
 } from "lucide-react";
 import {
     Tabs,
@@ -21,6 +22,7 @@ import ComponentsManagement from "@/modules/office/components";
 import MachinesManagement from "@/modules/office/machines";
 import { motion, AnimatePresence } from "framer-motion";
 import FactoryManagement from "@/modules/office/factory";
+import ToolRoomManagement from "@/modules/office/tool-room";
 
 export default function Home() {
     const tabVariants = {
@@ -56,6 +58,7 @@ export default function Home() {
     const TabListHeaders = () => {
         const tabItems = [
             { value: "factory", icon: Factory, label: "Factory" },
+            { value: "tool-room", icon: Bolt, label: "Tool Room" },
             { value: "machines", icon: ServerCog, label: "Machines" },
             { value: "moulds", icon: Puzzle, label: "Moulds" },
             { value: "components", icon: Component, label: "Components" },
@@ -94,7 +97,7 @@ export default function Home() {
                     <FolderKanban className="stroke-card-foreground" strokeWidth={1} size={18} />
                 </div>
                 <div className="w-full h-[98vh] bg-card p-1 rounded overflow-y-scroll mt-4">
-                    <Tabs defaultValue="factory" className="w-full overflow-hidden h-full">
+                    <Tabs defaultValue="tool-room" className="w-full overflow-hidden h-full">
                         <TabsList>
                             <TabListHeaders />
                         </TabsList>
@@ -107,6 +110,16 @@ export default function Home() {
                                 exit="exit">
                                 <TabsContent value="factory" className="w-full bg-background p-1 rounded">
                                     <FactoryManagement />
+                                </TabsContent>
+                            </motion.div>
+                            <motion.div
+                                key="tool-room"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit">
+                                <TabsContent value="tool-room" className="w-full bg-background p-1 rounded">
+                                    <ToolRoomManagement />
                                 </TabsContent>
                             </motion.div>
                             <motion.div
