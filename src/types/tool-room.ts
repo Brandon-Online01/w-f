@@ -61,5 +61,6 @@ export type BookingFormData = {
         unit: string;
     }[];
     factoryReferenceID: string;
+    checkInDate: string;
     itemReferenceCode: string;
 }

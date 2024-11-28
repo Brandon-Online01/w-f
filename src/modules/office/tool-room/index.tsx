@@ -40,7 +40,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { format } from "date-fns"
+import { format, formatDistanceToNow } from "date-fns"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -96,7 +96,7 @@ export default function FactoryComponents() {
     const [currentPage, setCurrentPage] = useState(1)
     const [isAddBookingOpen, setIsAddBookingOpen] = useState(false)
     const [filter, setFilter] = useState("all")
-    const [selectedComponent, setSelectedComponent] = useState<FactoryReference | null>(null)
+    const [selectedComponent, setSelectedComponent] = useState<ToolRoomCardProps | null>(null)
     const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false)
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
     const [updateForm, setUpdateForm] = useState<z.infer<typeof bookingFormSchema> | null>(null)
@@ -155,6 +155,8 @@ export default function FactoryComponents() {
     const handleAddBooking = async (values: z.infer<typeof bookingFormSchema>) => {
         if (!session) return
 
+        setIsAddBookingOpen(false)
+
         const sessionData = JSON.parse(session)
         const config = { headers: { 'token': sessionData?.state?.token } };
 
@@ -166,7 +168,8 @@ export default function FactoryComponents() {
             peopleNeeded: parseInt(peopleNeeded),
             damageRating: parseInt(damageRating),
             factoryReferenceID: `${sessionData?.state?.user?.factoryReferenceID}`,
-            itemReferenceCode: `${selectMould}`
+            itemReferenceCode: `${selectMould}`,
+            checkInDate: `${new Date()}`,
         }
 
         const message = await createBooking(newBooking, config)
@@ -182,9 +185,6 @@ export default function FactoryComponents() {
                     },
                 }
             );
-
-            setIsAddBookingOpen(false)
-            form.reset()
         }
     }
 
@@ -347,8 +347,7 @@ export default function FactoryComponents() {
                                                         <FormControl>
                                                             <Button
                                                                 variant={"outline"}
-                                                                className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                                            >
+                                                                className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}>
                                                                 {field.value ? (
                                                                     format(field.value, "PPP")
                                                                 ) : (
@@ -477,8 +476,7 @@ export default function FactoryComponents() {
                                         variant="outline"
                                         size="sm"
                                         className="mt-2"
-                                        onClick={() => append({ materialName: "", quantityUsed: 1, unit: "" })}
-                                    >
+                                        onClick={() => append({ materialName: "", quantityUsed: 1, unit: "" })}>
                                         Add Item
                                     </Button>
                                 </div>
@@ -493,29 +491,36 @@ export default function FactoryComponents() {
         )
     }
 
-    const ToolRoomCard = ({ component, index }: { component: FactoryReference, index: number }) => {
+    const ToolRoomCard = ({ component, index }: { component: ToolRoomCardProps, index: number }) => {
+        const { factoryReferenceID, status, damageRating, eta, selectMould, peopleNeeded, materialsUsed, checkedInBy, checkInComments, checkInDate } = component
 
-        console.log("component", component)
+        console.log(checkInDate)
 
         return (
             <Card key={index} className="relative group bg-card">
                 <CardContent className="p-3">
                     <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold">{component.factoryReferenceID}</h3>
+                        <h3 className="font-semibold">{selectMould}</h3>
                         <Badge variant="secondary" className="bg-green-100 text-green-800">
-                            {component.status}
+                            {status}
                         </Badge>
                     </div>
                     <div className="flex justify-between items-center text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <Timer className="h-4 w-4" />
-                            <span className="text-card-foreground">Damage: {component.damageRating}/5</span>
+                            <span className="text-card-foreground">Damage: {damageRating}/5</span>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                            <Timer className="h-4 w-4" />
+                            <span className="text-card-foreground">Elapsed Time: ~ {formatDistanceToNow(new Date(checkInDate), { addSuffix: true })}</span>
                         </div>
                     </div>
                     <div className="flex justify-between items-center text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <Calendar1Icon className="h-4 w-4" />
-                            <span className="text-card-foreground">Ready By: {format(new Date(component.eta), "PPP")}</span>
+                            <span className="text-card-foreground">Ready By: {format(new Date(eta), "PPP")}</span>
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -533,17 +538,17 @@ export default function FactoryComponents() {
                                 <DropdownMenuItem onSelect={() => {
                                     setSelectedComponent(component)
                                     setUpdateForm({
-                                        selectMould: component.factoryReferenceID.split('-')[2],
-                                        checkedInBy: component.checkedInBy,
-                                        status: component.status,
-                                        checkInComments: component.checkInComments,
-                                        damageRating: component.damageRating.toString(),
+                                        selectMould: factoryReferenceID.split('-')[2],
+                                        checkedInBy: checkedInBy,
+                                        status: status,
+                                        checkInComments: checkInComments,
+                                        damageRating: damageRating.toString(),
                                         eta: new Date(),
-                                        peopleNeeded: "1",
-                                        materialsUsed: component.materialsUsed.map(m => ({
-                                            materialName: m.materialName,
-                                            quantityUsed: m.quantityUsed,
-                                            unit: m.unit
+                                        peopleNeeded: peopleNeeded.toString(),
+                                        materialsUsed: materialsUsed?.map(m => ({
+                                            materialName: m?.materialName,
+                                            quantityUsed: m?.quantityUsed,
+                                            unit: m?.unit
                                         }))
                                     })
                                     setIsUpdateModalOpen(true)
@@ -907,13 +912,11 @@ export default function FactoryComponents() {
         return matchesSearch && matchesFilter
     })
 
-    console.log("filteredComponents", filteredComponents)
-
     return (
         <div className="w-full flex flex-col gap-2">
             <PageHeader />
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 w-full overflow-y-scroll">
-                {filteredComponents?.map((component: FactoryReference, index: number) => <ToolRoomCard key={index} component={component} index={index} />)}
+                {filteredComponents?.map((component: ToolRoomCardProps, index: number) => <ToolRoomCard key={index} component={component} index={index} />)}
             </div>
             <DetailModal />
             <UpdateModal />
@@ -929,29 +932,30 @@ const ToolRoomCardsLoader = () => {
                 {Array.from({ length: 8 }).map((_, index) => (
                     <motion.div
                         key={index}
-                        className="relative bg-card rounded p-4 border shadow animate-pulse flex flex-col justify-start gap-2"
+                        className="relative bg-card rounded p-4 h-36 border shadow animate-pulse flex flex-col justify-start gap-2"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}>
-                        <div className="aspect-video w-full bg-gray-200 rounded mb-4 h-40 flex items-center justify-center" >
-                            <div className="w-full h-full flex items-center justify-center">
-                                <div className="loading">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
+                        <div className="aspect-video w-full rounded mb-4 h-full flex items-center justify-center absolute top-0 left-0 right-0 bottom-0 bg-background/50" >
+                            <div className="loading">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 justify-between">
                             <div className="h-5 bg-gray-200 rounded w-1/2" />
+                            <div className="h-5 bg-gray-200 rounded w-2/12" />
                         </div>
                         <div className="space-y-3">
-                            <div className="h-4 bg-gray-200 rounded w-2/3" />
+                            <div className="h-4 bg-gray-200 rounded w-2/12" />
                         </div>
-                        <div className="flex items-center gap-2 justify-between">
-                            <div className="h-3 bg-gray-200 rounded w-1/4" />
+                        <div className="flex items-center gap-2 justify-start">
+                            <div className="h-3 bg-gray-200 rounded w-1/2" />
+                        </div>
+                        <div className="flex items-center gap-2 justify-end">
                             <div className="h-5 bg-gray-200 rounded w-1/12" />
                         </div>
                     </motion.div>
@@ -960,3 +964,28 @@ const ToolRoomCardsLoader = () => {
         </div>
     );
 };
+
+interface ToolRoomCardProps {
+    uid: number,
+    factoryReferenceID: string,
+    itemReferenceCode: string,
+    checkedInBy: string,
+    checkedOutBy: string | null,
+    checkInDate: string,
+    checkOutDate: string | null,
+    checkInComments: string,
+    checkOutComments: string | null,
+    repairComments: string | null,
+    damageRating: number,
+    turnaroundTime: string | null,
+    status: string,
+    selectMould: string,
+    eta: string,
+    peopleNeeded: number,
+    materialsUsed: {
+        uid: number,
+        materialName: string,
+        quantityUsed: number,
+        unit: string
+    }[]
+}
